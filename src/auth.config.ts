@@ -1,4 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
+import "next-auth/jwt";
 import type { Role } from "@prisma/client";
 
 declare module "next-auth" {
