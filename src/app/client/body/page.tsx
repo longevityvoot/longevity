@@ -34,46 +34,75 @@ export default async function BodyPage() {
       }),
     ]);
 
+  // Weight delta vs ~30 days ago (or earliest in window if no older sample).
+  let weightDelta: number | null = null;
+  if (latestWeight && weightHistory.length >= 2) {
+    const threshold = new Date();
+    threshold.setDate(threshold.getDate() - 30);
+    const older =
+      weightHistory.find((m) => m.measuredAt <= threshold) ?? weightHistory[0];
+    if (older) {
+      weightDelta = +(latestWeight.value - older.value).toFixed(1);
+    }
+  }
+
+  const bmi =
+    latestWeight && profile?.heightCm
+      ? +(latestWeight.value / Math.pow(profile.heightCm / 100, 2)).toFixed(1)
+      : null;
+
   return (
-    <main className="min-h-screen bg-canvas pb-24">
+    <main className="min-h-screen bg-canvas pb-32">
       <div className="max-w-[420px] mx-auto px-5 pt-6">
         <Link href="/client" className="text-[13px] text-ink-3 inline-flex items-center gap-1">
-          ← กลับ dashboard
+          ← กลับ
         </Link>
         <header className="mt-3">
-          <h1 className="text-[22px] font-semibold tracking-tight text-ink">
-            Body & Vitals
-          </h1>
-          <p className="text-[12px] text-ink-3 mt-1">
-            น้ำหนัก / รอบเอว / ความดัน / น้ำตาล
+          <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+            Vitals
           </p>
+          <h1 className="text-[22px] font-semibold tracking-tight text-ink mt-0.5">
+            ร่างกายของคุณ
+          </h1>
         </header>
 
         {/* Weight hero */}
         <section className="mt-5 bg-surface border border-border rounded-xl p-5">
           <div className="flex items-baseline justify-between">
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-                น้ำหนัก
-              </p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-2">
+                <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+                  น้ำหนัก
+                </p>
+                <CadenceChip text={profile?.weightCadence ?? "weekly"} />
+              </div>
               {latestWeight ? (
-                <p className="text-[36px] font-bold font-num tabular-nums leading-none text-ink mt-1">
-                  {latestWeight.value}
-                  <span className="text-[14px] text-ink-4 ml-1 font-medium">kg</span>
-                </p>
+                <>
+                  <p className="text-[44px] font-bold font-num tabular-nums leading-none text-ink mt-1">
+                    {latestWeight.value}
+                    <span className="text-[14px] text-ink-4 ml-1 font-medium">kg</span>
+                  </p>
+                  <div className="mt-1.5 flex items-center gap-2 text-[11px]">
+                    {weightDelta != null && weightDelta !== 0 ? (
+                      <span
+                        className={`font-semibold ${
+                          weightDelta < 0 ? "text-pillar-social" : "text-pillar-stress"
+                        }`}
+                      >
+                        {weightDelta > 0 ? "↑" : "↓"} {Math.abs(weightDelta)} kg /30d
+                      </span>
+                    ) : null}
+                    {bmi != null ? (
+                      <span className="text-ink-4">
+                        BMI <span className="font-num font-semibold text-ink-2">{bmi}</span>
+                      </span>
+                    ) : null}
+                  </div>
+                </>
               ) : (
-                <p className="text-[24px] text-ink-4 mt-2">ยังไม่มีข้อมูล</p>
+                <p className="text-[20px] text-ink-4 mt-2">ยังไม่มีข้อมูล</p>
               )}
-              {latestWeight && profile?.heightCm ? (
-                <p className="text-[12px] text-ink-3 mt-1">
-                  BMI{" "}
-                  {(
-                    latestWeight.value / Math.pow(profile.heightCm / 100, 2)
-                  ).toFixed(1)}
-                </p>
-              ) : null}
             </div>
-            <CadenceChip text={profile?.weightCadence ?? "weekly"} />
           </div>
           <div className="mt-3">
             <TrendChart
@@ -83,19 +112,20 @@ export default async function BodyPage() {
               color="#14142B"
             />
           </div>
-          <p className="text-[11px] text-ink-4 mt-2">60 วันล่าสุด</p>
+          <p className="text-[10px] text-ink-4 mt-1">60 วันล่าสุด</p>
         </section>
 
         {/* 3 metric cards */}
-        <section className="mt-3 grid grid-cols-1 gap-3">
+        <section className="mt-3 grid grid-cols-1 gap-2.5">
           <MetricCard
             label="รอบเอว"
             value={latestWaist ? `${latestWaist.value} cm` : "—"}
             cadence={profile?.waistCadence ?? "biweekly"}
             href="/client/body/log?tab=waist"
+            icon="📏"
           />
           <MetricCard
-            label="ความดัน"
+            label="ความดันโลหิต"
             value={
               bp[0] && typeof bp[0].values === "object" && bp[0].values
                 ? `${(bp[0].values as { sys: number }).sys}/${(bp[0].values as { dia: number }).dia}`
@@ -104,6 +134,7 @@ export default async function BodyPage() {
             cadence={profile?.bpCadence ?? "as-needed"}
             flag={bp[0]?.flag ?? null}
             href="/client/body/log?tab=bp"
+            icon="❤️"
           />
           <MetricCard
             label="น้ำตาลในเลือด"
@@ -115,6 +146,7 @@ export default async function BodyPage() {
             cadence={profile?.glucoseCadence ?? "as-needed"}
             flag={glucose[0]?.flag ?? null}
             href="/client/body/log?tab=glucose"
+            icon="🩸"
           />
         </section>
 
@@ -128,17 +160,23 @@ export default async function BodyPage() {
                 const v = r.values as { sys: number; dia: number; hr?: number };
                 return (
                   <li key={r.id} className="py-2 flex items-center gap-2 text-[13px]">
-                    <span className="font-num tabular-nums font-semibold text-ink w-20">
+                    <span className="font-num tabular-nums font-semibold text-ink w-16">
                       {v.sys}/{v.dia}
                     </span>
+                    {v.hr ? (
+                      <span className="text-[11px] text-ink-4">{v.hr} bpm</span>
+                    ) : null}
                     {r.flag ? <FlagPill flag={r.flag} /> : null}
-                    <span className="ml-auto text-[11px] text-ink-4">
+                    <span className="ml-auto text-[10px] text-ink-4 text-right">
                       {r.measuredAt.toLocaleString("th-TH", {
                         day: "numeric",
                         month: "short",
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
+                      {r.context ? (
+                        <span className="block text-ink-4">{r.context}</span>
+                      ) : null}
                     </span>
                   </li>
                 );
@@ -165,26 +203,35 @@ function MetricCard({
   cadence,
   flag,
   href,
+  icon,
 }: {
   label: string;
   value: string;
   cadence: string;
   flag?: string | null;
   href: string;
+  icon: string;
 }) {
   return (
     <Link
       href={href}
-      className="bg-surface border border-border rounded-lg p-4 flex items-center justify-between"
+      className="bg-surface border border-border rounded-lg p-4 flex items-center gap-3"
     >
-      <div>
+      <span className="text-[24px] size-12 inline-flex items-center justify-center rounded-full bg-canvas">
+        {icon}
+      </span>
+      <div className="flex-1 min-w-0">
         <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
           {label}
         </p>
-        <p className="text-[20px] font-bold font-num tabular-nums text-ink mt-1">
+        <p className="text-[20px] font-bold font-num tabular-nums text-ink leading-none mt-1">
           {value}
         </p>
-        {flag ? <FlagPill flag={flag} /> : null}
+        {flag ? (
+          <div className="mt-1.5">
+            <FlagPill flag={flag} />
+          </div>
+        ) : null}
       </div>
       <CadenceChip text={cadence} />
     </Link>
@@ -201,7 +248,7 @@ function CadenceChip({ text }: { text: string }) {
     "scheduled-daily": "ทุกวัน (นัด)",
   };
   return (
-    <span className="text-[11px] text-ink-3 bg-canvas border border-border rounded-pill px-2 py-0.5">
+    <span className="text-[10px] text-ink-3 bg-canvas border border-border rounded-pill px-2 py-0.5 whitespace-nowrap">
       {map[text] ?? text}
     </span>
   );
@@ -216,7 +263,7 @@ function FlagPill({ flag }: { flag: string }) {
       ? "bg-pillar-stress-wash text-pillar-stress"
       : "bg-pillar-social-wash text-pillar-social";
   return (
-    <span className={`mt-1 inline-flex text-[10px] font-semibold px-1.5 py-0.5 rounded-pill ${cls}`}>
+    <span className={`inline-flex text-[10px] font-semibold px-1.5 py-0.5 rounded-pill ${cls}`}>
       {flag}
     </span>
   );
