@@ -227,7 +227,8 @@ export default async function ClientHome() {
           <h2 className="text-[14px] font-semibold text-ink mb-3 px-1">
             บันทึก
           </h2>
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-2 gap-2.5">
+            <ShortcutTile href="/client/nutrition" label="อาหาร" hint="kcal วันนี้" icon={<UtensilIcon />} tone="nutrition" />
             <ShortcutTile href="/client/body" label="บอดี้" hint="น้ำหนัก · BP" icon={<HeartIcon />} tone="activity" />
             <ShortcutTile href="/client/labs" label="ผลแล็บ" hint="เลือด" icon={<FlaskIcon />} tone="substances" />
             <ShortcutTile href="/client/meds" label="ยา" hint="วันนี้" icon={<PillIcon />} tone="stress" />
@@ -291,13 +292,15 @@ function ShortcutTile({
   label: string;
   hint: string;
   icon: React.ReactNode;
-  tone: "activity" | "substances" | "stress";
+  tone: "activity" | "substances" | "stress" | "nutrition";
 }) {
   const cls =
     tone === "activity"
       ? "bg-pillar-activity-wash text-pillar-activity"
       : tone === "substances"
       ? "bg-pillar-substances-wash text-pillar-substances"
+      : tone === "nutrition"
+      ? "bg-pillar-nutrition-wash text-pillar-nutrition"
       : "bg-pillar-stress-wash text-pillar-stress";
   return (
     <Link
@@ -342,6 +345,16 @@ function PillIcon() {
     <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
       <rect x={3.5} y={9} width={17} height={6} rx={3} transform="rotate(-30 12 12)" />
       <path d="M11 6.5l3 5.2" />
+    </svg>
+  );
+}
+function UtensilIcon() {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7 3v8a2 2 0 002 2v8" />
+      <path d="M5 3v6" />
+      <path d="M9 3v6" />
+      <path d="M16 3c-1.5 0-3 1.5-3 5s1.5 5 3 5v8" />
     </svg>
   );
 }
