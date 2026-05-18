@@ -52,7 +52,7 @@ export default async function BodyPage() {
       : null;
 
   return (
-    <main className="min-h-screen bg-canvas pb-32">
+    <main className="min-h-screen bg-canvas pb-6">
       <div className="max-w-[420px] mx-auto px-5 pt-6">
         <Link href="/client" className="text-[13px] text-ink-3 inline-flex items-center gap-1">
           ← กลับ
@@ -66,8 +66,15 @@ export default async function BodyPage() {
           </h1>
         </header>
 
+        <Link
+          href="/client/body/log"
+          className="mt-4 inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-ink text-white text-[13.5px] font-semibold"
+        >
+          + บันทึกค่าวันนี้
+        </Link>
+
         {/* Weight hero */}
-        <section className="mt-5 bg-surface border border-border rounded-xl p-5">
+        <section className="mt-4 bg-surface border border-border rounded-xl p-5">
           <div className="flex items-baseline justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-2">
@@ -184,13 +191,6 @@ export default async function BodyPage() {
           </section>
         ) : null}
 
-        <Link
-          href="/client/body/log"
-          className="fixed left-0 right-0 bottom-16 bg-pillar-activity text-white font-semibold text-[15px] flex items-center justify-center h-14 z-20 max-w-[420px] mx-auto rounded-t-xl"
-          style={{ boxShadow: "0 -4px 12px rgba(255, 107, 107, 0.20)" }}
-        >
-          + บันทึกค่าวันนี้
-        </Link>
       </div>
     </main>
   );
