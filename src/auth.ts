@@ -43,12 +43,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientId: process.env.LINE_CHANNEL_ID,
             clientSecret: process.env.LINE_CHANNEL_SECRET,
             authorization: {
-              // openid + profile only — `email` scope on LINE requires a
-              // separately approved permission. We synthesize an email
-              // from the LINE user ID below so PrismaAdapter's unique
-              // email constraint stays satisfied without that hurdle.
               params: { scope: "openid profile" },
             },
+            // LINE's authorize endpoint rejects requests without `state`.
+            // NextAuth v5 defaults the LINE provider to PKCE-only — bring
+            // state back explicitly so the authorization URL carries both.
+            checks: ["pkce", "state"],
             profile(profile) {
               return {
                 id: profile.sub,
