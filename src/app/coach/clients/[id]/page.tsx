@@ -133,8 +133,8 @@ export default async function ClientDetailPage({
             <div className="bg-surface border border-border rounded-xl p-5 flex items-center gap-5">
               <MultiDonut
                 rings={rings}
-                size={180}
-                thickness={9}
+                size={200}
+                thickness={6}
                 ringGap={3}
                 centerValue={client.todayOverall != null ? String(client.todayOverall) : "—"}
                 centerLabel="คะแนนวันนี้"
