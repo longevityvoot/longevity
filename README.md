@@ -59,7 +59,7 @@ pnpm dev
 - [x] Phase 3 — Donut component (Garmin-style segmented SVG: DonutScore + MultiDonut, wired into dashboard)
 - [x] Phase 4 — Designer dashboard + client detail (client list w/ alerts, 3-col detail w/ profile + scores + 14d table)
 - [x] Phase 5 — Sessions + chat + invoices (create session/invoice, toggle paid, shared thread per client)
-- [ ] Phase 8 — Body & Vitals (v0.2)
+- [x] Phase 8 — Body & Vitals (BodyMeasurement + VitalReading models, weight/waist/BP/glucose log, server-side flagging, trend chart)
 - [ ] Phase 9 — Lab Results (v0.2)
 - [ ] Phase 10 — Meds (v0.2)
 - [ ] Phase 6 — Google Health API
