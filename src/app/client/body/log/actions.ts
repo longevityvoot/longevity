@@ -12,6 +12,7 @@ export async function logBodyMeasurement(type: "weight" | "waist", form: FormDat
   const value = Number(form.get("value"));
   if (!Number.isFinite(value)) return;
   const context = (form.get("context") as string | null) ?? null;
+  const notes = ((form.get("notes") as string | null) ?? "").trim() || null;
 
   await prisma.bodyMeasurement.create({
     data: {
@@ -21,6 +22,7 @@ export async function logBodyMeasurement(type: "weight" | "waist", form: FormDat
       unit: type === "weight" ? "kg" : "cm",
       measuredAt: new Date(),
       context,
+      notes,
     },
   });
 
@@ -38,6 +40,7 @@ export async function logBpReading(form: FormData) {
   if (!Number.isFinite(sys) || !Number.isFinite(dia)) return;
 
   const context = (form.get("context") as string | null) ?? "morning";
+  const notes = ((form.get("notes") as string | null) ?? "").trim() || null;
   const flag = computeBpFlag(sys, dia);
 
   await prisma.vitalReading.create({
@@ -48,6 +51,7 @@ export async function logBpReading(form: FormData) {
       context,
       values: hr != null ? { sys, dia, hr } : { sys, dia },
       flag,
+      notes,
     },
   });
 
@@ -61,6 +65,7 @@ export async function logGlucoseReading(form: FormData) {
   const value = Number(form.get("value"));
   if (!Number.isFinite(value)) return;
   const context = ((form.get("context") as string | null) ?? "random") as GlucoseContext;
+  const notes = ((form.get("notes") as string | null) ?? "").trim() || null;
   const flag = computeGlucoseFlag(value, context);
 
   await prisma.vitalReading.create({
@@ -71,6 +76,7 @@ export async function logGlucoseReading(form: FormData) {
       context,
       values: { value, unit: "mg/dL" },
       flag,
+      notes,
     },
   });
 
