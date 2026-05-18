@@ -95,7 +95,7 @@ export default async function NewMedicationPage({
             <legend className="text-[12px] text-ink-3 font-semibold">แนะนำโดย</legend>
             <div className="mt-2 flex gap-3 flex-wrap">
               <Radio name="source" value="doctor" label="แพทย์" defaultChecked />
-              <Radio name="source" value="pharmacist" label="เภสัชกร" />
+              <Radio name="source" value="pharmacist" label="ร้านยา" />
               <Radio name="source" value="coach" label="designer" />
               <Radio name="source" value="self" label="ตัวเอง" />
             </div>
