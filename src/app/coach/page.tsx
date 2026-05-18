@@ -26,16 +26,24 @@ export default async function CoachDashboard() {
               {session.user.name}
             </h1>
           </div>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
-            <button className="text-[13px] text-ink-3 hover:underline">
-              ออกจากระบบ
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/coach/clients/new"
+              className="h-10 px-4 inline-flex items-center rounded-md bg-ink text-white text-[13px] font-semibold"
+            >
+              + ลูกค้าใหม่
+            </Link>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/login" });
+              }}
+            >
+              <button className="text-[13px] text-ink-3 hover:underline">
+                ออกจากระบบ
+              </button>
+            </form>
+          </div>
         </header>
 
         <section className="mt-6 grid grid-cols-3 gap-3">
