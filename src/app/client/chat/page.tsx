@@ -28,7 +28,7 @@ export default async function ClientChatPage() {
 
         <form
           action={sendMessageAsClient}
-          className="fixed left-0 right-0 bottom-0 bg-surface border-t border-border px-5 py-3 z-10"
+          className="fixed left-0 right-0 bottom-16 bg-surface border-t border-border px-5 py-3 z-20"
         >
           <div className="max-w-[420px] mx-auto flex gap-2">
             <input
