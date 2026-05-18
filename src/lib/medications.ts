@@ -77,3 +77,31 @@ export function adherence7d(logs: Array<{ taken: boolean }>): number {
   const taken = logs.filter((l) => l.taken).length;
   return Math.round((taken / logs.length) * 100);
 }
+
+// 7-day taken/missed vector ending today. Each entry is true if any slot
+// on that day has a positive log, false if logged but missed, null if
+// the day has no log yet. Powers the small 7-bar adherence pattern.
+export function adherenceVector7d(
+  logs: Array<{ date: Date; taken: boolean }>,
+  today: Date,
+): Array<{ date: Date; taken: boolean | null }> {
+  const map = new Map<string, boolean>();
+  for (const l of logs) {
+    const key = isoDay(l.date);
+    if (l.taken) map.set(key, true);
+    else if (!map.has(key)) map.set(key, false);
+  }
+  const out: Array<{ date: Date; taken: boolean | null }> = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = isoDay(d);
+    const taken = map.has(key) ? (map.get(key) as boolean) : null;
+    out.push({ date: d, taken });
+  }
+  return out;
+}
+
+function isoDay(d: Date): string {
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
