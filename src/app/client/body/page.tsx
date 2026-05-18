@@ -6,184 +6,232 @@ import {
   getLatestWeight,
   getLatestWaist,
   getWeightHistory,
+  getWeightAround,
   getRecentVitals,
 } from "@/lib/body";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { flagTone } from "@/lib/vitals";
 
-export default async function BodyPage() {
+type SearchParams = Promise<{ range?: string }>;
+
+export default async function BodyPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const [latestWeight, latestWaist, weightHistory, bp, glucose, profile] =
-    await Promise.all([
-      getLatestWeight(session.user.id),
-      getLatestWaist(session.user.id),
-      getWeightHistory(session.user.id, 60),
-      getRecentVitals(session.user.id, "bp", 5),
-      getRecentVitals(session.user.id, "glucose", 5),
-      prisma.clientProfile.findUnique({
-        where: { userId: session.user.id },
-        select: {
-          heightCm: true,
-          weightCadence: true,
-          waistCadence: true,
-          bpCadence: true,
-          glucoseCadence: true,
-        },
-      }),
-    ]);
+  const { range = "30" } = await searchParams;
+  const days = range === "7" ? 7 : range === "90" ? 90 : 30;
 
-  // Weight delta vs ~30 days ago (or earliest in window if no older sample).
-  let weightDelta: number | null = null;
-  if (latestWeight && weightHistory.length >= 2) {
-    const threshold = new Date();
-    threshold.setDate(threshold.getDate() - 30);
-    const older =
-      weightHistory.find((m) => m.measuredAt <= threshold) ?? weightHistory[0];
-    if (older) {
-      weightDelta = +(latestWeight.value - older.value).toFixed(1);
-    }
-  }
+  const [
+    latestWeight,
+    latestWaist,
+    weightHistory,
+    bp,
+    glucose,
+    profile,
+    weightAtRange,
+  ] = await Promise.all([
+    getLatestWeight(session.user.id),
+    getLatestWaist(session.user.id),
+    getWeightHistory(session.user.id, days),
+    getRecentVitals(session.user.id, "bp", 5),
+    getRecentVitals(session.user.id, "glucose", 5),
+    prisma.clientProfile.findUnique({
+      where: { userId: session.user.id },
+      select: {
+        heightCm: true,
+        weightCadence: true,
+        waistCadence: true,
+        bpCadence: true,
+        glucoseCadence: true,
+      },
+    }),
+    getWeightAround(session.user.id, days),
+  ]);
+
+  const weightDelta =
+    latestWeight && weightAtRange
+      ? +(latestWeight.value - weightAtRange.value).toFixed(1)
+      : null;
 
   const bmi =
     latestWeight && profile?.heightCm
       ? +(latestWeight.value / Math.pow(profile.heightCm / 100, 2)).toFixed(1)
       : null;
 
+  const latestBp = bp[0]
+    ? (bp[0].values as { sys: number; dia: number })
+    : null;
+  const latestGlucose = glucose[0]
+    ? (glucose[0].values as { value: number })
+    : null;
+
   return (
     <main className="min-h-screen bg-canvas pb-6">
-      <div className="max-w-[420px] mx-auto px-5 pt-6">
-        <Link href="/client" className="text-[13px] text-ink-3 inline-flex items-center gap-1">
-          ← กลับ
-        </Link>
-        <header className="mt-3">
-          <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-            Vitals
-          </p>
-          <h1 className="text-[22px] font-semibold tracking-tight text-ink mt-0.5">
-            ร่างกายของคุณ
-          </h1>
-        </header>
+      <header className="sticky top-0 z-20 bg-canvas/95 backdrop-blur border-b border-border">
+        <div className="max-w-[420px] mx-auto px-5 py-3 flex items-center gap-3">
+          <Link
+            href="/client"
+            className="size-9 inline-flex items-center justify-center rounded-full bg-surface border border-border text-ink-3"
+            aria-label="กลับ"
+          >
+            ←
+          </Link>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.1em] text-pillar-activity font-bold">
+              Vitals
+            </p>
+            <p className="text-[15px] font-semibold text-ink leading-tight">
+              การวัดร่างกาย
+            </p>
+          </div>
+          <Link
+            href="/client/body/log"
+            className="text-[12px] text-ink-3 font-semibold"
+          >
+            +บันทึก
+          </Link>
+        </div>
+      </header>
 
-        <Link
-          href="/client/body/log"
-          className="mt-4 inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-ink text-white text-[13.5px] font-semibold"
-        >
-          + บันทึกค่าวันนี้
-        </Link>
+      <div className="max-w-[420px] mx-auto px-5 pt-4">
+        {/* Profile context strip */}
+        <section className="text-[11px] text-ink-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 px-1">
+          {profile?.heightCm ? (
+            <span>
+              ส่วนสูง <span className="text-ink-2 font-num font-semibold">{profile.heightCm}</span> cm
+            </span>
+          ) : null}
+          {bmi != null ? (
+            <span>
+              BMI <span className="text-ink-2 font-num font-semibold">{bmi}</span>
+            </span>
+          ) : null}
+          {latestWaist ? (
+            <span>
+              รอบเอว <span className="text-ink-2 font-num font-semibold">{latestWaist.value}</span> cm
+            </span>
+          ) : null}
+        </section>
 
         {/* Weight hero */}
-        <section className="mt-4 bg-surface border border-border rounded-xl p-5">
-          <div className="flex items-baseline justify-between">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-2">
-                <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-                  น้ำหนัก
-                </p>
-                <CadenceChip text={profile?.weightCadence ?? "weekly"} />
-              </div>
-              {latestWeight ? (
-                <>
-                  <p className="text-[44px] font-bold font-num tabular-nums leading-none text-ink mt-1">
-                    {latestWeight.value}
-                    <span className="text-[14px] text-ink-4 ml-1 font-medium">kg</span>
-                  </p>
-                  <div className="mt-1.5 flex items-center gap-2 text-[11px]">
-                    {weightDelta != null && weightDelta !== 0 ? (
-                      <span
-                        className={`font-semibold ${
-                          weightDelta < 0 ? "text-pillar-social" : "text-pillar-stress"
-                        }`}
-                      >
-                        {weightDelta > 0 ? "↑" : "↓"} {Math.abs(weightDelta)} kg /30d
-                      </span>
-                    ) : null}
-                    {bmi != null ? (
-                      <span className="text-ink-4">
-                        BMI <span className="font-num font-semibold text-ink-2">{bmi}</span>
-                      </span>
-                    ) : null}
-                  </div>
-                </>
-              ) : (
-                <p className="text-[20px] text-ink-4 mt-2">ยังไม่มีข้อมูล</p>
-              )}
+        <section className="mt-4 bg-surface rounded-xl p-5 border border-border">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-bold">
+            น้ำหนัก
+          </p>
+          {latestWeight ? (
+            <div className="mt-1 flex items-baseline gap-3">
+              <span className="text-[48px] font-bold font-num tabular-nums leading-none text-ink">
+                {latestWeight.value}
+              </span>
+              <span className="text-[13px] text-ink-4 font-medium">kg</span>
+              {weightDelta != null && weightDelta !== 0 ? (
+                <span
+                  className={`text-[12px] font-semibold px-2 py-0.5 rounded-pill ml-auto ${
+                    weightDelta < 0
+                      ? "bg-pillar-social-wash text-pillar-social"
+                      : "bg-pillar-stress-wash text-pillar-stress"
+                  }`}
+                >
+                  {weightDelta > 0 ? "↑" : "↓"} {Math.abs(weightDelta)} kg
+                </span>
+              ) : null}
             </div>
-          </div>
-          <div className="mt-3">
+          ) : (
+            <p className="text-[20px] text-ink-4 mt-2">ยังไม่มีข้อมูล</p>
+          )}
+          <div className="mt-4">
             <TrendChart
               data={weightHistory.map((m) => ({ x: m.measuredAt, y: m.value }))}
               height={120}
               color="#14142B"
             />
           </div>
-          <p className="text-[10px] text-ink-4 mt-1">60 วันล่าสุด</p>
+          <nav className="mt-3 inline-flex bg-canvas border border-border rounded-pill p-1 gap-0.5">
+            {[
+              { v: "7", label: "7 วัน" },
+              { v: "30", label: "30 วัน" },
+              { v: "90", label: "90 วัน" },
+            ].map((r) => (
+              <Link
+                key={r.v}
+                href={`/client/body?range=${r.v}`}
+                className={`px-3.5 h-7 rounded-pill text-[11px] font-semibold inline-flex items-center ${
+                  range === r.v
+                    ? "bg-ink text-white"
+                    : "text-ink-3"
+                }`}
+              >
+                {r.label}
+              </Link>
+            ))}
+          </nav>
         </section>
 
-        {/* 3 metric cards */}
-        <section className="mt-3 grid grid-cols-1 gap-2.5">
-          <MetricCard
+        {/* Vitals card row */}
+        <section className="mt-3 grid grid-cols-3 gap-2.5">
+          <VitalCard
             label="รอบเอว"
-            value={latestWaist ? `${latestWaist.value} cm` : "—"}
-            cadence={profile?.waistCadence ?? "biweekly"}
+            value={latestWaist ? `${latestWaist.value}` : "—"}
+            unit="cm"
             href="/client/body/log?tab=waist"
-            icon="📏"
+            cadence={profile?.waistCadence ?? "biweekly"}
           />
-          <MetricCard
-            label="ความดันโลหิต"
-            value={
-              bp[0] && typeof bp[0].values === "object" && bp[0].values
-                ? `${(bp[0].values as { sys: number }).sys}/${(bp[0].values as { dia: number }).dia}`
-                : "—"
-            }
-            cadence={profile?.bpCadence ?? "as-needed"}
-            flag={bp[0]?.flag ?? null}
+          <VitalCard
+            label="ความดัน"
+            value={latestBp ? `${latestBp.sys}/${latestBp.dia}` : "—"}
+            unit="mmHg"
             href="/client/body/log?tab=bp"
-            icon="❤️"
+            flag={bp[0]?.flag ?? null}
+            cadence={profile?.bpCadence ?? "as-needed"}
           />
-          <MetricCard
-            label="น้ำตาลในเลือด"
-            value={
-              glucose[0] && typeof glucose[0].values === "object" && glucose[0].values
-                ? `${(glucose[0].values as { value: number }).value} mg/dL`
-                : "—"
-            }
-            cadence={profile?.glucoseCadence ?? "as-needed"}
-            flag={glucose[0]?.flag ?? null}
+          <VitalCard
+            label="น้ำตาล"
+            value={latestGlucose ? `${latestGlucose.value}` : "—"}
+            unit="mg/dL"
             href="/client/body/log?tab=glucose"
-            icon="🩸"
+            flag={glucose[0]?.flag ?? null}
+            cadence={profile?.glucoseCadence ?? "as-needed"}
           />
         </section>
 
         {bp.length > 0 ? (
           <section className="mt-5 bg-surface border border-border rounded-lg p-4">
-            <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+            <h2 className="text-[10px] uppercase tracking-wider text-ink-4 font-bold">
               ความดันล่าสุด
-            </p>
-            <ul className="mt-2 divide-y divide-border">
+            </h2>
+            <ul className="mt-2.5 divide-y divide-border">
               {bp.map((r) => {
                 const v = r.values as { sys: number; dia: number; hr?: number };
                 return (
-                  <li key={r.id} className="py-2 flex items-center gap-2 text-[13px]">
-                    <span className="font-num tabular-nums font-semibold text-ink w-16">
+                  <li key={r.id} className="py-2.5 flex items-center gap-3 text-[13px]">
+                    <span className="font-num tabular-nums font-bold text-ink w-16">
                       {v.sys}/{v.dia}
                     </span>
                     {v.hr ? (
-                      <span className="text-[11px] text-ink-4">{v.hr} bpm</span>
+                      <span className="text-[11px] text-ink-4 font-num">
+                        {v.hr} bpm
+                      </span>
                     ) : null}
                     {r.flag ? <FlagPill flag={r.flag} /> : null}
-                    <span className="ml-auto text-[10px] text-ink-4 text-right">
-                      {r.measuredAt.toLocaleString("th-TH", {
-                        day: "numeric",
-                        month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                    <div className="ml-auto text-right">
+                      <p className="text-[11px] text-ink-3 leading-tight">
+                        {r.measuredAt.toLocaleString("th-TH", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
                       {r.context ? (
-                        <span className="block text-ink-4">{r.context}</span>
+                        <p className="text-[10px] text-ink-4 leading-tight">
+                          {r.context}
+                        </p>
                       ) : null}
-                    </span>
+                    </div>
                   </li>
                 );
               })}
@@ -191,48 +239,54 @@ export default async function BodyPage() {
           </section>
         ) : null}
 
+        <Link
+          href="/client/labs"
+          className="mt-3 bg-surface border border-border rounded-lg p-4 flex items-center justify-between"
+        >
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-ink-4 font-bold">
+              ผลแล็บ
+            </p>
+            <p className="text-[13px] text-ink-2 mt-1">ดูผลตรวจเลือดของคุณ</p>
+          </div>
+          <span className="text-ink-3 text-[14px]">→</span>
+        </Link>
       </div>
     </main>
   );
 }
 
-function MetricCard({
+function VitalCard({
   label,
   value,
-  cadence,
-  flag,
+  unit,
   href,
-  icon,
+  flag,
+  cadence,
 }: {
   label: string;
   value: string;
-  cadence: string;
-  flag?: string | null;
+  unit: string;
   href: string;
-  icon: string;
+  flag?: string | null;
+  cadence: string;
 }) {
   return (
     <Link
       href={href}
-      className="bg-surface border border-border rounded-lg p-4 flex items-center gap-3"
+      className="bg-surface border border-border rounded-lg p-3 flex flex-col"
     >
-      <span className="text-[24px] size-12 inline-flex items-center justify-center rounded-full bg-canvas">
-        {icon}
-      </span>
-      <div className="flex-1 min-w-0">
-        <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-          {label}
-        </p>
-        <p className="text-[20px] font-bold font-num tabular-nums text-ink leading-none mt-1">
-          {value}
-        </p>
-        {flag ? (
-          <div className="mt-1.5">
-            <FlagPill flag={flag} />
-          </div>
-        ) : null}
+      <p className="text-[10px] uppercase tracking-wider text-ink-4 font-bold truncate">
+        {label}
+      </p>
+      <p className="text-[20px] font-bold font-num tabular-nums text-ink leading-none mt-1.5">
+        {value}
+      </p>
+      <p className="text-[10px] text-ink-4 mt-0.5">{unit}</p>
+      <div className="mt-2 flex items-center justify-between gap-1">
+        <CadenceChip text={cadence} />
+        {flag ? <FlagPill flag={flag} small /> : null}
       </div>
-      <CadenceChip text={cadence} />
     </Link>
   );
 }
@@ -244,16 +298,16 @@ function CadenceChip({ text }: { text: string }) {
     biweekly: "ทุก 2 สัปดาห์",
     monthly: "รายเดือน",
     "as-needed": "เมื่อต้องการ",
-    "scheduled-daily": "ทุกวัน (นัด)",
+    "scheduled-daily": "ทุกวัน",
   };
   return (
-    <span className="text-[10px] text-ink-3 bg-canvas border border-border rounded-pill px-2 py-0.5 whitespace-nowrap">
+    <span className="text-[9px] text-ink-4 truncate">
       {map[text] ?? text}
     </span>
   );
 }
 
-function FlagPill({ flag }: { flag: string }) {
+function FlagPill({ flag, small }: { flag: string; small?: boolean }) {
   const tone = flagTone(flag as never);
   const cls =
     tone === "danger"
@@ -262,7 +316,11 @@ function FlagPill({ flag }: { flag: string }) {
       ? "bg-pillar-stress-wash text-pillar-stress"
       : "bg-pillar-social-wash text-pillar-social";
   return (
-    <span className={`inline-flex text-[10px] font-semibold px-1.5 py-0.5 rounded-pill ${cls}`}>
+    <span
+      className={`inline-flex font-semibold rounded-pill ${cls} ${
+        small ? "text-[9px] px-1.5 py-0.5" : "text-[10px] px-1.5 py-0.5"
+      }`}
+    >
       {flag}
     </span>
   );
