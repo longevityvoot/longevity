@@ -153,7 +153,7 @@ export default async function CheckInPage() {
           />
         </Section>
 
-        <div className="fixed left-0 right-0 bottom-0 bg-surface/95 backdrop-blur border-t border-border px-5 py-3 z-10">
+        <div className="fixed left-0 right-0 bottom-0 bg-surface/95 backdrop-blur border-t border-border px-5 py-3 z-10 pb-safe">
           <div className="max-w-[420px] mx-auto">
             <button
               type="submit"

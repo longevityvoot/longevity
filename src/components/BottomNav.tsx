@@ -46,7 +46,7 @@ export function BottomNav() {
   const pathname = usePathname();
   if (HIDE_ON.some((p) => pathname.startsWith(p))) return null;
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-surface/95 backdrop-blur border-t border-border">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-surface/95 backdrop-blur border-t border-border pb-safe">
       <div className="max-w-[420px] mx-auto px-2 py-1.5 grid grid-cols-4">
         {ITEMS.map((it) => {
           const active = it.match(pathname);
