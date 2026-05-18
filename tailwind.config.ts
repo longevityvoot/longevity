@@ -5,6 +5,11 @@ const config: Config = {
     "./src/app/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",
   ],
+  safelist: [
+    {
+      pattern: /^(text|bg|border)-pillar-(nutrition|sleep|activity|stress|social|substances)(-wash)?$/,
+    },
+  ],
   theme: {
     extend: {
       colors: {
