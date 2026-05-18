@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PILLARS } from "@/lib/pillars";
 import { scoreFromCheckIn, overallScore } from "@/lib/scoring";
@@ -16,23 +16,36 @@ export default async function ClientHome() {
   if (!session?.user?.id) redirect("/login");
 
   const today = todayLocalDate();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
 
-  const [todayCheckIn, recent14, upcoming, recentMessages] = await Promise.all([
-    prisma.dailyCheckIn.findUnique({
-      where: { userId_date: { userId: session.user.id, date: today } },
-    }),
-    prisma.dailyCheckIn.findMany({
-      where: { userId: session.user.id },
-      orderBy: { date: "desc" },
-      take: 14,
-      select: { date: true },
-    }),
-    getUpcomingSessionForClient(session.user.id),
-    listMessages(threadIdForClient(session.user.id), 3),
-  ]);
+  const [todayCheckIn, yesterdayCheckIn, recent14, upcoming, recentMessages] =
+    await Promise.all([
+      prisma.dailyCheckIn.findUnique({
+        where: { userId_date: { userId: session.user.id, date: today } },
+      }),
+      prisma.dailyCheckIn.findUnique({
+        where: { userId_date: { userId: session.user.id, date: yesterday } },
+      }),
+      prisma.dailyCheckIn.findMany({
+        where: { userId: session.user.id },
+        orderBy: { date: "desc" },
+        take: 14,
+        select: { date: true },
+      }),
+      getUpcomingSessionForClient(session.user.id),
+      listMessages(threadIdForClient(session.user.id), 3),
+    ]);
 
   const scores = scoreFromCheckIn(todayCheckIn);
+  const prevScores = scoreFromCheckIn(yesterdayCheckIn);
   const overall = overallScore(scores);
+  const prevOverall = overallScore(prevScores);
+  const overallDelta = overall != null && prevOverall != null ? overall - prevOverall : null;
+  const flaggedCount = scores
+    ? Object.values(scores).filter((v) => v < 50).length
+    : 0;
+
   const lastMessage = recentMessages[recentMessages.length - 1] ?? null;
   const streak = computeStreak(recent14.map((r) => r.date), today);
   const greeting = greetingFor(bangkokHour());
@@ -43,162 +56,196 @@ export default async function ClientHome() {
     value: scores?.[p.key] ?? null,
   }));
 
+  const todayLabel = today.toLocaleDateString("th-TH", {
+    day: "numeric",
+    month: "short",
+  });
+
   return (
-    <main className="min-h-screen bg-canvas pb-12">
+    <main className="min-h-screen bg-canvas">
       <div className="max-w-[420px] mx-auto px-5 pt-7">
-        <header className="flex items-center justify-between">
+        <header className="flex items-start justify-between">
           <div>
-            <p className="text-[12px] text-ink-3">{greeting}</p>
-            <h1 className="text-[20px] font-semibold tracking-tight text-ink leading-tight mt-0.5">
+            <p className="text-[13px] text-ink-3">{greeting}</p>
+            <h1 className="text-[22px] font-semibold tracking-tight text-ink leading-tight mt-0.5">
               {session.user.name}
             </h1>
           </div>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
+          <button
+            type="button"
+            className="size-10 rounded-full bg-surface border border-border inline-flex items-center justify-center text-ink-3"
+            aria-label="แจ้งเตือน"
           >
-            <button className="text-[11px] text-ink-3 hover:underline">
-              ออก
-            </button>
-          </form>
+            <BellIcon />
+          </button>
         </header>
 
         {/* Hero score */}
-        <section className="mt-5 bg-surface rounded-xl p-5 border border-border">
-          <div className="flex items-center gap-4">
-            <MultiDonut
-              rings={rings}
-              size={160}
-              thickness={6}
-              ringGap={3}
-              centerValue={overall != null ? String(overall) : "—"}
-              centerLabel="100"
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+        <section className="mt-6 bg-surface rounded-xl p-5 border border-border">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-bold">
                 Longevity score
               </p>
-              <p className="text-[12px] text-ink-3 mt-1">
-                {overall != null
-                  ? "วันนี้"
-                  : "ยังไม่มีข้อมูลวันนี้"}
-              </p>
-              {streak > 0 ? (
-                <p className="mt-2 text-[12px] text-ink-2">
-                  <span className="font-bold font-num text-pillar-nutrition">{streak}</span> วัน check-in ต่อเนื่อง
-                </p>
-              ) : null}
-              {todayCheckIn ? null : (
-                <p className="mt-2 text-[11px] text-pillar-activity font-semibold">
-                  กรอก check-in เพื่อดูคะแนน
+              <div className="mt-1 flex items-baseline gap-1">
+                <span className="text-[56px] font-bold font-num tabular-nums leading-none text-ink">
+                  {overall ?? "—"}
+                </span>
+                <span className="text-[14px] text-ink-4 font-num">/100</span>
+              </div>
+              {overall != null ? (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {overallDelta != null && overallDelta !== 0 ? (
+                    <span
+                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-pill ${
+                        overallDelta > 0
+                          ? "bg-pillar-social-wash text-pillar-social"
+                          : "bg-pillar-stress-wash text-pillar-stress"
+                      }`}
+                    >
+                      {overallDelta > 0 ? "↑" : "↓"} {Math.abs(overallDelta)} จากเมื่อวาน
+                    </span>
+                  ) : null}
+                  {flaggedCount > 0 ? (
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-pill bg-pillar-stress-wash text-pillar-stress">
+                      {flaggedCount} ค่าผิดปกติ
+                    </span>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="text-[12px] text-ink-3 mt-2">
+                  ยังไม่ได้กรอก check-in วันนี้
                 </p>
               )}
             </div>
+            <MultiDonut
+              rings={rings}
+              size={120}
+              thickness={5}
+              ringGap={2.5}
+            />
           </div>
-          <Link
-            href="/client/checkin"
-            className={`mt-4 inline-flex items-center justify-center w-full h-12 rounded-md text-[15px] font-semibold ${
-              todayCheckIn == null
-                ? "bg-pillar-activity text-white"
-                : "border border-border-strong text-ink-2 bg-surface"
-            }`}
-          >
-            {todayCheckIn == null ? "กรอก check-in วันนี้" : "แก้ check-in วันนี้"}
-          </Link>
         </section>
 
+        {/* Streak strip */}
+        {streak > 0 ? (
+          <Link
+            href="/client/checkin"
+            className="mt-3 bg-surface rounded-lg border border-border px-4 py-3 flex items-center gap-3"
+          >
+            <span className="size-9 rounded-full bg-pillar-nutrition-wash text-pillar-nutrition inline-flex items-center justify-center font-num font-bold text-[14px]">
+              {streak}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] text-ink font-medium">
+                Check-in มา{" "}
+                <span className="font-num font-bold text-pillar-nutrition">
+                  {streak}
+                </span>{" "}
+                วันติด
+              </p>
+              <p className="text-[11px] text-ink-4">เก่งมาก — ดูประวัติ →</p>
+            </div>
+          </Link>
+        ) : null}
+
+        {/* Primary CTA */}
+        <Link
+          href="/client/checkin"
+          className={`mt-3 w-full h-13 h-12 rounded-md inline-flex items-center justify-between px-5 ${
+            todayCheckIn == null
+              ? "bg-pillar-activity text-white"
+              : "bg-surface border border-border-strong text-ink-2"
+          }`}
+          style={
+            todayCheckIn == null
+              ? { boxShadow: "0 4px 12px rgba(255, 107, 107, 0.25)" }
+              : undefined
+          }
+        >
+          <span className="text-[15px] font-semibold">
+            {todayCheckIn == null ? "กรอก check-in วันนี้" : "แก้ check-in วันนี้"}
+          </span>
+          <span className="text-[18px]">→</span>
+        </Link>
+
         {/* 6 pillar tiles */}
-        <section className="mt-5">
-          <h2 className="text-[13px] font-semibold text-ink-2 mb-2 px-1">
-            6 ด้านของสุขภาพ
-          </h2>
+        <section className="mt-6">
+          <div className="flex items-baseline justify-between mb-3 px-1">
+            <h2 className="text-[14px] font-semibold text-ink">6 ด้านของสุขภาพ</h2>
+            <span className="text-[11px] text-ink-4">{todayLabel}</span>
+          </div>
           <div className="grid grid-cols-2 gap-2.5">
             {PILLARS.map((p) => {
               const score = scores?.[p.key] ?? null;
+              const prev = prevScores?.[p.key] ?? null;
+              const d = score != null && prev != null ? score - prev : null;
               return (
                 <Link
                   key={p.key}
                   href={`/client/pillars/${p.key}`}
-                  className="bg-surface rounded-lg p-3 border border-border flex items-center gap-3 hover:border-border-strong transition-colors"
+                  className="bg-surface rounded-lg p-3.5 border border-border flex items-center gap-3"
                 >
-                  <DonutScore
-                    value={score}
-                    size={56}
-                    thickness={5}
-                    segments={14}
-                    gapDeg={5}
-                    color={p.hex}
-                  />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] text-ink-3 font-medium truncate">
+                    <p className="text-[10px] uppercase tracking-wider text-ink-4 font-bold truncate">
                       {p.label}
                     </p>
                     <p
-                      className="text-[18px] font-bold font-num tabular-nums mt-0.5 leading-none"
+                      className="text-[26px] font-bold font-num tabular-nums leading-none mt-1"
                       style={{ color: p.hex }}
                     >
                       {score ?? "—"}
                     </p>
+                    {d != null && d !== 0 ? (
+                      <p
+                        className={`text-[11px] font-semibold mt-0.5 ${
+                          d > 0 ? "text-pillar-social" : "text-pillar-stress"
+                        }`}
+                      >
+                        {d > 0 ? "↑" : "↓"} {Math.abs(d)}
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-ink-4 mt-0.5">—</p>
+                    )}
                   </div>
+                  <DonutScore
+                    value={score}
+                    size={52}
+                    thickness={4.5}
+                    segments={14}
+                    gapDeg={5}
+                    color={p.hex}
+                  />
                 </Link>
               );
             })}
           </div>
         </section>
 
-        {/* Quick links — body, labs, meds */}
-        <section className="mt-5">
-          <h2 className="text-[13px] font-semibold text-ink-2 mb-2 px-1">
+        {/* Body / Labs / Meds shortcuts */}
+        <section className="mt-6">
+          <h2 className="text-[14px] font-semibold text-ink mb-3 px-1">
             บันทึก
           </h2>
           <div className="grid grid-cols-3 gap-2.5">
-            <Link
-              href="/client/body"
-              className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
-            >
-              <span className="size-9 rounded-full bg-pillar-activity-wash text-pillar-activity inline-flex items-center justify-center">
-                <HeartIcon />
-              </span>
-              <p className="text-[12px] text-ink-2 font-semibold mt-1.5">บอดี้</p>
-              <p className="text-[10px] text-ink-4">น้ำหนัก · BP</p>
-            </Link>
-            <Link
-              href="/client/labs"
-              className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
-            >
-              <span className="size-9 rounded-full bg-pillar-substances-wash text-pillar-substances inline-flex items-center justify-center">
-                <FlaskIcon />
-              </span>
-              <p className="text-[12px] text-ink-2 font-semibold mt-1.5">ผลแล็บ</p>
-              <p className="text-[10px] text-ink-4">เลือด</p>
-            </Link>
-            <Link
-              href="/client/meds"
-              className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
-            >
-              <span className="size-9 rounded-full bg-pillar-stress-wash text-pillar-stress inline-flex items-center justify-center">
-                <PillIcon />
-              </span>
-              <p className="text-[12px] text-ink-2 font-semibold mt-1.5">ยา</p>
-              <p className="text-[10px] text-ink-4">วันนี้</p>
-            </Link>
+            <ShortcutTile href="/client/body" label="บอดี้" hint="น้ำหนัก · BP" icon={<HeartIcon />} tone="activity" />
+            <ShortcutTile href="/client/labs" label="ผลแล็บ" hint="เลือด" icon={<FlaskIcon />} tone="substances" />
+            <ShortcutTile href="/client/meds" label="ยา" hint="วันนี้" icon={<PillIcon />} tone="stress" />
           </div>
         </section>
 
         {/* Chat shortcut */}
         <Link
           href="/client/chat"
-          className="mt-5 bg-surface rounded-lg p-4 border border-border block"
+          className="mt-3 bg-surface rounded-lg p-4 border border-border block"
         >
           <div className="flex items-center justify-between">
-            <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
               คุยกับ designer
             </p>
-            <span className="text-[12px] text-ink-3">เปิด →</span>
+            <span className="text-[12px] text-ink-3">→</span>
           </div>
-          <p className="text-[14px] text-ink-2 mt-2 line-clamp-2">
+          <p className="text-[14px] text-ink-2 mt-1.5 line-clamp-2">
             {lastMessage
               ? `${lastMessage.user.role === "CLIENT" ? "คุณ" : "designer"}: ${lastMessage.content}`
               : "ยังไม่มีข้อความ — เริ่มถามได้เลย"}
@@ -206,34 +253,72 @@ export default async function ClientHome() {
         </Link>
 
         {/* Upcoming session */}
-        <section className="mt-3 bg-surface rounded-lg p-4 border border-border">
-          <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
-            session ถัดไป
-          </p>
-          {upcoming ? (
-            <div className="mt-2">
-              <p className="text-[14px] text-ink-2 font-semibold">
-                {upcoming.scheduledAt
-                  ? upcoming.scheduledAt.toLocaleString("th-TH", {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "TBD"}
+        {upcoming ? (
+          <section className="mt-3 bg-surface rounded-lg p-4 border border-border mb-6">
+            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
+              Session ถัดไป
+            </p>
+            <p className="text-[14px] text-ink-2 font-semibold mt-1.5">
+              {upcoming.scheduledAt
+                ? upcoming.scheduledAt.toLocaleString("th-TH", {
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "TBD"}
+            </p>
+            {upcoming.durationMin ? (
+              <p className="text-[12px] text-ink-3 mt-0.5">
+                ~{upcoming.durationMin} นาที · {upcoming.type}
               </p>
-              {upcoming.durationMin ? (
-                <p className="text-[12px] text-ink-3 mt-0.5">
-                  ~{upcoming.durationMin} นาที · {upcoming.type}
-                </p>
-              ) : null}
-            </div>
-          ) : (
-            <p className="text-[14px] text-ink-3 mt-2">ยังไม่มีนัด</p>
-          )}
-        </section>
+            ) : null}
+          </section>
+        ) : null}
       </div>
     </main>
+  );
+}
+
+function ShortcutTile({
+  href,
+  label,
+  hint,
+  icon,
+  tone,
+}: {
+  href: string;
+  label: string;
+  hint: string;
+  icon: React.ReactNode;
+  tone: "activity" | "substances" | "stress";
+}) {
+  const cls =
+    tone === "activity"
+      ? "bg-pillar-activity-wash text-pillar-activity"
+      : tone === "substances"
+      ? "bg-pillar-substances-wash text-pillar-substances"
+      : "bg-pillar-stress-wash text-pillar-stress";
+  return (
+    <Link
+      href={href}
+      className="bg-surface rounded-lg p-3.5 border border-border flex flex-col items-center text-center"
+    >
+      <span className={`size-10 rounded-full inline-flex items-center justify-center ${cls}`}>
+        {icon}
+      </span>
+      <p className="text-[12.5px] text-ink font-semibold mt-2">{label}</p>
+      <p className="text-[10px] text-ink-4 mt-0.5">{hint}</p>
+    </Link>
+  );
+}
+
+function BellIcon() {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 8a6 6 0 0112 0c0 5 2 6.5 2 6.5H4S6 13 6 8z" />
+      <path d="M10 19a2 2 0 004 0" />
+    </svg>
   );
 }
 
@@ -261,15 +346,11 @@ function PillIcon() {
   );
 }
 
-// Count consecutive days of check-ins ending today (or yesterday if today
-// isn't filled yet) so a missed day breaks the streak immediately.
 function computeStreak(dates: Date[], today: Date): number {
   if (dates.length === 0) return 0;
   const set = new Set(dates.map((d) => d.getTime()));
   let cursor = new Date(today);
   let streak = 0;
-  // If today not checked in, allow yesterday to start the streak so the
-  // counter doesn't reset to 0 until 8am.
   if (!set.has(cursor.getTime())) {
     cursor.setDate(cursor.getDate() - 1);
   }
