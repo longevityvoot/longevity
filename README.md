@@ -22,6 +22,29 @@ pnpm dev
 - Middleware (`src/middleware.ts`) กันเส้นทาง `/coach/*` (COACH/ADMIN) และ `/client/*` (CLIENT)
 - หน้า login: `/login`
 
+## Deployment
+
+**Hosting:** Vercel · **DB:** Supabase Postgres · **Repo:** GitHub (push → auto-preview)
+
+### Supabase setup
+1. สร้าง project บน [supabase.com](https://supabase.com) — เลือก region ใกล้ผู้ใช้ (Singapore สำหรับ TH)
+2. Project Settings → Database → Connection string → copy ทั้ง **Pooler** (port 6543) และ **Direct** (port 5432)
+3. ใช้ pooler URL เป็น `DATABASE_URL` (Prisma runtime), direct URL เป็น `DIRECT_URL` (migrations)
+
+### Vercel setup
+1. Import repo เข้า Vercel — framework auto-detect = Next.js
+2. Project Settings → Environment Variables — ใส่:
+   - `DATABASE_URL` (Supabase pooler)
+   - `DIRECT_URL` (Supabase direct)
+   - `AUTH_SECRET` (`openssl rand -base64 32`)
+   - `AUTH_URL` = production URL (เช่น `https://longevity.vercel.app`)
+   - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (optional)
+3. Build จะรัน `postinstall` → `prisma generate` อัตโนมัติ
+4. Migration: รันจาก local ด้วย `pnpm prisma migrate deploy` ที่ชี้ไป Supabase direct URL — Vercel build ไม่ migrate เอง (กัน race ตอน rollback)
+
+### Google OAuth (optional)
+- Authorized redirect URIs: `https://<vercel-url>/api/auth/callback/google` + `http://localhost:3000/api/auth/callback/google`
+
 ## Docs
 - `handoff/spec-v0.2.md` — PRD เต็ม (read this first)
 - `handoff/design-tokens.md` — สี/font/spacing (ลงใน `tailwind.config.ts` แล้ว)
