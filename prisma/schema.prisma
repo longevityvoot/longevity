@@ -1,5 +1,6 @@
 // Prisma schema — Longevity Designer
-// Full schema lives in handoff/spec-v0.2.md §7. Phase 1 will expand this.
+// Phase 1: v0.1 schema + interestTags (used in onboarding step 3).
+// Body/Vitals/Labs/Meds models land in Phase 8/9/10 — see handoff/schema-delta.md.
 
 generator client {
   provider = "prisma-client-js"
@@ -17,9 +18,167 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  role      Role
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  role         Role
+  passwordHash String?
+  createdAt    DateTime @default(now())
+
+  accounts     Account[]
+  authSessions AuthSession[]
+
+  clientProfile   ClientProfile?
+  coachProfile    CoachProfile?
+  assignedClients ClientProfile[] @relation("AssignedCoach")
+
+  sessionsAsClient Session[] @relation("ClientSessions")
+  sessionsAsCoach  Session[] @relation("CoachSessions")
+
+  dailyCheckIns DailyCheckIn[]
+  healthMetrics HealthMetric[]
+  messages      Message[]
+  invoices      Invoice[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model AuthSession {
+  sessionToken String   @id
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model ClientProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateOfBirth           DateTime
+  gender                String
+  heightCm              Float
+  weightKg              Float
+  medicalHistory        String?
+  allergies             String?
+  longevityGoal         String?
+  interestTags          String[] @default([])
+  wearableType          String?
+  googleHealthConnected Boolean  @default(false)
+  googleHealthTokens    Json?
+
+  assignedCoachId String?
+  assignedCoach   User?   @relation("AssignedCoach", fields: [assignedCoachId], references: [id])
+}
+
+model CoachProfile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentials String?
+  bio         String?
+  isPrimary   Boolean @default(false)
+}
+
+model DailyCheckIn {
+  id     String   @id @default(cuid())
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date   DateTime @db.Date
+
+  energyLevel  Int?
+  moodLevel    Int?
+  sleepQuality Int?
+  stressLevel  Int?
+
+  nutritionNotes   String?
+  supplementsTaken Json?
+  socialActivities String?
+
+  alcoholUnits  Float?
+  caffeineCount Int?
+  smokedToday   Boolean?
+
+  notes String?
+
+  @@unique([userId, date])
+}
+
+model HealthMetric {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime
+  source     String
+  metricType String
+  value      Float
+  unit       String
+  rawData    Json?
+
+  @@index([userId, metricType, date])
+}
+
+model Session {
+  id               String    @id @default(cuid())
+  clientId         String
+  client           User      @relation("ClientSessions", fields: [clientId], references: [id])
+  coachId          String
+  coach            User      @relation("CoachSessions", fields: [coachId], references: [id])
+  type             String
+  scheduledAt      DateTime?
+  durationMin      Int?
+  summary          String?
+  actionItems      Json?
+  attachedSnapshot Json?
+  status           String
+  createdAt        DateTime  @default(now())
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  threadId    String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String
+  attachments Json?
+  createdAt   DateTime @default(now())
+
+  @@index([threadId, createdAt])
+}
+
+model Invoice {
+  id          String    @id @default(cuid())
+  clientId    String
+  client      User      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  amount      Float
+  currency    String    @default("THB")
+  description String
+  issuedDate  DateTime
+  dueDate     DateTime
+  paidDate    DateTime?
+  status      String
+  notes       String?
 }
