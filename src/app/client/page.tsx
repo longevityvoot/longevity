@@ -61,8 +61,8 @@ export default async function ClientHome() {
         <section className="mt-6 bg-surface rounded-xl p-5 border border-border flex items-center gap-5">
           <MultiDonut
             rings={rings}
-            size={170}
-            thickness={8}
+            size={180}
+            thickness={6}
             ringGap={3}
             centerValue={overall != null ? String(overall) : "—"}
             centerLabel="คะแนนรวม"
