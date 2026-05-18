@@ -7,6 +7,8 @@ import { scoreFromCheckIn, overallScore } from "@/lib/scoring";
 import { todayLocalDate } from "@/lib/dates";
 import { MultiDonut } from "@/components/charts/MultiDonut";
 import { DonutScore } from "@/components/charts/DonutScore";
+import { getUpcomingSessionForClient } from "@/lib/sessions";
+import { listMessages, threadIdForClient } from "@/lib/messages";
 
 export default async function ClientHome() {
   const session = await auth();
@@ -14,12 +16,17 @@ export default async function ClientHome() {
 
   const today = todayLocalDate();
 
-  const todayCheckIn = await prisma.dailyCheckIn.findUnique({
-    where: { userId_date: { userId: session.user.id, date: today } },
-  });
+  const [todayCheckIn, upcoming, recentMessages] = await Promise.all([
+    prisma.dailyCheckIn.findUnique({
+      where: { userId_date: { userId: session.user.id, date: today } },
+    }),
+    getUpcomingSessionForClient(session.user.id),
+    listMessages(threadIdForClient(session.user.id), 3),
+  ]);
 
   const scores = scoreFromCheckIn(todayCheckIn);
   const overall = overallScore(scores);
+  const lastMessage = recentMessages[recentMessages.length - 1] ?? null;
 
   const rings = PILLARS.map((p) => ({
     key: p.key,
@@ -120,20 +127,48 @@ export default async function ClientHome() {
           </div>
         </section>
 
-        <section className="mt-6 bg-surface rounded-lg p-4 border border-border">
-          <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
-            ข้อความจาก designer
+        <Link
+          href="/client/chat"
+          className="mt-6 bg-surface rounded-lg p-4 border border-border block"
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+              คุยกับ designer
+            </p>
+            <span className="text-[12px] text-ink-3">เปิด →</span>
+          </div>
+          <p className="text-[14px] text-ink-2 mt-2 line-clamp-2">
+            {lastMessage
+              ? `${lastMessage.user.role === "CLIENT" ? "คุณ" : "designer"}: ${lastMessage.content}`
+              : "ยังไม่มีข้อความ — เริ่มถามได้เลย"}
           </p>
-          <p className="text-[14px] text-ink-3 mt-2">
-            ยังไม่มี insight ใหม่ — designer จะส่งให้หลัง review check-in
-          </p>
-        </section>
+        </Link>
 
         <section className="mt-3 bg-surface rounded-lg p-4 border border-border">
           <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
             session ถัดไป
           </p>
-          <p className="text-[14px] text-ink-3 mt-2">ยังไม่มีนัด</p>
+          {upcoming ? (
+            <div className="mt-2">
+              <p className="text-[14px] text-ink-2 font-semibold">
+                {upcoming.scheduledAt
+                  ? upcoming.scheduledAt.toLocaleString("th-TH", {
+                      day: "numeric",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "TBD"}
+              </p>
+              {upcoming.durationMin ? (
+                <p className="text-[12px] text-ink-3 mt-0.5">
+                  ~{upcoming.durationMin} นาที · {upcoming.type}
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="text-[14px] text-ink-3 mt-2">ยังไม่มีนัด</p>
+          )}
         </section>
       </div>
     </main>
