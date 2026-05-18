@@ -7,6 +7,7 @@ type SearchParams = Promise<{ from?: string; error?: string }>;
 export default async function LoginPage({ searchParams }: { searchParams: SearchParams }) {
   const { from = "/", error } = await searchParams;
   const googleConfigured = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+  const lineConfigured = !!(process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRET);
 
   // Decorative concentric rings — all six pillars filled, no center text.
   const heroRings = PILLARS.map((p) => ({ key: p.key, color: p.hex, value: 100 }));
@@ -56,15 +57,32 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
             </form>
           ) : null}
 
-          <button
-            type="button"
-            disabled
-            className="w-full h-12 rounded-md bg-[#06C755] text-white font-semibold text-[14px] opacity-50 cursor-not-allowed flex items-center justify-center gap-2"
-            title="LINE Login มาใน Phase 7"
-          >
-            <LineIcon />
-            เข้าสู่ระบบด้วย LINE (เร็วๆนี้)
-          </button>
+          {lineConfigured ? (
+            <form
+              action={async () => {
+                "use server";
+                await signIn("line", { redirectTo: from });
+              }}
+            >
+              <button
+                type="submit"
+                className="w-full h-12 rounded-md bg-[#06C755] text-white font-semibold text-[14px] flex items-center justify-center gap-2"
+              >
+                <LineIcon />
+                เข้าสู่ระบบด้วย LINE
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="w-full h-12 rounded-md bg-[#06C755] text-white font-semibold text-[14px] opacity-50 cursor-not-allowed flex items-center justify-center gap-2"
+              title="LINE Login รอ env var"
+            >
+              <LineIcon />
+              เข้าสู่ระบบด้วย LINE (เร็วๆนี้)
+            </button>
+          )}
         </div>
 
         <div className="mt-6 relative">
