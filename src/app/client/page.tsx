@@ -158,24 +158,30 @@ export default async function ClientHome() {
               href="/client/body"
               className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
             >
-              <span className="text-[20px]">⚖️</span>
-              <p className="text-[12px] text-ink-2 font-semibold mt-1">บอดี้</p>
+              <span className="size-9 rounded-full bg-pillar-activity-wash text-pillar-activity inline-flex items-center justify-center">
+                <HeartIcon />
+              </span>
+              <p className="text-[12px] text-ink-2 font-semibold mt-1.5">บอดี้</p>
               <p className="text-[10px] text-ink-4">น้ำหนัก · BP</p>
             </Link>
             <Link
               href="/client/labs"
               className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
             >
-              <span className="text-[20px]">🧪</span>
-              <p className="text-[12px] text-ink-2 font-semibold mt-1">ผลแล็บ</p>
+              <span className="size-9 rounded-full bg-pillar-substances-wash text-pillar-substances inline-flex items-center justify-center">
+                <FlaskIcon />
+              </span>
+              <p className="text-[12px] text-ink-2 font-semibold mt-1.5">ผลแล็บ</p>
               <p className="text-[10px] text-ink-4">เลือด</p>
             </Link>
             <Link
               href="/client/meds"
               className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
             >
-              <span className="text-[20px]">💊</span>
-              <p className="text-[12px] text-ink-2 font-semibold mt-1">ยา</p>
+              <span className="size-9 rounded-full bg-pillar-stress-wash text-pillar-stress inline-flex items-center justify-center">
+                <PillIcon />
+              </span>
+              <p className="text-[12px] text-ink-2 font-semibold mt-1.5">ยา</p>
               <p className="text-[10px] text-ink-4">วันนี้</p>
             </Link>
           </div>
@@ -228,6 +234,30 @@ export default async function ClientHome() {
         </section>
       </div>
     </main>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 21s-7-4.5-9.3-9.3C1.2 8.6 3 5.3 6.2 5.3c1.7 0 3.3.9 4.2 2.3l1.6 2.4 1.6-2.4c.9-1.4 2.5-2.3 4.2-2.3 3.2 0 5 3.3 3.5 6.4C19 16.5 12 21 12 21z" />
+    </svg>
+  );
+}
+function FlaskIcon() {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M9 3h6M10 3v6.5L4.5 18a2 2 0 001.7 3h11.6a2 2 0 001.7-3L14 9.5V3" />
+      <path d="M7 14h10" />
+    </svg>
+  );
+}
+function PillIcon() {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
+      <rect x={3.5} y={9} width={17} height={6} rx={3} transform="rotate(-30 12 12)" />
+      <path d="M11 6.5l3 5.2" />
+    </svg>
   );
 }
 

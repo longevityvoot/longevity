@@ -23,8 +23,8 @@ export function TrendChart({
   if (data.length === 0) {
     return (
       <div
-        style={{ width, height }}
-        className="flex items-center justify-center text-[12px] text-ink-4"
+        style={{ height }}
+        className="w-full flex items-center justify-center text-[12px] text-ink-4"
       >
         ยังไม่มีข้อมูล
       </div>
@@ -57,7 +57,14 @@ export function TrendChart({
   const last = points[points.length - 1];
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      width="100%"
+      height={height}
+      style={{ display: "block" }}
+      aria-hidden="true"
+    >
       <defs>
         <linearGradient id="trend-area" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.18" />

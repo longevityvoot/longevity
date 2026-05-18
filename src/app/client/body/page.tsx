@@ -107,7 +107,6 @@ export default async function BodyPage() {
           <div className="mt-3">
             <TrendChart
               data={weightHistory.map((m) => ({ x: m.measuredAt, y: m.value }))}
-              width={360}
               height={120}
               color="#14142B"
             />
