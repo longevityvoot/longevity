@@ -30,3 +30,23 @@ export async function getResultHistory(userId: string, name: string) {
     include: { panel: { select: { date: true, id: true } } },
   });
 }
+
+// Bulk previous values keyed by result name for a single client. Used to
+// compute delta-vs-previous on the panel detail view without N round-trips.
+export async function getPreviousValuesMap(
+  userId: string,
+  beforePanelDate: Date,
+): Promise<Map<string, { value: number; date: Date }>> {
+  const rows = await prisma.labResult.findMany({
+    where: {
+      panel: { userId, status: "published", date: { lt: beforePanelDate } },
+    },
+    include: { panel: { select: { date: true } } },
+    orderBy: { panel: { date: "desc" } },
+  });
+  const out = new Map<string, { value: number; date: Date }>();
+  for (const r of rows) {
+    if (!out.has(r.name)) out.set(r.name, { value: r.value, date: r.panel.date });
+  }
+  return out;
+}
