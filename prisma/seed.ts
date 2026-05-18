@@ -15,7 +15,7 @@ async function main() {
       role: Role.COACH,
       passwordHash,
       coachProfile: {
-        create: { credentials: "เภสัชกร", bio: "Primary designer", isPrimary: true },
+        create: { credentials: "Designer", bio: "Primary designer", isPrimary: true },
       },
     },
   });
