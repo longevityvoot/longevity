@@ -61,6 +61,6 @@ pnpm dev
 - [x] Phase 5 — Sessions + chat + invoices (create session/invoice, toggle paid, shared thread per client)
 - [x] Phase 8 — Body & Vitals (BodyMeasurement + VitalReading models, weight/waist/BP/glucose log, server-side flagging, trend chart)
 - [x] Phase 9 — Lab Results (LabPanel/Result, 17 reference ranges, draft → publish flow, RangeBar viz)
-- [ ] Phase 10 — Meds (v0.2)
+- [x] Phase 10 — Meds (Medication/MedicationLog, today schedule toggle, 7d adherence %, source-tinted badges)
 - [ ] Phase 6 — Google Health API
 - [ ] Phase 7 — LineOA + polish

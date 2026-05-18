@@ -249,6 +249,12 @@ export default async function ClientDetailPage({
                 >
                   Lab panels →
                 </Link>
+                <Link
+                  href={`/coach/clients/${id}/meds`}
+                  className="w-full h-10 inline-flex items-center justify-center rounded-md border border-border-strong text-[13px] font-semibold text-ink-2"
+                >
+                  Meds →
+                </Link>
               </div>
               {lastMessage ? (
                 <div className="mt-3 pt-3 border-t border-border">

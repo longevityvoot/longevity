@@ -43,6 +43,7 @@ model User {
   bodyMeasurements BodyMeasurement[]
   vitalReadings    VitalReading[]
   labPanels        LabPanel[]
+  medications      Medication[]
 }
 
 model Account {
@@ -254,4 +255,39 @@ model LabResult {
   watch    Boolean  @default(false)
 
   @@index([panelId, category])
+}
+
+// v0.2 — Medications & supplements
+model Medication {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String    // "rx" | "supplement" | "prn"
+  name        String
+  dose        String    // free text, e.g. "2000 IU", "500mg"
+  schedule    String[]  @default([]) // ["เช้า", "ก่อนนอน"]
+  reason      String?
+  source      String    // "doctor" | "pharmacist" | "coach" | "self"
+  sourceName  String?
+  startedDate DateTime
+  stoppedDate DateTime?
+  status      String    // "active" | "paused" | "discontinued"
+  createdAt   DateTime  @default(now())
+
+  logs MedicationLog[]
+
+  @@index([userId, status])
+}
+
+model MedicationLog {
+  id           String     @id @default(cuid())
+  medicationId String
+  medication   Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  date         DateTime   @db.Date
+  slot         String     // "เช้า" | "ก่อนนอน" etc
+  taken        Boolean
+  takenAt      DateTime?
+
+  @@unique([medicationId, date, slot])
+  @@index([medicationId, date])
 }
