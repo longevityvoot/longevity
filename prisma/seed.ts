@@ -11,7 +11,7 @@ async function main() {
     update: {},
     create: {
       email: "coach@example.com",
-      name: "เภสัชกร (designer)",
+      name: "Longevity Designer",
       role: Role.COACH,
       passwordHash,
       coachProfile: {
