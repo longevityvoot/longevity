@@ -2,23 +2,48 @@
 
 import { useState } from "react";
 
-export function ScaleInput({ name, defaultValue }: { name: string; defaultValue: number }) {
+export function ScaleInput({
+  name,
+  defaultValue,
+  lowLabel,
+  highLabel,
+}: {
+  name: string;
+  defaultValue: number;
+  lowLabel?: string;
+  highLabel?: string;
+}) {
   const [value, setValue] = useState(defaultValue);
   return (
-    <div className="flex items-center gap-3">
-      <input
-        type="range"
-        name={name}
-        min={1}
-        max={10}
-        step={1}
-        value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
-        className="flex-1 accent-ink"
-      />
-      <output className="w-8 text-right text-[16px] font-num font-semibold text-ink">
-        {value}
-      </output>
+    <div>
+      <div className="grid grid-cols-10 gap-1">
+        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
+          const active = n === value;
+          return (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setValue(n)}
+              className={`h-10 rounded-md text-[13px] font-num font-semibold transition-colors ${
+                active
+                  ? "bg-ink text-white"
+                  : "bg-canvas text-ink-3 hover:bg-surface-soft"
+              }`}
+              aria-pressed={active}
+              aria-label={`${name} ${n}`}
+            >
+              {n}
+            </button>
+          );
+        })}
+      </div>
+      {(lowLabel || highLabel) ? (
+        <div className="mt-1.5 flex justify-between text-[10px] text-ink-4">
+          <span>{lowLabel ?? "1"}</span>
+          <span>{highLabel ?? "10"}</span>
+        </div>
+      ) : null}
+      <input type="hidden" name={name} value={value} />
     </div>
   );
 }
