@@ -132,10 +132,9 @@ export default async function PillarDetailPage({
 
         <section className="mt-5 bg-surface rounded-lg p-4 border border-border">
           <h2 className="text-[13px] font-semibold text-ink-2">Trend 30 วันล่าสุด</h2>
-          <div className="mt-3 -mx-1">
+          <div className="mt-3">
             <TrendChart
               data={points}
-              width={360}
               height={140}
               color={pillar.hex}
               target={70}
