@@ -13,6 +13,15 @@ const useLine = !!(process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRE
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
+  debug: true,
+  logger: {
+    error(error) {
+      console.error("[NEXTAUTH ERROR]", error);
+    },
+    warn(code) {
+      console.warn("[NEXTAUTH WARN]", code);
+    },
+  },
   providers: [
     ...(useGoogle ? [Google] : []),
     ...(useLine
