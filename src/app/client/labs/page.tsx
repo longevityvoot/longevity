@@ -24,40 +24,47 @@ export default async function LabsPage() {
   const drafts = panels.filter((p) => p.status === "draft");
   const latest = published[0] ?? null;
 
-  // Pull previous values to show delta on the latest panel
   const prevMap = latest
     ? await getPreviousValuesMap(session.user.id, latest.date)
     : new Map();
 
   return (
-    <main className="min-h-screen bg-canvas">
-      <div className="max-w-[420px] mx-auto px-5 pt-6">
-        <Link href="/client" className="text-[13px] text-ink-3 inline-flex items-center gap-1">
-          ← กลับ
-        </Link>
-        <header className="mt-3 flex items-baseline justify-between gap-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+    <main className="min-h-screen bg-canvas pb-6">
+      <header className="sticky top-0 z-20 bg-canvas/95 backdrop-blur border-b border-border">
+        <div className="max-w-[420px] mx-auto px-5 py-3 flex items-center gap-3">
+          <Link
+            href="/client"
+            className="size-9 inline-flex items-center justify-center rounded-full bg-surface border border-border text-ink-3"
+            aria-label="กลับ"
+          >
+            ←
+          </Link>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.1em] text-pillar-substances font-bold">
               Labs
             </p>
-            <h1 className="text-[22px] font-semibold tracking-tight text-ink mt-0.5">
-              ผลตรวจของคุณ
-            </h1>
+            <p className="text-[15px] font-semibold text-ink leading-tight">
+              ผลแล็บ
+            </p>
           </div>
           <Link
             href="/client/labs/new"
-            className="px-3 h-10 inline-flex items-center rounded-md bg-ink text-white text-[13px] font-semibold"
+            className="text-[12px] text-ink-3 font-semibold"
           >
-            + เพิ่มผล
+            +เพิ่ม
           </Link>
-        </header>
+        </div>
+      </header>
 
+      <div className="max-w-[420px] mx-auto px-5 pt-4">
         {drafts.length > 0 ? (
-          <section className="mt-4 bg-pillar-stress-wash border border-pillar-stress rounded-lg p-3 flex items-start gap-2.5">
-            <span className="text-[16px]">⏳</span>
+          <section className="bg-pillar-stress-wash border border-pillar-stress/30 rounded-lg p-3 flex items-start gap-2.5">
+            <span className="size-6 mt-0.5 rounded-full bg-pillar-stress text-white inline-flex items-center justify-center text-[12px] font-bold">
+              {drafts.length}
+            </span>
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] font-semibold text-pillar-stress">
-                ส่ง draft รอ designer review {drafts.length} รายการ
+              <p className="text-[13px] font-semibold text-ink">
+                ส่ง draft รอ designer review
               </p>
               <p className="text-[11px] text-ink-3 mt-0.5">
                 จะเห็นค่าหลัง designer publish
@@ -67,11 +74,13 @@ export default async function LabsPage() {
         ) : null}
 
         {!latest ? (
-          <section className="mt-5 bg-surface border border-border rounded-lg p-8 text-center">
-            <div className="size-14 rounded-full bg-pillar-nutrition-wash flex items-center justify-center text-[24px] mx-auto">
-              🧪
+          <section className="mt-4 bg-surface border border-border rounded-lg p-8 text-center">
+            <div className="size-14 rounded-full bg-pillar-substances-wash text-pillar-substances inline-flex items-center justify-center">
+              <FlaskIcon />
             </div>
-            <p className="mt-3 text-[14px] font-semibold text-ink-2">ยังไม่มีผลตรวจ</p>
+            <p className="mt-3 text-[14px] font-semibold text-ink-2">
+              ยังไม่มีผลตรวจ
+            </p>
             <p className="mt-1 text-[12px] text-ink-3">
               เริ่มจากผลตรวจล่าสุดของคุณ designer จะช่วยอ่าน
             </p>
@@ -88,7 +97,7 @@ export default async function LabsPage() {
 
         {published.length > 1 ? (
           <section className="mt-6">
-            <h2 className="text-[13px] font-semibold text-ink-2 mb-2 px-1">
+            <h2 className="text-[10px] uppercase tracking-wider text-ink-4 font-bold mb-2 px-1">
               ประวัติย้อนหลัง
             </h2>
             <ul className="space-y-2">
@@ -97,7 +106,7 @@ export default async function LabsPage() {
                 return (
                   <li
                     key={p.id}
-                    className="bg-surface border border-border rounded-lg p-3 flex items-center justify-between gap-3"
+                    className="bg-surface border border-border rounded-lg px-4 py-3 flex items-center justify-between gap-3"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-semibold text-ink">
@@ -106,20 +115,20 @@ export default async function LabsPage() {
                           month: "short",
                           year: "numeric",
                         })}
-                        {p.labName ? ` · ${p.labName}` : ""}
                       </p>
                       <p className="text-[11px] text-ink-4 mt-0.5">
+                        {p.labName ? `${p.labName} · ` : ""}
                         {p.results.length} รายการ
                         {flagged.length > 0
-                          ? ` · ${flagged.length} ค่าผิดปกติ`
-                          : " · ทุกค่าปกติ"}
+                          ? ` · ${flagged.length} ผิดปกติ`
+                          : ""}
                       </p>
                     </div>
-                    {flagged.length > 0 ? (
-                      <span className="size-2 rounded-full bg-pillar-stress" />
-                    ) : (
-                      <span className="size-2 rounded-full bg-pillar-social" />
-                    )}
+                    <span
+                      className={`size-2 rounded-full ${
+                        flagged.length > 0 ? "bg-pillar-stress" : "bg-pillar-social"
+                      }`}
+                    />
                   </li>
                 );
               })}
@@ -136,6 +145,7 @@ type PanelViewProps = {
     id: string;
     date: Date;
     labName: string | null;
+    note: string | null;
     summary: string | null;
     results: Array<{
       id: string;
@@ -160,49 +170,51 @@ function PanelView({ panel, prevMap }: PanelViewProps) {
   const byCategory: Record<string, typeof panel.results> = {};
   for (const r of panel.results) (byCategory[r.category] ??= []).push(r);
 
-  const totals = {
-    n: panel.results.length,
-    flagged: panel.results.filter((r) => r.flag !== "normal").length,
-  };
+  // Human-readable summary "X ค่าที่ต้องดู — A, B"
+  const flaggedSummary = (() => {
+    if (watchOrFlagged.length === 0) return "ทุกค่าอยู่ในเกณฑ์ปกติ";
+    const names = watchOrFlagged.slice(0, 2).map((r) => {
+      const direction =
+        r.flag === "high" || r.flag === "critical"
+          ? "สูง"
+          : r.flag === "low"
+          ? "ต่ำ"
+          : "ต้องดู";
+      return `${r.name} ${direction}`;
+    });
+    const tail =
+      watchOrFlagged.length > 2 ? ` · อีก ${watchOrFlagged.length - 2}` : "";
+    return `${watchOrFlagged.length} ค่าที่ต้องดู — ${names.join(", ")}${tail}`;
+  })();
 
   return (
     <>
-      <section className="mt-5 bg-ink text-white rounded-xl p-5">
-        <p className="text-[11px] uppercase tracking-wider text-ink-5 font-semibold">
+      {/* Hero panel */}
+      <section className="mt-4 bg-surface rounded-xl p-5 border border-border">
+        <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-bold">
           ผลล่าสุด
         </p>
-        <p className="text-[18px] font-semibold mt-1">
+        <p className="text-[24px] font-bold text-ink leading-tight mt-1">
           {panel.date.toLocaleDateString("th-TH", {
             day: "numeric",
             month: "long",
             year: "numeric",
           })}
         </p>
-        {panel.labName ? (
-          <p className="text-[12px] text-ink-5 mt-0.5">{panel.labName}</p>
-        ) : null}
-        <div className="mt-3 flex items-baseline gap-4">
-          <div>
-            <p className="text-[32px] font-bold font-num tabular-nums leading-none">
-              {totals.n}
-            </p>
-            <p className="text-[10px] uppercase tracking-wider text-ink-5">รายการ</p>
-          </div>
-          <div>
-            <p
-              className={`text-[32px] font-bold font-num tabular-nums leading-none ${
-                totals.flagged > 0 ? "text-pillar-stress" : "text-pillar-social"
-              }`}
-            >
-              {totals.flagged}
-            </p>
-            <p className="text-[10px] uppercase tracking-wider text-ink-5">
-              ค่าที่ผิดปกติ
-            </p>
-          </div>
-        </div>
+        <p className="text-[12px] text-ink-3 mt-1">
+          {[panel.labName, panel.note ?? "ผลตรวจประจำ"].filter(Boolean).join(" · ")}
+        </p>
+        <p
+          className={`mt-3 text-[13px] font-medium px-3 py-2 rounded-md ${
+            watchOrFlagged.length > 0
+              ? "bg-pillar-stress-wash text-pillar-stress"
+              : "bg-pillar-social-wash text-pillar-social"
+          }`}
+        >
+          {flaggedSummary}
+        </p>
         {panel.summary ? (
-          <p className="mt-3 text-[13px] text-ink-5 italic">
+          <p className="mt-3 text-[13px] text-ink-3 italic border-l-2 border-border pl-3">
             “{panel.summary}”
           </p>
         ) : null}
@@ -210,7 +222,7 @@ function PanelView({ panel, prevMap }: PanelViewProps) {
 
       {watchOrFlagged.length > 0 ? (
         <section className="mt-3 bg-surface border border-border rounded-lg p-4">
-          <h3 className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+          <h3 className="text-[10px] uppercase tracking-wider text-ink-4 font-bold">
             ค่าที่ต้องดู
           </h3>
           <ul className="mt-3 space-y-4">
@@ -233,13 +245,16 @@ function PanelView({ panel, prevMap }: PanelViewProps) {
             key={cat}
             className="mt-3 bg-surface border border-border rounded-lg p-4"
           >
-            <h3 className="flex items-center gap-2 text-[12px] uppercase tracking-wider font-semibold">
+            <h3 className="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold">
               <span
                 className="size-2 rounded-full"
                 style={{ backgroundColor: hex }}
               />
               <span className="text-ink-2">
                 {CATEGORY_LABEL[cat as LabCategory] ?? cat}
+              </span>
+              <span className="text-ink-4 normal-case font-medium ml-auto">
+                {results.length} รายการ
               </span>
             </h3>
             <ul className="mt-3 space-y-4">
@@ -286,41 +301,62 @@ function ResultRow({
         : delta < 0
       : null;
 
+  // Direction arrow for the value itself (high → up, low → down)
+  const valueArrow =
+    r.flag === "high" || r.flag === "critical"
+      ? "↑"
+      : r.flag === "low"
+      ? "↓"
+      : null;
+  const valueTone =
+    r.flag === "critical"
+      ? "text-pillar-activity"
+      : r.flag === "high" || r.flag === "low"
+      ? "text-pillar-stress"
+      : "text-ink";
+
   return (
     <>
       <div className="flex items-baseline justify-between gap-3">
-        <span className="text-[13px] text-ink-2 font-medium">{r.name}</span>
-        <div className="text-right">
-          <span className="text-[15px] font-bold font-num tabular-nums text-ink">
+        <span className="text-[13.5px] text-ink-2 font-medium flex items-center gap-1.5">
+          {r.name}
+          {r.watch ? (
+            <span className="text-[9px] text-pillar-stress font-bold uppercase tracking-wider">
+              ★
+            </span>
+          ) : null}
+        </span>
+        <div className="text-right flex items-baseline gap-1">
+          {valueArrow ? (
+            <span className={`text-[14px] font-bold ${valueTone}`}>
+              {valueArrow}
+            </span>
+          ) : null}
+          <span className={`text-[17px] font-bold font-num tabular-nums ${valueTone}`}>
             {r.value}
           </span>
-          <span className="text-[10px] text-ink-4 ml-1">{r.unit}</span>
+          <span className="text-[10px] text-ink-4 ml-0.5">{r.unit}</span>
         </div>
       </div>
-      <div className="mt-1.5 flex items-center gap-2">
+      <div className="mt-1.5">
         <RangeBar
           value={r.value}
           low={r.refLow}
           high={r.refHigh}
           flag={r.flag as never}
-          width={220}
-          height={20}
+          width={300}
+          height={18}
         />
-        <FlagPill flag={r.flag} />
       </div>
-      <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-ink-4">
-        <span>{formatRangeRaw(r.refLow, r.refHigh, r.unit)}</span>
-        {delta != null ? (
+      <div className="mt-1 flex items-center justify-between gap-2 text-[10.5px] text-ink-4">
+        <span>ปกติ {formatRangeRaw(r.refLow, r.refHigh, r.unit)}</span>
+        {delta != null && delta !== 0 ? (
           <span
             className={`font-semibold ${
-              isImprovement
-                ? "text-pillar-social"
-                : delta === 0
-                ? "text-ink-4"
-                : "text-pillar-stress"
+              isImprovement ? "text-pillar-social" : "text-pillar-stress"
             }`}
           >
-            {delta > 0 ? "↑" : delta < 0 ? "↓" : "="} {Math.abs(delta)} {r.unit} vs ครั้งก่อน
+            {delta > 0 ? "↑" : "↓"} {Math.abs(delta)} vs ครั้งก่อน
           </span>
         ) : null}
       </div>
@@ -328,16 +364,21 @@ function ResultRow({
   );
 }
 
-function FlagPill({ flag }: { flag: string }) {
-  const cls =
-    flag === "critical"
-      ? "bg-pillar-activity-wash text-pillar-activity"
-      : flag === "high" || flag === "low"
-      ? "bg-pillar-stress-wash text-pillar-stress"
-      : "bg-pillar-social-wash text-pillar-social";
+function FlaskIcon() {
   return (
-    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-pill ${cls}`}>
-      {flag}
-    </span>
+    <svg
+      width={22}
+      height={22}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 3h6M10 3v6.5L4.5 18a2 2 0 001.7 3h11.6a2 2 0 001.7-3L14 9.5V3" />
+      <path d="M7 14h10" />
+    </svg>
   );
 }
