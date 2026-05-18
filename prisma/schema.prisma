@@ -42,6 +42,7 @@ model User {
   invoices         Invoice[]
   bodyMeasurements BodyMeasurement[]
   vitalReadings    VitalReading[]
+  labPanels        LabPanel[]
 }
 
 model Account {
@@ -219,4 +220,38 @@ model VitalReading {
   flag       String?  // "normal" | "low" | "high" | "critical"
 
   @@index([userId, type, measuredAt])
+}
+
+// v0.2 — Lab results
+model LabPanel {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  labName   String?
+  note      String?
+  summary   String?
+  photoUrl  String?
+  status    String   // "draft" | "published"
+  createdAt DateTime @default(now())
+
+  results LabResult[]
+
+  @@index([userId, date])
+}
+
+model LabResult {
+  id       String   @id @default(cuid())
+  panelId  String
+  panel    LabPanel @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  category String   // lipids | glucose | liver | kidney | inflammation | vitamins | other
+  name     String
+  value    Float
+  unit     String
+  refLow   Float?
+  refHigh  Float?
+  flag     String   // low | normal | high | critical
+  watch    Boolean  @default(false)
+
+  @@index([panelId, category])
 }

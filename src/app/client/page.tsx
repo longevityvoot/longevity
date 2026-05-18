@@ -127,20 +127,28 @@ export default async function ClientHome() {
           </div>
         </section>
 
-        <Link
-          href="/client/body"
-          className="mt-3 bg-surface rounded-lg p-4 border border-border flex items-center justify-between"
-        >
-          <div>
-            <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <Link
+            href="/client/body"
+            className="bg-surface rounded-lg p-4 border border-border block"
+          >
+            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
               Body & Vitals
             </p>
-            <p className="text-[14px] text-ink-3 mt-1">
-              น้ำหนัก / รอบเอว / ความดัน / น้ำตาล
+            <p className="text-[13px] text-ink-3 mt-1">
+              น้ำหนัก / ความดัน / น้ำตาล
             </p>
-          </div>
-          <span className="text-[12px] text-ink-3">เปิด →</span>
-        </Link>
+          </Link>
+          <Link
+            href="/client/labs"
+            className="bg-surface rounded-lg p-4 border border-border block"
+          >
+            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+              Lab Results
+            </p>
+            <p className="text-[13px] text-ink-3 mt-1">ผลตรวจเลือด</p>
+          </Link>
+        </div>
 
         <Link
           href="/client/chat"
