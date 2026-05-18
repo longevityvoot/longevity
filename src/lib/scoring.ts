@@ -11,7 +11,11 @@ export function scoreFromCheckIn(c: DailyCheckIn | null): PillarScores | null {
   if (!c) return null;
 
   const sleep   = clamp((c.sleepQuality ?? 5) * 10);
-  const stress  = clamp((11 - (c.stressLevel ?? 5)) * 10);
+  // Stress pillar = mental wellbeing — average inverted-stress with mood.
+  // High mood (good) and low stress (good) both push the score up.
+  const moodScore = (c.moodLevel ?? 5) * 10;
+  const stressScore = (11 - (c.stressLevel ?? 5)) * 10;
+  const stress  = clamp((stressScore + moodScore) / 2);
   const activity = clamp((c.energyLevel ?? 5) * 10);
   const nutrition = c.nutritionNotes?.trim() ? 70 : 50;
   const social    = c.socialActivities?.trim() ? 70 : 50;
