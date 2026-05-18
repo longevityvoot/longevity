@@ -87,6 +87,28 @@ export const LAB_TEMPLATES: Array<{ key: string; label: string; tests: string[] 
   },
 ];
 
+export function formatRange(spec: LabSpec): string {
+  const hasLow = spec.low > 0;
+  const hasHigh = spec.high < 999;
+  if (hasLow && hasHigh) return `${spec.low} - ${spec.high} ${spec.unit}`;
+  if (hasHigh) return `≤ ${spec.high} ${spec.unit}`;
+  if (hasLow) return `≥ ${spec.low} ${spec.unit}`;
+  return spec.unit;
+}
+
+export function formatRangeRaw(
+  low: number | null,
+  high: number | null,
+  unit: string,
+): string {
+  const hasLow = low != null && low > 0;
+  const hasHigh = high != null && high < 999;
+  if (hasLow && hasHigh) return `${low} - ${high} ${unit}`;
+  if (hasHigh) return `≤ ${high} ${unit}`;
+  if (hasLow) return `≥ ${low} ${unit}`;
+  return unit;
+}
+
 export const CATEGORY_LABEL: Record<LabCategory, string> = {
   lipids: "ไขมัน",
   glucose: "น้ำตาล",

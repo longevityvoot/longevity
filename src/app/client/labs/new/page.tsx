@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { LAB_RANGES, LAB_TEMPLATES, CATEGORY_LABEL } from "@/lib/lab-ranges";
+import { LAB_RANGES, LAB_TEMPLATES, CATEGORY_LABEL, formatRange } from "@/lib/lab-ranges";
 import { submitDraftPanel } from "./actions";
 
 type SearchParams = Promise<{ tmpl?: string }>;
@@ -31,12 +31,12 @@ export default async function NewLabPage({
           กรอกค่าจากใบผลตรวจ — designer จะ review ก่อน publish
         </p>
 
-        <nav className="mt-4 flex flex-wrap gap-2">
+        <nav className="mt-4 -mx-5 px-5 flex gap-2 overflow-x-auto no-scrollbar">
           {LAB_TEMPLATES.map((t) => (
             <Link
               key={t.key}
               href={`/client/labs/new?tmpl=${t.key}`}
-              className={`h-9 px-3 inline-flex items-center rounded-pill text-[12px] font-semibold ${
+              className={`h-9 px-3 inline-flex items-center rounded-pill text-[12px] font-semibold whitespace-nowrap shrink-0 ${
                 t.key === active.key
                   ? "bg-ink text-white"
                   : "bg-surface border border-border text-ink-2"
@@ -89,21 +89,21 @@ export default async function NewLabPage({
                       {spec.name}
                     </span>
                     <span className="text-[11px] text-ink-4">
-                      ค่าปกติ {spec.low > 0 ? spec.low : "—"}
-                      {"-"}
-                      {spec.high < 999 ? spec.high : "—"} {spec.unit}
+                      ปกติ {formatRange(spec)}
                     </span>
                   </span>
-                  <div className="mt-1 flex items-center gap-2">
+                  <div className="mt-1 relative">
                     <input
                       name={`value:${spec.key}`}
                       type="number"
                       step="0.01"
                       inputMode="decimal"
-                      className="flex-1 h-11 rounded-md border border-border-strong px-3 text-[16px] font-num text-center"
-                      placeholder="—"
+                      className="w-full h-11 rounded-md border border-border-strong pl-3 pr-14 text-[16px] font-num focus:outline-none focus:border-ink"
+                      placeholder=""
                     />
-                    <span className="text-[12px] text-ink-4 w-14">{spec.unit}</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-ink-4 pointer-events-none">
+                      {spec.unit}
+                    </span>
                   </div>
                 </label>
               ))}

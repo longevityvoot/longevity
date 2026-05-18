@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { listPanelsForUser, getPreviousValuesMap } from "@/lib/labs";
-import { CATEGORY_LABEL, type LabCategory } from "@/lib/lab-ranges";
+import { CATEGORY_LABEL, formatRangeRaw, type LabCategory } from "@/lib/lab-ranges";
 import { RangeBar } from "@/components/charts/RangeBar";
 
 const CATEGORY_HEX: Record<LabCategory, string> = {
@@ -309,11 +309,7 @@ function ResultRow({
         <FlagPill flag={r.flag} />
       </div>
       <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-ink-4">
-        <span>
-          {r.refLow != null && r.refLow > 0 ? r.refLow : "—"}
-          {" - "}
-          {r.refHigh != null && r.refHigh < 999 ? r.refHigh : "—"} {r.unit}
-        </span>
+        <span>{formatRangeRaw(r.refLow, r.refHigh, r.unit)}</span>
         {delta != null ? (
           <span
             className={`font-semibold ${

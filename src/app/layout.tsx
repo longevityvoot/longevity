@@ -1,9 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Longevity Designer",
-  description: "Phase 1 MVP — Longevity Designer",
+  description: "ดูแลสุขภาพระยะยาวกับ designer ส่วนตัว",
+  appleWebApp: {
+    capable: true,
+    title: "Longevity",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#F6F7FB",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
