@@ -41,12 +41,12 @@ export default async function QuickLogPage({
       </header>
 
       <div className="max-w-[420px] mx-auto px-5 pt-4">
-        <nav className="-mx-5 px-5 flex gap-2 overflow-x-auto no-scrollbar">
+        <nav className="grid grid-cols-4 gap-2">
           {TABS.map((t) => (
             <Link
               key={t.key}
               href={`/client/body/log?tab=${t.key}`}
-              className={`h-9 px-4 inline-flex items-center rounded-pill text-[12px] font-semibold whitespace-nowrap shrink-0 ${
+              className={`h-10 inline-flex items-center justify-center rounded-md text-[12.5px] font-semibold ${
                 t.key === active.key
                   ? "bg-ink text-white"
                   : "bg-surface border border-border text-ink-2"
