@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-thai: "Noto Sans Thai", "IBM Plex Sans Thai", system-ui, sans-serif;
+  --font-sans: "Inter", "Noto Sans Thai", system-ui, sans-serif;
+  --font-num:  "Inter", "IBM Plex Sans", system-ui, sans-serif;
+}
+
+html, body {
+  background: #F6F7FB;
+  color: #14142B;
+  font-family: var(--font-thai);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.font-num { font-variant-numeric: tabular-nums; }
