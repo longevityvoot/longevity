@@ -16,7 +16,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: true,
   logger: {
     error(error) {
-      console.error("[NEXTAUTH ERROR]", error);
+      // Drill into the `cause` chain so OAuthCallbackError surfaces the
+      // underlying provider response (LINE returns the actual reason in
+      // error.cause.error_description).
+      const layers: Record<string, unknown> = { message: error.message };
+      let cur: unknown = (error as { cause?: unknown }).cause;
+      let depth = 0;
+      while (cur && depth < 5) {
+        layers[`cause_${depth}`] = cur instanceof Error
+          ? { message: cur.message, name: cur.name, stack: cur.stack }
+          : cur;
+        cur = (cur as { cause?: unknown }).cause;
+        depth++;
+      }
+      console.error("[NEXTAUTH ERROR]", JSON.stringify(layers, null, 2));
     },
     warn(code) {
       console.warn("[NEXTAUTH WARN]", code);
