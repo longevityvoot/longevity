@@ -62,5 +62,6 @@ pnpm dev
 - [x] Phase 8 — Body & Vitals (BodyMeasurement + VitalReading models, weight/waist/BP/glucose log, server-side flagging, trend chart)
 - [x] Phase 9 — Lab Results (LabPanel/Result, 17 reference ranges, draft → publish flow, RangeBar viz)
 - [x] Phase 10 — Meds (Medication/MedicationLog, today schedule toggle, 7d adherence %, source-tinted badges)
+- [x] Pillar detail page — per-pillar score + 30d trend + drivers (artboard 08)
 - [ ] Phase 6 — Google Health API
 - [ ] Phase 7 — LineOA + polish
