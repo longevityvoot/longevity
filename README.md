@@ -56,7 +56,7 @@ pnpm dev
 - [x] Phase 0 — Project setup (Next.js + TS + Tailwind + Prisma scaffold, design tokens)
 - [x] Phase 1 — DB + Auth (full v0.1 schema, NextAuth v5 with Credentials + Google, role-based middleware, seed)
 - [x] Phase 2 — Client dashboard + daily check-in (6-pillar bars w/ placeholder, scoring lib, full form w/ upsert)
-- [ ] Phase 3 — Donut component
+- [x] Phase 3 — Donut component (Garmin-style segmented SVG: DonutScore + MultiDonut, wired into dashboard)
 - [ ] Phase 4 — Designer dashboard + client detail
 - [ ] Phase 5 — Sessions + chat + invoices
 - [ ] Phase 8 — Body & Vitals (v0.2)
