@@ -21,11 +21,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientId: process.env.LINE_CHANNEL_ID,
             clientSecret: process.env.LINE_CHANNEL_SECRET,
             authorization: {
-              // openid required, profile returns displayName + picture.
-              // email scope only resolves when the user granted email
-              // permission on the LINE channel — we fall back synthetically
-              // below.
-              params: { scope: "openid profile email" },
+              // openid + profile only — `email` scope on LINE requires a
+              // separately approved permission. We synthesize an email
+              // from the LINE user ID below so PrismaAdapter's unique
+              // email constraint stays satisfied without that hurdle.
+              params: { scope: "openid profile" },
             },
             profile(profile) {
               return {
