@@ -46,6 +46,7 @@ model User {
   vitalReadings    VitalReading[]
   labPanels        LabPanel[]
   medications      Medication[]
+  meals            Meal[]
 }
 
 model Account {
@@ -292,4 +293,20 @@ model MedicationLog {
 
   @@unique([medicationId, date, slot])
   @@index([medicationId, date])
+}
+
+// v0.2 — Meals (food log + estimated kcal)
+model Meal {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime @db.Date
+  mealType    String   // "breakfast" | "lunch" | "dinner" | "snack"
+  description String
+  kcal        Int?
+  foodKey     String?  // optional ref to library entry
+  portion     Float    @default(1.0)
+  createdAt   DateTime @default(now())
+
+  @@index([userId, date])
 }

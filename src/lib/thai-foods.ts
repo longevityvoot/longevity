@@ -1,0 +1,161 @@
+// Thai food library — kcal estimates per typical serving.
+// Numbers are rough averages from common Thai food tables — designed for
+// "good enough" tracking, not lab-grade.
+//
+// Keywords power the fuzzy search; matching uses substring + keyword hit.
+
+export type FoodCategory =
+  | "rice"
+  | "noodle"
+  | "soup"
+  | "salad"
+  | "meat"
+  | "egg"
+  | "veg"
+  | "fruit"
+  | "drink"
+  | "snack"
+  | "dessert";
+
+export type FoodItem = {
+  key: string;
+  name: string;
+  kcal: number;
+  unit: string; // "ชาม" | "จาน" | "แก้ว" | "ลูก" | "ชิ้น" | etc.
+  category: FoodCategory;
+  keywords: string[]; // english + alt spellings for search
+};
+
+export const CATEGORY_LABEL: Record<FoodCategory, string> = {
+  rice: "ข้าว",
+  noodle: "ก๋วยเตี๋ยว / เส้น",
+  soup: "แกง / ต้ม",
+  salad: "ยำ / ตำ",
+  meat: "เมนูเนื้อ",
+  egg: "ไข่",
+  veg: "ผัก",
+  fruit: "ผลไม้",
+  drink: "เครื่องดื่ม",
+  snack: "ของว่าง",
+  dessert: "ขนมหวาน",
+};
+
+export const THAI_FOODS: FoodItem[] = [
+  // Rice
+  { key: "rice-white",   name: "ข้าวสวย",          kcal: 200, unit: "1 ทัพพี", category: "rice",   keywords: ["rice", "ข้าว"] },
+  { key: "rice-brown",   name: "ข้าวกล้อง",        kcal: 215, unit: "1 ทัพพี", category: "rice",   keywords: ["brown rice", "กล้อง"] },
+  { key: "rice-sticky",  name: "ข้าวเหนียว",      kcal: 240, unit: "1 ทัพพี", category: "rice",   keywords: ["sticky rice", "เหนียว"] },
+  { key: "rice-porridge",name: "ข้าวต้มหมูสับ",   kcal: 280, unit: "1 ชาม",  category: "rice",   keywords: ["porridge", "ข้าวต้ม"] },
+  { key: "rice-fried",   name: "ข้าวผัด",          kcal: 520, unit: "1 จาน",  category: "rice",   keywords: ["fried rice", "ผัด"] },
+  { key: "rice-chicken", name: "ข้าวมันไก่",      kcal: 620, unit: "1 จาน",  category: "rice",   keywords: ["chicken rice", "มันไก่"] },
+  { key: "rice-pork",    name: "ข้าวหมูแดง",      kcal: 560, unit: "1 จาน",  category: "rice",   keywords: ["red pork rice", "หมูแดง"] },
+  { key: "rice-duck",    name: "ข้าวหน้าเป็ด",     kcal: 580, unit: "1 จาน",  category: "rice",   keywords: ["duck rice", "เป็ด"] },
+  { key: "rice-kapao",   name: "ข้าวกะเพราหมูไข่ดาว", kcal: 720, unit: "1 จาน", category: "rice", keywords: ["kapao", "กะเพรา", "basil"] },
+  { key: "rice-omelet",  name: "ข้าวไข่เจียว",     kcal: 480, unit: "1 จาน",  category: "rice",   keywords: ["omelet rice", "ไข่เจียว"] },
+  { key: "rice-pad-krapao",name:"ข้าวผัดกะเพรา",   kcal: 600, unit: "1 จาน",  category: "rice",   keywords: ["fried basil"] },
+  { key: "khao-soi",     name: "ข้าวซอย",          kcal: 580, unit: "1 ชาม",  category: "rice",   keywords: ["khao soi"] },
+  { key: "rice-curry",   name: "ข้าวราดแกง 1 อย่าง", kcal: 550, unit: "1 จาน", category: "rice",  keywords: ["curry rice", "ราดแกง"] },
+
+  // Noodle
+  { key: "noodle-namtok", name: "ก๋วยเตี๋ยวน้ำตก",   kcal: 420, unit: "1 ชาม",  category: "noodle", keywords: ["namtok"] },
+  { key: "noodle-tomyum", name: "ก๋วยเตี๋ยวต้มยำ",   kcal: 450, unit: "1 ชาม",  category: "noodle", keywords: ["tomyum"] },
+  { key: "noodle-clear",  name: "ก๋วยเตี๋ยวน้ำใส",   kcal: 380, unit: "1 ชาม",  category: "noodle", keywords: ["clear noodle"] },
+  { key: "noodle-egg",    name: "บะหมี่หมูแดง",      kcal: 450, unit: "1 ชาม",  category: "noodle", keywords: ["egg noodle"] },
+  { key: "noodle-yen-ta-fo",name:"เย็นตาโฟ",         kcal: 480, unit: "1 ชาม",  category: "noodle", keywords: ["yen ta fo"] },
+  { key: "noodle-pad-thai",name:"ผัดไทย",            kcal: 530, unit: "1 จาน",  category: "noodle", keywords: ["pad thai"] },
+  { key: "noodle-radna",  name: "ราดหน้า",          kcal: 580, unit: "1 จาน",  category: "noodle", keywords: ["rad na"] },
+  { key: "noodle-pad-see-ew",name:"ผัดซีอิ๊ว",       kcal: 540, unit: "1 จาน",  category: "noodle", keywords: ["pad see ew"] },
+  { key: "instant-noodle",name: "บะหมี่กึ่งสำเร็จ",   kcal: 380, unit: "1 ซอง",  category: "noodle", keywords: ["instant", "mama"] },
+
+  // Soup / curry
+  { key: "tomyum-kung",   name: "ต้มยำกุ้ง",         kcal: 280, unit: "1 ถ้วย",  category: "soup",   keywords: ["tom yum"] },
+  { key: "tom-kha",       name: "ต้มข่าไก่",         kcal: 320, unit: "1 ถ้วย",  category: "soup",   keywords: ["tom kha"] },
+  { key: "green-curry",   name: "แกงเขียวหวานไก่",    kcal: 380, unit: "1 ถ้วย",  category: "soup",   keywords: ["green curry"] },
+  { key: "red-curry",     name: "แกงเผ็ดเป็ดย่าง",     kcal: 420, unit: "1 ถ้วย",  category: "soup",   keywords: ["red curry"] },
+  { key: "massaman",      name: "แกงมัสมั่นเนื้อ",     kcal: 460, unit: "1 ถ้วย",  category: "soup",   keywords: ["massaman"] },
+  { key: "tom-jued",      name: "ต้มจืดหมูสับ",       kcal: 180, unit: "1 ถ้วย",  category: "soup",   keywords: ["tom jued"] },
+  { key: "gaeng-som",     name: "แกงส้ม",            kcal: 220, unit: "1 ถ้วย",  category: "soup",   keywords: ["gaeng som"] },
+
+  // Salad / yum / tam
+  { key: "som-tam",       name: "ส้มตำไทย",          kcal: 230, unit: "1 จาน",  category: "salad",  keywords: ["som tam", "papaya salad"] },
+  { key: "som-tam-pu",    name: "ส้มตำปูปลาร้า",     kcal: 270, unit: "1 จาน",  category: "salad",  keywords: ["som tam pu"] },
+  { key: "yum-woonsen",   name: "ยำวุ้นเส้น",        kcal: 290, unit: "1 จาน",  category: "salad",  keywords: ["yum woonsen"] },
+  { key: "laab",          name: "ลาบหมู",             kcal: 220, unit: "1 จาน",  category: "salad",  keywords: ["laab", "larb"] },
+  { key: "namtok-moo",    name: "น้ำตกหมู",          kcal: 250, unit: "1 จาน",  category: "salad",  keywords: ["namtok"] },
+  { key: "salad-green",   name: "สลัดผัก",           kcal: 180, unit: "1 จาน",  category: "salad",  keywords: ["green salad"] },
+
+  // Meat dishes
+  { key: "moo-yang",      name: "หมูย่าง",           kcal: 280, unit: "1 จาน",  category: "meat",   keywords: ["grilled pork"] },
+  { key: "kor-moo-yang",  name: "คอหมูย่าง",         kcal: 320, unit: "1 จาน",  category: "meat",   keywords: ["pork neck"] },
+  { key: "gai-yang",      name: "ไก่ย่าง",           kcal: 260, unit: "1/2 ตัว",category: "meat",   keywords: ["grilled chicken"] },
+  { key: "gai-tod",       name: "ไก่ทอด",            kcal: 320, unit: "1 ชิ้น",  category: "meat",   keywords: ["fried chicken"] },
+  { key: "moo-kratiem",   name: "หมูทอดกระเทียม",   kcal: 350, unit: "1 จาน",  category: "meat",   keywords: ["pork garlic"] },
+  { key: "pla-rad-prik",  name: "ปลาราดพริก",        kcal: 380, unit: "1 จาน",  category: "meat",   keywords: ["fish chili"] },
+  { key: "pla-nueng",     name: "ปลานึ่งซีอิ๊ว",       kcal: 280, unit: "1 จาน",  category: "meat",   keywords: ["steamed fish"] },
+  { key: "kao-mok-gai",   name: "ข้าวหมกไก่",        kcal: 540, unit: "1 จาน",  category: "rice",   keywords: ["khao mok"] },
+
+  // Egg
+  { key: "egg-boiled",    name: "ไข่ต้ม",             kcal: 78,  unit: "1 ฟอง",  category: "egg",    keywords: ["boiled egg"] },
+  { key: "egg-fried",     name: "ไข่ดาว",             kcal: 110, unit: "1 ฟอง",  category: "egg",    keywords: ["fried egg"] },
+  { key: "egg-omelet",    name: "ไข่เจียว",           kcal: 220, unit: "1 ฟอง",  category: "egg",    keywords: ["omelet"] },
+
+  // Veg
+  { key: "pak-boong",     name: "ผัดผักบุ้งไฟแดง",    kcal: 180, unit: "1 จาน",  category: "veg",    keywords: ["morning glory"] },
+  { key: "pak-tom",       name: "ผักลวก",             kcal: 60,  unit: "1 จาน",  category: "veg",    keywords: ["boiled veg"] },
+  { key: "pak-yang",      name: "ผักย่าง",            kcal: 80,  unit: "1 จาน",  category: "veg",    keywords: ["grilled veg"] },
+
+  // Fruit
+  { key: "fruit-banana",  name: "กล้วยหอม",          kcal: 90,  unit: "1 ลูก",   category: "fruit",  keywords: ["banana"] },
+  { key: "fruit-apple",   name: "แอปเปิ้ล",          kcal: 80,  unit: "1 ลูก",   category: "fruit",  keywords: ["apple"] },
+  { key: "fruit-orange",  name: "ส้ม",                kcal: 50,  unit: "1 ลูก",   category: "fruit",  keywords: ["orange"] },
+  { key: "fruit-mango",   name: "มะม่วงสุก",         kcal: 150, unit: "1/2 ลูก", category: "fruit",  keywords: ["mango"] },
+  { key: "fruit-papaya",  name: "มะละกอสุก",         kcal: 60,  unit: "1 จาน",   category: "fruit",  keywords: ["papaya"] },
+  { key: "fruit-watermelon",name:"แตงโม",           kcal: 45,  unit: "1 ชิ้น",  category: "fruit",  keywords: ["watermelon"] },
+  { key: "fruit-pineapple",name:"สับปะรด",           kcal: 60,  unit: "1 ชิ้น",  category: "fruit",  keywords: ["pineapple"] },
+  { key: "fruit-mixed",   name: "ผลไม้รวม",          kcal: 120, unit: "1 จาน",   category: "fruit",  keywords: ["mixed fruit"] },
+
+  // Drinks
+  { key: "water",         name: "น้ำเปล่า",            kcal: 0,   unit: "1 แก้ว",  category: "drink",  keywords: ["water"] },
+  { key: "coffee-black",  name: "กาแฟดำ",             kcal: 5,   unit: "1 แก้ว",  category: "drink",  keywords: ["black coffee", "americano"] },
+  { key: "coffee-latte",  name: "ลาเต้",              kcal: 180, unit: "1 แก้ว",  category: "drink",  keywords: ["latte"] },
+  { key: "coffee-iced",   name: "กาแฟเย็น",           kcal: 280, unit: "1 แก้ว",  category: "drink",  keywords: ["iced coffee"] },
+  { key: "tea-thai",      name: "ชาไทยเย็น",          kcal: 280, unit: "1 แก้ว",  category: "drink",  keywords: ["thai tea"] },
+  { key: "tea-green",     name: "ชาเขียวเย็น",        kcal: 140, unit: "1 แก้ว",  category: "drink",  keywords: ["green tea"] },
+  { key: "tea-plain",     name: "ชาร้อน (ไม่ใส่น้ำตาล)", kcal: 5, unit: "1 แก้ว",  category: "drink",  keywords: ["plain tea"] },
+  { key: "milk-cow",      name: "นมจืด",              kcal: 150, unit: "1 แก้ว",  category: "drink",  keywords: ["milk"] },
+  { key: "soy-milk",      name: "นมถั่วเหลือง",       kcal: 100, unit: "1 แก้ว",  category: "drink",  keywords: ["soy milk"] },
+  { key: "soda-coke",     name: "โค้ก",                kcal: 140, unit: "1 กระป๋อง",category: "drink", keywords: ["coke", "soda"] },
+  { key: "juice-orange",  name: "น้ำส้ม",              kcal: 110, unit: "1 แก้ว",  category: "drink",  keywords: ["orange juice"] },
+  { key: "beer",          name: "เบียร์",              kcal: 150, unit: "1 ขวด",   category: "drink",  keywords: ["beer"] },
+  { key: "wine",          name: "ไวน์แดง",            kcal: 125, unit: "1 แก้ว",  category: "drink",  keywords: ["wine"] },
+
+  // Snacks
+  { key: "bread-toast",   name: "ขนมปังปิ้งเนยน้ำตาล", kcal: 180, unit: "2 แผ่น",  category: "snack",  keywords: ["toast"] },
+  { key: "sandwich-ham",  name: "แซนด์วิชแฮม",      kcal: 320, unit: "1 ชิ้น",  category: "snack",  keywords: ["sandwich"] },
+  { key: "chips",         name: "มันฝรั่งทอด",       kcal: 250, unit: "1 ห่อ",   category: "snack",  keywords: ["chips"] },
+  { key: "popcorn",       name: "ป๊อปคอร์น",         kcal: 200, unit: "1 ถ้วย",  category: "snack",  keywords: ["popcorn"] },
+  { key: "donut",         name: "โดนัท",             kcal: 280, unit: "1 ชิ้น",  category: "dessert",keywords: ["donut"] },
+  { key: "cake-choc",     name: "ช็อกโกแลตเค้ก",    kcal: 380, unit: "1 ชิ้น",  category: "dessert",keywords: ["chocolate cake"] },
+  { key: "ice-cream",     name: "ไอศกรีม",           kcal: 220, unit: "1 ลูก",   category: "dessert",keywords: ["ice cream"] },
+  { key: "manggwan",      name: "ขนมหวานไทย (มะม่วงข้าวเหนียว)",kcal:520,unit:"1 จาน",category:"dessert",keywords:["mango sticky rice"] },
+
+  // Common Western
+  { key: "burger",        name: "เบอร์เกอร์เนื้อ",     kcal: 550, unit: "1 ชิ้น",  category: "meat",   keywords: ["burger"] },
+  { key: "pizza",         name: "พิซซ่า",            kcal: 280, unit: "1 ชิ้น",  category: "snack",  keywords: ["pizza"] },
+  { key: "pasta-cream",   name: "พาสต้าครีม",        kcal: 580, unit: "1 จาน",  category: "noodle", keywords: ["pasta", "carbonara"] },
+  { key: "salad-caesar",  name: "ซีซาร์สลัด",        kcal: 320, unit: "1 จาน",  category: "salad",  keywords: ["caesar salad"] },
+];
+
+export function searchFoods(query: string, limit = 30): FoodItem[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return THAI_FOODS.slice(0, limit);
+  return THAI_FOODS.filter(
+    (f) =>
+      f.name.toLowerCase().includes(q) ||
+      f.keywords.some((k) => k.toLowerCase().includes(q)),
+  ).slice(0, limit);
+}
+
+export function foodByKey(key: string): FoodItem | undefined {
+  return THAI_FOODS.find((f) => f.key === key);
+}

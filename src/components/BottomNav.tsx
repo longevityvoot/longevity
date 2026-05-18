@@ -21,7 +21,7 @@ const ITEMS: Item[] = [
   {
     href: "/client/body",
     label: "บอดี้",
-    match: (p) => p.startsWith("/client/body") || p.startsWith("/client/labs") || p.startsWith("/client/meds"),
+    match: (p) => p.startsWith("/client/body") || p.startsWith("/client/labs") || p.startsWith("/client/meds") || p.startsWith("/client/nutrition"),
     icon: BodyIcon,
   },
   {
@@ -40,7 +40,7 @@ const ITEMS: Item[] = [
 
 // Hide the nav on focused flows where the page owns the bottom band itself
 // (full-page form with sticky save, modal-like quick-log, etc).
-const HIDE_ON = ["/client/checkin", "/client/body/log", "/client/labs/new"];
+const HIDE_ON = ["/client/checkin", "/client/body/log", "/client/labs/new", "/client/nutrition/add"];
 
 export function BottomNav() {
   const pathname = usePathname();
