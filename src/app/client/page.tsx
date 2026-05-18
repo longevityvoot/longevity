@@ -9,6 +9,7 @@ import { MultiDonut } from "@/components/charts/MultiDonut";
 import { DonutScore } from "@/components/charts/DonutScore";
 import { getUpcomingSessionForClient } from "@/lib/sessions";
 import { listMessages, threadIdForClient } from "@/lib/messages";
+import { greetingFor, bangkokHour } from "@/lib/greeting";
 
 export default async function ClientHome() {
   const session = await auth();
@@ -16,9 +17,15 @@ export default async function ClientHome() {
 
   const today = todayLocalDate();
 
-  const [todayCheckIn, upcoming, recentMessages] = await Promise.all([
+  const [todayCheckIn, recent14, upcoming, recentMessages] = await Promise.all([
     prisma.dailyCheckIn.findUnique({
       where: { userId_date: { userId: session.user.id, date: today } },
+    }),
+    prisma.dailyCheckIn.findMany({
+      where: { userId: session.user.id },
+      orderBy: { date: "desc" },
+      take: 14,
+      select: { date: true },
     }),
     getUpcomingSessionForClient(session.user.id),
     listMessages(threadIdForClient(session.user.id), 3),
@@ -27,6 +34,8 @@ export default async function ClientHome() {
   const scores = scoreFromCheckIn(todayCheckIn);
   const overall = overallScore(scores);
   const lastMessage = recentMessages[recentMessages.length - 1] ?? null;
+  const streak = computeStreak(recent14.map((r) => r.date), today);
+  const greeting = greetingFor(bangkokHour());
 
   const rings = PILLARS.map((p) => ({
     key: p.key,
@@ -36,13 +45,11 @@ export default async function ClientHome() {
 
   return (
     <main className="min-h-screen bg-canvas pb-12">
-      <div className="max-w-[420px] mx-auto px-5 pt-8">
-        <header className="flex items-start justify-between">
+      <div className="max-w-[420px] mx-auto px-5 pt-7">
+        <header className="flex items-center justify-between">
           <div>
-            <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
-              สวัสดี
-            </p>
-            <h1 className="text-[22px] font-semibold tracking-tight text-ink mt-0.5">
+            <p className="text-[12px] text-ink-3">{greeting}</p>
+            <h1 className="text-[20px] font-semibold tracking-tight text-ink leading-tight mt-0.5">
               {session.user.name}
             </h1>
           </div>
@@ -52,46 +59,62 @@ export default async function ClientHome() {
               await signOut({ redirectTo: "/login" });
             }}
           >
-            <button className="text-[12px] text-ink-3 hover:underline">
-              ออกจากระบบ
+            <button className="text-[11px] text-ink-3 hover:underline">
+              ออก
             </button>
           </form>
         </header>
 
-        <section className="mt-6 bg-surface rounded-xl p-5 border border-border flex items-center gap-5">
-          <MultiDonut
-            rings={rings}
-            size={180}
-            thickness={6}
-            ringGap={3}
-            centerValue={overall != null ? String(overall) : "—"}
-            centerLabel="คะแนนรวม"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-              Longevity score วันนี้
-            </p>
-            <p className="text-[13px] text-ink-3 mt-1">
-              {overall != null
-                ? "อัปเดตจาก check-in ล่าสุด"
-                : "ยังไม่ได้กรอก check-in วันนี้"}
-            </p>
-            <Link
-              href="/client/checkin"
-              className={`mt-3 inline-flex items-center justify-center w-full h-10 rounded-md text-[13px] font-semibold ${
-                overall == null
-                  ? "bg-pillar-activity text-white"
-                  : "border border-border-strong text-ink-2"
-              }`}
-            >
-              {overall == null ? "กรอก check-in" : "แก้ check-in"}
-            </Link>
+        {/* Hero score */}
+        <section className="mt-5 bg-surface rounded-xl p-5 border border-border">
+          <div className="flex items-center gap-4">
+            <MultiDonut
+              rings={rings}
+              size={160}
+              thickness={6}
+              ringGap={3}
+              centerValue={overall != null ? String(overall) : "—"}
+              centerLabel="100"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+                Longevity score
+              </p>
+              <p className="text-[12px] text-ink-3 mt-1">
+                {overall != null
+                  ? "วันนี้"
+                  : "ยังไม่มีข้อมูลวันนี้"}
+              </p>
+              {streak > 0 ? (
+                <p className="mt-2 text-[12px] text-ink-2">
+                  <span className="font-bold font-num text-pillar-nutrition">{streak}</span> วัน check-in ต่อเนื่อง
+                </p>
+              ) : null}
+              {todayCheckIn ? null : (
+                <p className="mt-2 text-[11px] text-pillar-activity font-semibold">
+                  กรอก check-in เพื่อดูคะแนน
+                </p>
+              )}
+            </div>
           </div>
+          <Link
+            href="/client/checkin"
+            className={`mt-4 inline-flex items-center justify-center w-full h-12 rounded-md text-[15px] font-semibold ${
+              todayCheckIn == null
+                ? "bg-pillar-activity text-white"
+                : "border border-border-strong text-ink-2 bg-surface"
+            }`}
+          >
+            {todayCheckIn == null ? "กรอก check-in วันนี้" : "แก้ check-in วันนี้"}
+          </Link>
         </section>
 
-        <section className="mt-6">
-          <h2 className="text-[14px] font-semibold text-ink-2 mb-3">6 ด้านของสุขภาพ</h2>
-          <div className="grid grid-cols-2 gap-3">
+        {/* 6 pillar tiles */}
+        <section className="mt-5">
+          <h2 className="text-[13px] font-semibold text-ink-2 mb-2 px-1">
+            6 ด้านของสุขภาพ
+          </h2>
+          <div className="grid grid-cols-2 gap-2.5">
             {PILLARS.map((p) => {
               const score = scores?.[p.key] ?? null;
               return (
@@ -101,24 +124,21 @@ export default async function ClientHome() {
                 >
                   <DonutScore
                     value={score}
-                    size={64}
-                    thickness={6}
+                    size={56}
+                    thickness={5}
                     segments={14}
-                    gapDeg={4}
+                    gapDeg={5}
                     color={p.hex}
                   />
-                  <div className="min-w-0">
-                    <p className="text-[11px] text-ink-4 font-semibold uppercase tracking-wider truncate">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] text-ink-3 font-medium truncate">
                       {p.label}
                     </p>
                     <p
-                      className="text-[18px] font-bold font-num tabular-nums"
+                      className="text-[18px] font-bold font-num tabular-nums mt-0.5 leading-none"
                       style={{ color: p.hex }}
                     >
                       {score ?? "—"}
-                      {score != null && (
-                        <span className="text-[10px] text-ink-4 ml-1">/100</span>
-                      )}
                     </p>
                   </div>
                 </div>
@@ -127,43 +147,43 @@ export default async function ClientHome() {
           </div>
         </section>
 
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <Link
-            href="/client/body"
-            className="bg-surface rounded-lg p-4 border border-border block"
-          >
-            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-              Body & Vitals
-            </p>
-            <p className="text-[13px] text-ink-3 mt-1">
-              น้ำหนัก / ความดัน / น้ำตาล
-            </p>
-          </Link>
-          <Link
-            href="/client/labs"
-            className="bg-surface rounded-lg p-4 border border-border block"
-          >
-            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-              Lab Results
-            </p>
-            <p className="text-[13px] text-ink-3 mt-1">ผลตรวจเลือด</p>
-          </Link>
-          <Link
-            href="/client/meds"
-            className="bg-surface rounded-lg p-4 border border-border block col-span-2"
-          >
-            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-              ยา · อาหารเสริม
-            </p>
-            <p className="text-[13px] text-ink-3 mt-1">
-              ดูตารางวันนี้ · ติ๊กว่ากินแล้ว
-            </p>
-          </Link>
-        </div>
+        {/* Quick links — body, labs, meds */}
+        <section className="mt-5">
+          <h2 className="text-[13px] font-semibold text-ink-2 mb-2 px-1">
+            บันทึก
+          </h2>
+          <div className="grid grid-cols-3 gap-2.5">
+            <Link
+              href="/client/body"
+              className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
+            >
+              <span className="text-[20px]">⚖️</span>
+              <p className="text-[12px] text-ink-2 font-semibold mt-1">บอดี้</p>
+              <p className="text-[10px] text-ink-4">น้ำหนัก · BP</p>
+            </Link>
+            <Link
+              href="/client/labs"
+              className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
+            >
+              <span className="text-[20px]">🧪</span>
+              <p className="text-[12px] text-ink-2 font-semibold mt-1">ผลแล็บ</p>
+              <p className="text-[10px] text-ink-4">เลือด</p>
+            </Link>
+            <Link
+              href="/client/meds"
+              className="bg-surface rounded-lg p-3 border border-border flex flex-col items-center text-center"
+            >
+              <span className="text-[20px]">💊</span>
+              <p className="text-[12px] text-ink-2 font-semibold mt-1">ยา</p>
+              <p className="text-[10px] text-ink-4">วันนี้</p>
+            </Link>
+          </div>
+        </section>
 
+        {/* Chat shortcut */}
         <Link
           href="/client/chat"
-          className="mt-3 bg-surface rounded-lg p-4 border border-border block"
+          className="mt-5 bg-surface rounded-lg p-4 border border-border block"
         >
           <div className="flex items-center justify-between">
             <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
@@ -178,6 +198,7 @@ export default async function ClientHome() {
           </p>
         </Link>
 
+        {/* Upcoming session */}
         <section className="mt-3 bg-surface rounded-lg p-4 border border-border">
           <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
             session ถัดไป
@@ -207,4 +228,23 @@ export default async function ClientHome() {
       </div>
     </main>
   );
+}
+
+// Count consecutive days of check-ins ending today (or yesterday if today
+// isn't filled yet) so a missed day breaks the streak immediately.
+function computeStreak(dates: Date[], today: Date): number {
+  if (dates.length === 0) return 0;
+  const set = new Set(dates.map((d) => d.getTime()));
+  let cursor = new Date(today);
+  let streak = 0;
+  // If today not checked in, allow yesterday to start the streak so the
+  // counter doesn't reset to 0 until 8am.
+  if (!set.has(cursor.getTime())) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  while (set.has(cursor.getTime())) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
 }
