@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { PILLARS } from "@/lib/pillars";
 import { scoreFromCheckIn, overallScore } from "@/lib/scoring";
 import { todayLocalDate } from "@/lib/dates";
+import { MultiDonut } from "@/components/charts/MultiDonut";
+import { DonutScore } from "@/components/charts/DonutScore";
 
 export default async function ClientHome() {
   const session = await auth();
@@ -18,6 +20,12 @@ export default async function ClientHome() {
 
   const scores = scoreFromCheckIn(todayCheckIn);
   const overall = overallScore(scores);
+
+  const rings = PILLARS.map((p) => ({
+    key: p.key,
+    color: p.hex,
+    value: scores?.[p.key] ?? null,
+  }));
 
   return (
     <main className="min-h-screen bg-canvas pb-12">
@@ -37,39 +45,41 @@ export default async function ClientHome() {
               await signOut({ redirectTo: "/login" });
             }}
           >
-            <button className="text-[12px] text-ink-3 underline-offset-2 hover:underline">
+            <button className="text-[12px] text-ink-3 hover:underline">
               ออกจากระบบ
             </button>
           </form>
         </header>
 
-        <section className="mt-6 bg-ink text-white rounded-xl p-5 shadow-lg">
-          <p className="text-[11px] uppercase tracking-wider text-ink-5 font-semibold">
-            Longevity score วันนี้
-          </p>
-          <div className="mt-2 flex items-baseline gap-3">
-            <span className="text-[44px] font-bold font-num tabular-nums leading-none">
-              {overall ?? "—"}
-            </span>
-            <span className="text-[13px] text-ink-5">
-              {overall != null ? "คะแนนรวม 6 ด้าน" : "ยังไม่ได้กรอกวันนี้"}
-            </span>
+        <section className="mt-6 bg-surface rounded-xl p-5 border border-border flex items-center gap-5">
+          <MultiDonut
+            rings={rings}
+            size={170}
+            thickness={8}
+            ringGap={3}
+            centerValue={overall != null ? String(overall) : "—"}
+            centerLabel="คะแนนรวม"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+              Longevity score วันนี้
+            </p>
+            <p className="text-[13px] text-ink-3 mt-1">
+              {overall != null
+                ? "อัปเดตจาก check-in ล่าสุด"
+                : "ยังไม่ได้กรอก check-in วันนี้"}
+            </p>
+            <Link
+              href="/client/checkin"
+              className={`mt-3 inline-flex items-center justify-center w-full h-10 rounded-md text-[13px] font-semibold ${
+                overall == null
+                  ? "bg-pillar-activity text-white"
+                  : "border border-border-strong text-ink-2"
+              }`}
+            >
+              {overall == null ? "กรอก check-in" : "แก้ check-in"}
+            </Link>
           </div>
-          {overall == null ? (
-            <Link
-              href="/client/checkin"
-              className="mt-4 inline-flex items-center justify-center w-full h-12 rounded-md bg-pillar-activity text-white font-semibold text-[15px]"
-            >
-              กรอก check-in วันนี้ (~1 นาที)
-            </Link>
-          ) : (
-            <Link
-              href="/client/checkin"
-              className="mt-4 inline-flex items-center justify-center w-full h-11 rounded-md border border-ink-3 text-white text-[13px] font-semibold"
-            >
-              แก้ไข check-in วันนี้
-            </Link>
-          )}
         </section>
 
         <section className="mt-6">
@@ -80,28 +90,34 @@ export default async function ClientHome() {
               return (
                 <div
                   key={p.key}
-                  className="bg-surface rounded-lg p-4 border border-border"
+                  className="bg-surface rounded-lg p-3 border border-border flex items-center gap-3"
                 >
-                  <p className="text-[12px] text-ink-3 font-medium">{p.label}</p>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className={`text-[24px] font-bold font-num tabular-nums text-${p.color}`}>
+                  <DonutScore
+                    value={score}
+                    size={64}
+                    thickness={6}
+                    segments={14}
+                    gapDeg={4}
+                    color={p.hex}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-[11px] text-ink-4 font-semibold uppercase tracking-wider truncate">
+                      {p.label}
+                    </p>
+                    <p
+                      className="text-[18px] font-bold font-num tabular-nums"
+                      style={{ color: p.hex }}
+                    >
                       {score ?? "—"}
-                    </span>
-                    {score != null && <span className="text-[11px] text-ink-4">/100</span>}
-                  </div>
-                  <div className="mt-2 h-1.5 bg-canvas rounded-pill overflow-hidden">
-                    <div
-                      className={`h-full bg-${p.color} rounded-pill`}
-                      style={{ width: `${score ?? 0}%` }}
-                    />
+                      {score != null && (
+                        <span className="text-[10px] text-ink-4 ml-1">/100</span>
+                      )}
+                    </p>
                   </div>
                 </div>
               );
             })}
           </div>
-          <p className="text-[11px] text-ink-4 mt-3">
-            * Donut chart แบบ Garmin จะมาใน Phase 3 — ตอนนี้ใช้ bar placeholder
-          </p>
         </section>
 
         <section className="mt-6 bg-surface rounded-lg p-4 border border-border">
