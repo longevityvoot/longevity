@@ -148,6 +148,17 @@ export default async function ClientHome() {
             </p>
             <p className="text-[13px] text-ink-3 mt-1">ผลตรวจเลือด</p>
           </Link>
+          <Link
+            href="/client/meds"
+            className="bg-surface rounded-lg p-4 border border-border block col-span-2"
+          >
+            <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+              ยา · อาหารเสริม
+            </p>
+            <p className="text-[13px] text-ink-3 mt-1">
+              ดูตารางวันนี้ · ติ๊กว่ากินแล้ว
+            </p>
+          </Link>
         </div>
 
         <Link
