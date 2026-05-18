@@ -31,12 +31,12 @@ export default async function NewLabPage({
           กรอกค่าจากใบผลตรวจ — designer จะ review ก่อน publish
         </p>
 
-        <nav className="mt-4 -mx-5 px-5 flex gap-2 overflow-x-auto no-scrollbar">
+        <nav className="mt-4 flex flex-wrap gap-2">
           {LAB_TEMPLATES.map((t) => (
             <Link
               key={t.key}
               href={`/client/labs/new?tmpl=${t.key}`}
-              className={`h-9 px-3 inline-flex items-center rounded-pill text-[12px] font-semibold whitespace-nowrap shrink-0 ${
+              className={`h-9 px-3 inline-flex items-center rounded-pill text-[12px] font-semibold ${
                 t.key === active.key
                   ? "bg-ink text-white"
                   : "bg-surface border border-border text-ink-2"
