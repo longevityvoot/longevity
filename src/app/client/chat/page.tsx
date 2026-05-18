@@ -20,7 +20,7 @@ export default async function ClientChatPage() {
   const designerName = profile?.assignedCoach?.name ?? "Longevity Designer";
 
   return (
-    <main className="min-h-screen bg-canvas pb-32">
+    <main className="min-h-screen bg-canvas pb-6">
       <header className="sticky top-0 z-20 bg-canvas/90 backdrop-blur border-b border-border">
         <div className="max-w-[420px] mx-auto px-5 py-3 flex items-center gap-3">
           <Link
@@ -30,42 +30,45 @@ export default async function ClientChatPage() {
           >
             ←
           </Link>
-          <div className="size-10 rounded-full bg-pillar-sleep-wash text-pillar-sleep flex items-center justify-center text-[14px] font-bold">
-            {designerName.charAt(0)}
-          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[14px] font-semibold text-ink leading-tight truncate">
-              {designerName}
+            <p className="text-[14px] font-semibold text-ink leading-tight">
+              บันทึกการคุย
             </p>
-            <p className="text-[11px] text-ink-3 leading-tight">designer ของคุณ</p>
+            <p className="text-[11px] text-ink-3 leading-tight truncate">
+              กับ {designerName} · ไม่ realtime — designer จะตอบเมื่อสะดวก
+            </p>
           </div>
         </div>
       </header>
 
       <div className="max-w-[420px] mx-auto px-4 pt-4">
         <ChatThread messages={messages} currentUserId={session.user.id} />
-      </div>
 
-      <form
-        action={sendMessageAsClient}
-        className="fixed left-0 right-0 bottom-16 bg-surface/95 backdrop-blur border-t border-border px-4 py-2.5 z-20"
-      >
-        <div className="max-w-[420px] mx-auto flex gap-2 items-end">
-          <input
+        <form
+          action={sendMessageAsClient}
+          className="mt-6 bg-surface border border-border rounded-lg p-3"
+        >
+          <p className="text-[12px] font-semibold text-ink-3 mb-2">เขียนคำถามใหม่</p>
+          <textarea
             name="content"
             required
-            placeholder="พิมพ์ข้อความ..."
-            className="flex-1 h-11 rounded-pill border border-border-strong px-4 text-[14px] bg-canvas focus:outline-none focus:border-ink"
+            rows={3}
+            placeholder="เช่น สัปดาห์นี้ HRV ต่ำลง ปกติมั้ย?"
+            className="w-full rounded-md border border-border-strong px-3 py-2 text-[14px] resize-none focus:outline-none focus:border-ink"
           />
-          <button
-            type="submit"
-            className="size-11 rounded-full bg-ink text-white font-semibold text-[14px] flex items-center justify-center"
-            aria-label="ส่ง"
-          >
-            ↑
-          </button>
-        </div>
-      </form>
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <p className="text-[10px] text-ink-4">
+              เหมือนคอมเมนต์ — เก็บเป็น thread อ่านย้อนหลังได้
+            </p>
+            <button
+              type="submit"
+              className="h-9 px-4 rounded-md bg-ink text-white font-semibold text-[13px]"
+            >
+              ส่ง
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
   );
 }
