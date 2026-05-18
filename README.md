@@ -45,6 +45,14 @@ pnpm dev
 ### Google OAuth (optional)
 - Authorized redirect URIs: `https://<vercel-url>/api/auth/callback/google` + `http://localhost:3000/api/auth/callback/google`
 
+### LINE Login (optional)
+1. https://developers.line.biz/console/ → เลือก Provider → **Create a new channel** → **LINE Login**
+2. Channel settings: ใส่ App name / region (TH) / category
+3. **Callback URL:** `https://<vercel-url>/api/auth/callback/line`
+4. (optional) เปิด email permission ใน "OpenID Connect" tab — ถ้าไม่เปิด ระบบจะใส่ synthetic email ให้
+5. Copy **Channel ID** → `LINE_CHANNEL_ID` env, **Channel secret** → `LINE_CHANNEL_SECRET` env
+6. ต้อง redeploy หลังใส่ env เพื่อให้ปุ่ม LINE บน /login active
+
 ## Docs
 - `handoff/spec-v0.2.md` — PRD เต็ม (read this first)
 - `handoff/design-tokens.md` — สี/font/spacing (ลงใน `tailwind.config.ts` แล้ว)
