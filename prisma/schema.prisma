@@ -36,10 +36,12 @@ model User {
   sessionsAsClient Session[] @relation("ClientSessions")
   sessionsAsCoach  Session[] @relation("CoachSessions")
 
-  dailyCheckIns DailyCheckIn[]
-  healthMetrics HealthMetric[]
-  messages      Message[]
-  invoices      Invoice[]
+  dailyCheckIns    DailyCheckIn[]
+  healthMetrics    HealthMetric[]
+  messages         Message[]
+  invoices         Invoice[]
+  bodyMeasurements BodyMeasurement[]
+  vitalReadings    VitalReading[]
 }
 
 model Account {
@@ -93,6 +95,12 @@ model ClientProfile {
 
   assignedCoachId String?
   assignedCoach   User?   @relation("AssignedCoach", fields: [assignedCoachId], references: [id])
+
+  // v0.2 — per-client measurement cadence
+  weightCadence  String @default("weekly")     // daily | weekly | biweekly
+  waistCadence   String @default("biweekly")   // weekly | biweekly | monthly
+  bpCadence      String @default("as-needed")  // as-needed | scheduled-daily
+  glucoseCadence String @default("as-needed")  // as-needed | scheduled-daily
 }
 
 model CoachProfile {
@@ -182,4 +190,33 @@ model Invoice {
   paidDate    DateTime?
   status      String
   notes       String?
+}
+
+// v0.2 — Body & Vitals
+model BodyMeasurement {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String   // "weight" | "waist"
+  value      Float
+  unit       String   // "kg" | "cm"
+  measuredAt DateTime
+  context    String?  // "morning" | "evening" | etc.
+  notes      String?
+
+  @@index([userId, type, measuredAt])
+}
+
+model VitalReading {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String   // "bp" | "glucose"
+  measuredAt DateTime
+  context    String?  // BP: morning/evening/post-stress | glucose: fasting/post-meal/random/bedtime
+  values     Json     // {sys, dia, hr} | {value, unit}
+  notes      String?
+  flag       String?  // "normal" | "low" | "high" | "critical"
+
+  @@index([userId, type, measuredAt])
 }

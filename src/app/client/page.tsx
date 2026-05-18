@@ -128,8 +128,23 @@ export default async function ClientHome() {
         </section>
 
         <Link
+          href="/client/body"
+          className="mt-3 bg-surface rounded-lg p-4 border border-border flex items-center justify-between"
+        >
+          <div>
+            <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+              Body & Vitals
+            </p>
+            <p className="text-[14px] text-ink-3 mt-1">
+              น้ำหนัก / รอบเอว / ความดัน / น้ำตาล
+            </p>
+          </div>
+          <span className="text-[12px] text-ink-3">เปิด →</span>
+        </Link>
+
+        <Link
           href="/client/chat"
-          className="mt-6 bg-surface rounded-lg p-4 border border-border block"
+          className="mt-3 bg-surface rounded-lg p-4 border border-border block"
         >
           <div className="flex items-center justify-between">
             <p className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
