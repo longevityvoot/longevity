@@ -58,7 +58,7 @@ pnpm dev
 - [x] Phase 2 — Client dashboard + daily check-in (6-pillar bars w/ placeholder, scoring lib, full form w/ upsert)
 - [x] Phase 3 — Donut component (Garmin-style segmented SVG: DonutScore + MultiDonut, wired into dashboard)
 - [x] Phase 4 — Designer dashboard + client detail (client list w/ alerts, 3-col detail w/ profile + scores + 14d table)
-- [ ] Phase 5 — Sessions + chat + invoices
+- [x] Phase 5 — Sessions + chat + invoices (create session/invoice, toggle paid, shared thread per client)
 - [ ] Phase 8 — Body & Vitals (v0.2)
 - [ ] Phase 9 — Lab Results (v0.2)
 - [ ] Phase 10 — Meds (v0.2)

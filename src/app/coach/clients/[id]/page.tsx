@@ -4,7 +4,10 @@ import { auth } from "@/auth";
 import { getClientDetail, ageFromDOB } from "@/lib/clients";
 import { PILLARS } from "@/lib/pillars";
 import { MultiDonut } from "@/components/charts/MultiDonut";
-import { DonutScore } from "@/components/charts/DonutScore";
+import { listSessionsForClient } from "@/lib/sessions";
+import { listInvoicesForClient, invoiceTone } from "@/lib/invoices";
+import { listMessages, threadIdForClient } from "@/lib/messages";
+import { toggleInvoicePaid } from "./invoices/new/actions";
 
 export default async function ClientDetailPage({
   params,
@@ -17,6 +20,13 @@ export default async function ClientDetailPage({
   const { id } = await params;
   const client = await getClientDetail(id);
   if (!client) notFound();
+
+  const [sessions, invoices, messages] = await Promise.all([
+    listSessionsForClient(id),
+    listInvoicesForClient(id),
+    listMessages(threadIdForClient(id), 5),
+  ]);
+  const lastMessage = messages[messages.length - 1] ?? null;
 
   const rings = PILLARS.map((p) => ({
     key: p.key,
@@ -208,33 +218,149 @@ export default async function ClientDetailPage({
             </div>
           </section>
 
-          {/* RIGHT: actions + chat placeholder */}
+          {/* RIGHT: actions / chat / sessions / invoices */}
           <aside className="space-y-4">
             <section className="bg-surface border border-border rounded-lg p-4">
               <h2 className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
                 Quick actions
               </h2>
               <div className="mt-3 space-y-2">
-                <button
-                  disabled
-                  className="w-full h-10 rounded-md border border-border-strong text-[13px] font-semibold text-ink-3"
+                <Link
+                  href={`/coach/clients/${id}/sessions/new`}
+                  className="w-full h-10 inline-flex items-center justify-center rounded-md bg-ink text-white text-[13px] font-semibold"
                 >
-                  + Session ใหม่ (Phase 5)
-                </button>
-                <button
-                  disabled
-                  className="w-full h-10 rounded-md border border-border-strong text-[13px] font-semibold text-ink-3"
+                  + Session ใหม่
+                </Link>
+                <Link
+                  href={`/coach/clients/${id}/chat`}
+                  className="w-full h-10 inline-flex items-center justify-center rounded-md border border-border-strong text-[13px] font-semibold text-ink-2"
                 >
-                  ส่งข้อความ (Phase 5)
-                </button>
+                  เปิดแชท
+                </Link>
+                <Link
+                  href={`/coach/clients/${id}/invoices/new`}
+                  className="w-full h-10 inline-flex items-center justify-center rounded-md border border-border-strong text-[13px] font-semibold text-ink-2"
+                >
+                  + Invoice
+                </Link>
               </div>
+              {lastMessage ? (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
+                    ข้อความล่าสุด
+                  </p>
+                  <p className="mt-1 text-[12px] text-ink-3 line-clamp-2">
+                    {lastMessage.content}
+                  </p>
+                </div>
+              ) : null}
             </section>
 
             <section className="bg-surface border border-border rounded-lg p-4">
               <h2 className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
-                Action items
+                Sessions ล่าสุด
               </h2>
-              <p className="mt-2 text-[13px] text-ink-3">มาใน Phase 5</p>
+              {sessions.length === 0 ? (
+                <p className="mt-2 text-[13px] text-ink-3">ยังไม่มี</p>
+              ) : (
+                <ul className="mt-3 space-y-3">
+                  {sessions.slice(0, 5).map((s) => (
+                    <li key={s.id}>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded-pill ${
+                            s.status === "upcoming"
+                              ? "bg-pillar-sleep-wash text-pillar-sleep"
+                              : s.status === "completed"
+                              ? "bg-pillar-social-wash text-pillar-social"
+                              : "bg-canvas text-ink-3"
+                          }`}
+                        >
+                          {s.status}
+                        </span>
+                        <span className="text-[11px] text-ink-4">{s.type}</span>
+                      </div>
+                      <p className="text-[12px] text-ink-2 mt-1">
+                        {s.scheduledAt
+                          ? s.scheduledAt.toLocaleString("th-TH", {
+                              day: "numeric",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : s.createdAt.toLocaleDateString("th-TH", {
+                              day: "numeric",
+                              month: "short",
+                            })}
+                        {s.durationMin ? ` · ${s.durationMin} นาที` : ""}
+                      </p>
+                      {s.summary ? (
+                        <p className="text-[12px] text-ink-3 mt-0.5 line-clamp-2">
+                          {s.summary}
+                        </p>
+                      ) : null}
+                      {s.actionItems.length > 0 ? (
+                        <ul className="mt-1 space-y-0.5 text-[12px] text-ink-3">
+                          {s.actionItems.slice(0, 3).map((ai, i) => (
+                            <li key={i}>• {ai.text}</li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            <section className="bg-surface border border-border rounded-lg p-4">
+              <h2 className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+                Invoices
+              </h2>
+              {invoices.length === 0 ? (
+                <p className="mt-2 text-[13px] text-ink-3">ยังไม่มี</p>
+              ) : (
+                <ul className="mt-3 space-y-2">
+                  {invoices.slice(0, 5).map((inv) => {
+                    const tone = invoiceTone(inv.status);
+                    const toneCls =
+                      tone === "ok"
+                        ? "bg-pillar-social-wash text-pillar-social"
+                        : tone === "danger"
+                        ? "bg-pillar-activity-wash text-pillar-activity"
+                        : tone === "warning"
+                        ? "bg-pillar-stress-wash text-pillar-stress"
+                        : "bg-canvas text-ink-3";
+                    return (
+                      <li
+                        key={inv.id}
+                        className="flex items-center justify-between gap-2"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[12px] text-ink-2 truncate">
+                            {inv.description}
+                          </p>
+                          <p className="text-[11px] text-ink-4">
+                            {inv.amount.toLocaleString()} {inv.currency} ·{" "}
+                            {inv.issuedDate.toLocaleDateString("th-TH", {
+                              day: "numeric",
+                              month: "short",
+                            })}
+                          </p>
+                        </div>
+                        <form
+                          action={toggleInvoicePaid.bind(null, inv.id, id)}
+                        >
+                          <button
+                            className={`text-[11px] font-semibold px-2 py-0.5 rounded-pill ${toneCls}`}
+                          >
+                            {inv.status}
+                          </button>
+                        </form>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </section>
           </aside>
         </div>
