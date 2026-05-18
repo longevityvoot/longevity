@@ -33,10 +33,11 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ l
     ],
   },
   stress: {
-    intro: "ความเครียดสะสมระยะยาว เป็น marker ของหลายปัญหา",
+    intro: "Mental wellbeing — ความเครียดสะสม + อารมณ์ระยะยาว เป็น marker ของหลายปัญหา",
     drivers: [
-      { label: "Subjective rating", hint: "1-10 จาก check-in" },
-      { label: "HRV trend", hint: "ผ่าน wearable (Phase 6)" },
+      { label: "ความเครียด (1-10)", hint: "subjective จาก daily check-in" },
+      { label: "อารมณ์ (1-10)", hint: "blend เข้าคะแนน — อารมณ์ดี = pillar คะแนนขึ้น" },
+      { label: "HRV trend", hint: "indicator การฟื้นตัว (Phase 6)" },
       { label: "Stress score", hint: "Garmin/Fitbit (Phase 6)" },
     ],
   },
