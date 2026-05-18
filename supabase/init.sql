@@ -174,7 +174,7 @@ ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_clientId_fkey" FOREIGN KEY ("clien
 
 INSERT INTO "User" ("id", "email", "name", "role", "passwordHash")
 VALUES
-  ('seed_coach_01', 'coach@example.com',  'เภสัชกร (designer)', 'COACH',  '$2a$10$ncu8hSnj1oRiY3sSayet5.ne9yzJ5f7.LAM6FuAh/bAyXMn7KxCX.'),
+  ('seed_coach_01', 'coach@example.com',  'Longevity Designer', 'COACH',  '$2a$10$ncu8hSnj1oRiY3sSayet5.ne9yzJ5f7.LAM6FuAh/bAyXMn7KxCX.'),
   ('seed_client_01', 'client@example.com', 'ลูกค้าทดสอบ',        'CLIENT', '$2a$10$ncu8hSnj1oRiY3sSayet5.ne9yzJ5f7.LAM6FuAh/bAyXMn7KxCX.')
 ON CONFLICT ("email") DO NOTHING;
 
