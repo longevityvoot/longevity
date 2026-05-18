@@ -118,9 +118,10 @@ export default async function ClientHome() {
             {PILLARS.map((p) => {
               const score = scores?.[p.key] ?? null;
               return (
-                <div
+                <Link
                   key={p.key}
-                  className="bg-surface rounded-lg p-3 border border-border flex items-center gap-3"
+                  href={`/client/pillars/${p.key}`}
+                  className="bg-surface rounded-lg p-3 border border-border flex items-center gap-3 hover:border-border-strong transition-colors"
                 >
                   <DonutScore
                     value={score}
@@ -141,7 +142,7 @@ export default async function ClientHome() {
                       {score ?? "—"}
                     </p>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
