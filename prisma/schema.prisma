@@ -131,10 +131,14 @@ model DailyCheckIn {
   nutritionNotes   String?
   supplementsTaken Json?
   socialActivities String?
+  // Structured social engagement kind (replaces free-text scoring).
+  //   "none" | "text" | "call" | "in-person" | "group"
+  socialKind String?
 
   alcoholUnits  Float?
-  caffeineCount Int?
-  smokedToday   Boolean?
+  caffeineCount Int?   // info-only — no longer used in pillar scoring
+  smokedToday   Boolean?  // includes vape / chew (label updated in UI)
+  sugaryDrinkCount Int?  // sugary drinks: น้ำอัดลม, น้ำหวาน, น้ำผลไม้, ชานม, กาแฟใส่น้ำตาล/นม
 
   notes String?
 
