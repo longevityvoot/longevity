@@ -8,6 +8,7 @@ import {
   estimateBMR,
   estimateDailyTarget,
   bmrMethod,
+  dailyQualityByAxis,
   MEAL_TYPES,
 } from "@/lib/meals";
 import { getLatestWeight, getLatestLBM } from "@/lib/body";
@@ -50,6 +51,13 @@ export default async function NutritionPage() {
     dailyTarget != null && dailyTarget > 0
       ? Math.round((totalToday / dailyTarget) * 100)
       : null;
+
+  const qualityAxis = dailyQualityByAxis(meals);
+  const hasAnyQuality =
+    qualityAxis.protein != null ||
+    qualityAxis.veg != null ||
+    qualityAxis.carb != null ||
+    qualityAxis.fat != null;
 
   // Group meals by type
   const byType: Record<string, typeof meals> = {};
@@ -133,6 +141,20 @@ export default async function NutritionPage() {
           )}
         </section>
 
+        {hasAnyQuality ? (
+          <section className="mt-3 bg-surface rounded-xl p-4 border border-border">
+            <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-bold">
+              คุณภาพอาหารวันนี้
+            </p>
+            <dl className="mt-2 space-y-1.5">
+              <QualityRow label="🥩 โปรตีน"        score={qualityAxis.protein} />
+              <QualityRow label="🥬 ผัก / ใยอาหาร" score={qualityAxis.veg} />
+              <QualityRow label="🍚 ข้าว / แป้ง"   score={qualityAxis.carb} />
+              <QualityRow label="🥑 ไขมัน"          score={qualityAxis.fat} />
+            </dl>
+          </section>
+        ) : null}
+
         {/* Add CTA */}
         <Link
           href="/client/nutrition/add"
@@ -192,5 +214,24 @@ export default async function NutritionPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function QualityRow({ label, score }: { label: string; score: number | null }) {
+  const status =
+    score == null ? "—" :
+    score >= 80 ? "พอดี" :
+    score >= 50 ? "ปานกลาง" :
+    "ต้องปรับ";
+  const tone =
+    score == null ? "text-ink-4" :
+    score >= 80 ? "text-pillar-social" :
+    score >= 50 ? "text-pillar-stress" :
+    "text-pillar-activity";
+  return (
+    <div className="flex items-center justify-between gap-3 text-[12.5px]">
+      <dt className="text-ink-2">{label}</dt>
+      <dd className={`font-semibold ${tone}`}>{status}</dd>
+    </div>
   );
 }

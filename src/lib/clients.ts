@@ -4,9 +4,10 @@ import { todayLocalDate } from "@/lib/dates";
 import {
   estimateBMR,
   estimateDailyTarget,
-  getDailyKcalHistory,
+  getDailyNutritionHistory,
   getMealsForDay,
   totalKcal,
+  dailyMealQuality,
 } from "@/lib/meals";
 import { getLatestLBM } from "@/lib/body";
 
@@ -106,9 +107,9 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
   });
   if (!user || !user.clientProfile) return null;
 
-  const [todayMeals, kcalHistory, latestLbm] = await Promise.all([
+  const [todayMeals, nutritionHistory, latestLbm] = await Promise.all([
     getMealsForDay(id, today),
-    getDailyKcalHistory(id, 14),
+    getDailyNutritionHistory(id, 14),
     getLatestLBM(id),
   ]);
   const bmr = estimateBMR({
@@ -121,9 +122,13 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
   const dailyTarget = estimateDailyTarget(bmr);
 
   const recentCheckIns = user.dailyCheckIns.map((ci) => {
-    const kcal = kcalHistory.get(ci.date.toISOString().slice(0, 10)) ?? 0;
+    const day = nutritionHistory.get(ci.date.toISOString().slice(0, 10));
     const scores = scoreFromCheckIn(ci, {
-      nutrition: { kcalToday: kcal, dailyTarget },
+      nutrition: {
+        kcalToday: day?.kcal ?? 0,
+        dailyTarget,
+        qualityScore: day?.qualityScore ?? null,
+      },
     });
     return {
       date: ci.date,
@@ -137,7 +142,11 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
     (ci) => ci.date.getTime() === today.getTime(),
   ) ?? null;
   const todayScores = scoreFromCheckIn(todayCI, {
-    nutrition: { kcalToday: totalKcal(todayMeals), dailyTarget },
+    nutrition: {
+      kcalToday: totalKcal(todayMeals),
+      dailyTarget,
+      qualityScore: dailyMealQuality(todayMeals),
+    },
   });
 
   return {

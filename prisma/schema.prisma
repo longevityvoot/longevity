@@ -306,6 +306,13 @@ model Meal {
   kcal        Int?
   foodKey     String?  // optional ref to library entry
   portion     Float    @default(1.0)
+  // Bell-curve quality self-rating per macro category (range -2..+2):
+  //   -2 ขาดมาก · -1 ขาดนิด · 0 พอดี · +1 เกินนิด · +2 เกินมาก
+  // Optional — null means user didn't rate that axis for this meal.
+  proteinRating Int?
+  vegRating     Int?
+  carbRating    Int?
+  fatRating     Int?
   createdAt   DateTime @default(now())
 
   @@index([userId, date])
