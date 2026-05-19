@@ -1,6 +1,5 @@
 import { signIn } from "@/auth";
-import { MultiDonut } from "@/components/charts/MultiDonut";
-import { PILLARS } from "@/lib/pillars";
+import { FlowerHero } from "@/components/FlowerHero";
 
 type SearchParams = Promise<{ from?: string; error?: string }>;
 
@@ -9,27 +8,16 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
   const googleConfigured = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
   const lineConfigured = !!(process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRET);
 
-  // Decorative concentric rings — all six pillars filled, no center text.
-  const heroRings = PILLARS.map((p) => ({ key: p.key, color: p.hex, value: 100 }));
-
   return (
-    <main className="min-h-screen bg-canvas flex items-start justify-center px-5 pt-12 pb-10">
+    <main className="min-h-screen bg-canvas flex items-start justify-center px-5 pt-10 pb-10">
       <div className="w-full max-w-[360px]">
         <div className="flex flex-col items-center text-center">
-          <MultiDonut
-            rings={heroRings}
-            size={200}
-            thickness={6}
-            ringGap={3}
-            trackColor="transparent"
-          />
-          <h1 className="mt-4 text-[28px] font-bold tracking-tight text-ink leading-tight">
-            Longevity
-            <br />
-            Designer
+          <FlowerHero size={240} />
+          <h1 className="mt-3 text-[26px] font-bold tracking-tight text-ink leading-tight">
+            Longevity Designer
           </h1>
           <p className="mt-2 text-[13px] text-ink-3 max-w-[300px]">
-            ดูแลสุขภาพระยะยาว — ระบบติดตาม 6 ด้านโดย designer ส่วนตัวของคุณ
+            ดูแลสุขภาพระยะยาว · ระบบติดตาม 6 ด้านโดย designer ส่วนตัวของคุณ
           </p>
         </div>
 
