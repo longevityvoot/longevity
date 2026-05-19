@@ -3,15 +3,18 @@ import type { PillarKey } from "@/lib/pillars";
 
 export type PillarScores = Record<PillarKey, number>;
 
-// Optional context layered on top of the daily check-in to compute richer
-// pillar scores. Currently only nutrition uses it — kcal logged today vs
-// daily target maps to a closeness score, blended with bell-curve quality
-// self-ratings if the user filled them in.
+// Optional context layered on top of the daily reflection to compute
+// richer pillar scores. Nutrition uses kcal+target+quality. Social uses
+// the peak rating from the last 7 days because social engagement is a
+// weekly pattern, not a daily one.
 export type ScoringContext = {
   nutrition?: {
     kcalToday: number;
     dailyTarget: number | null;
     qualityScore?: number | null; // 0-100, null when no meal was rated
+  };
+  social?: {
+    weeklyPeakRating: number | null; // 0-100, best social engagement in last 7 days
   };
 };
 
@@ -32,8 +35,8 @@ export function scoreFromCheckIn(
   const stressScore = (11 - (c.stressLevel ?? 5)) * 10;
   const stress  = clamp((stressScore + moodScore) / 2);
   const activity = clamp((c.energyLevel ?? 5) * 10);
-  const nutrition = scoreNutrition(c, ctx?.nutrition);
-  const social    = scoreSocial(c);
+  const nutrition = scoreNutrition(ctx?.nutrition);
+  const social    = scoreSocial(c, ctx?.social);
   const substances = scoreSubstances(c);
 
   return {
@@ -46,11 +49,12 @@ export function scoreFromCheckIn(
   };
 }
 
-// Social pillar — structured single-choice mapping based on Harvard 75-year
-// study + Holt-Lunstad 2010 mortality meta-analysis. Falls back to legacy
-// free-text presence reward (70) for older check-ins before socialKind was
-// added; empty → 50.
-function scoreSocial(c: DailyCheckIn): number {
+// Social pillar — single-choice mapping per day, but pillar score uses
+// the WEEKLY PEAK across the last 7 days. Social engagement is a weekly
+// pattern: someone whose family dinner on Sunday is real social health,
+// even if the rest of the week is solo. Holt-Lunstad 2010 + Harvard
+// 75-year study both measure chronic isolation, not daily fluctuation.
+export function socialRatingForDay(c: DailyCheckIn): number | null {
   switch (c.socialKind) {
     case "none":      return 25;
     case "text":      return 45;
@@ -58,8 +62,15 @@ function scoreSocial(c: DailyCheckIn): number {
     case "in-person": return 80;
     case "group":     return 90;
     default:
-      return c.socialActivities?.trim() ? 70 : 50;
+      return c.socialActivities?.trim() ? 70 : null;
   }
+}
+
+function scoreSocial(c: DailyCheckIn, sctx: ScoringContext["social"]): number {
+  if (sctx && sctx.weeklyPeakRating != null) {
+    return sctx.weeklyPeakRating;
+  }
+  return socialRatingForDay(c) ?? 25;
 }
 
 // Substances pillar — only count items with strong evidence of harm:
@@ -88,11 +99,8 @@ function scoreSubstances(c: DailyCheckIn): number {
 //   meals + target            → closeness only
 //   meals + ratings           → quality only (no target available)
 //   meals only                → presence reward 70
-//   no meals                  → fall back to nutritionNotes (70 or 50)
-function scoreNutrition(
-  c: DailyCheckIn,
-  nctx: ScoringContext["nutrition"],
-): number {
+//   no meals                  → 50 (neutral — user didn't log)
+function scoreNutrition(nctx: ScoringContext["nutrition"]): number {
   if (nctx && nctx.kcalToday > 0) {
     const closeness = kcalClosenessScore(nctx.kcalToday, nctx.dailyTarget);
     const quality = nctx.qualityScore ?? null;
@@ -103,7 +111,7 @@ function scoreNutrition(
     if (quality != null) return quality;
     return 70;
   }
-  return c.nutritionNotes?.trim() ? 70 : 50;
+  return 50;
 }
 
 function kcalClosenessScore(kcal: number, target: number | null): number | null {
@@ -145,4 +153,23 @@ export function overallScore(scores: PillarScores | null): number | null {
 
 function clamp(v: number) {
   return Math.max(0, Math.min(100, Math.round(v)));
+}
+
+// Highest social rating in the 7-day window ending on `asOf` (inclusive).
+// Returns null if no check-in in the window had a rateable socialKind /
+// socialActivities. Callers can fall back to "isolated" (25) at use-site.
+export function weeklySocialPeak(
+  checkIns: Array<Pick<DailyCheckIn, "date" | "socialKind" | "socialActivities">>,
+  asOf: Date,
+): number | null {
+  const start = new Date(asOf);
+  start.setDate(start.getDate() - 6);
+  let peak: number | null = null;
+  for (const c of checkIns) {
+    if (c.date < start || c.date > asOf) continue;
+    const r = socialRatingForDay(c as DailyCheckIn);
+    if (r == null) continue;
+    if (peak == null || r > peak) peak = r;
+  }
+  return peak;
 }

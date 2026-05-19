@@ -169,9 +169,9 @@ export default async function ClientDetailPage({
             </div>
 
             <div className="bg-surface border border-border rounded-lg p-5">
-              <h2 className="text-[14px] font-semibold text-ink-2">Check-in 14 วันล่าสุด</h2>
+              <h2 className="text-[14px] font-semibold text-ink-2">ประเมิน 14 วันล่าสุด</h2>
               {client.recentCheckIns.length === 0 ? (
-                <p className="mt-3 text-[13px] text-ink-3">ยังไม่มี check-in</p>
+                <p className="mt-3 text-[13px] text-ink-3">ยังไม่มีการประเมิน</p>
               ) : (
                 <table className="mt-3 w-full text-[13px]">
                   <thead>

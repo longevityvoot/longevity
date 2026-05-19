@@ -54,7 +54,7 @@ export default async function CoachDashboard() {
 
         <section className="mt-6 grid grid-cols-3 gap-3">
           <Stat label="ลูกค้าทั้งหมด" value={total} />
-          <Stat label="ยังไม่ check-in วันนี้" value={stale} tone={stale ? "warning" : "ok"} />
+          <Stat label="ยังไม่ประเมินวันนี้" value={stale} tone={stale ? "warning" : "ok"} />
           <Stat label="คะแนนต่ำกว่า 50" value={lowScore} tone={lowScore ? "danger" : "ok"} />
         </section>
 
@@ -90,10 +90,10 @@ export default async function CoachDashboard() {
                       )}
                       <p className="text-[12px] text-ink-3 mt-1">
                         {c.hasCheckedInToday
-                          ? "check-in วันนี้แล้ว"
+                          ? "ประเมินวันนี้แล้ว"
                           : c.lastCheckInAt
                           ? `ล่าสุด ${formatRelDate(c.lastCheckInAt)}`
-                          : "ยังไม่เคย check-in"}
+                          : "ยังไม่เคยประเมิน"}
                       </p>
                     </div>
                   </div>

@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PILLARS, type PillarKey } from "@/lib/pillars";
-import { scoreFromCheckIn } from "@/lib/scoring";
+import { scoreFromCheckIn, weeklySocialPeak } from "@/lib/scoring";
 import { DonutScore } from "@/components/charts/DonutScore";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { estimateBMR, estimateDailyTarget, getDailyNutritionHistory } from "@/lib/meals";
@@ -14,7 +14,7 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ l
   nutrition: {
     intro: "อาหารและ supplement ที่กิน ส่งผลต่อพลังงาน น้ำหนัก และ lab ระยะยาว",
     drivers: [
-      { label: "Nutrition notes", hint: "บันทึกจาก daily check-in" },
+      { label: "Meal log", hint: "kcal เทียบเป้าหมาย + คุณภาพ 4 หมวด (โปรตีน/ผัก/แป้ง/ไขมัน)" },
       { label: "Supplements / meds", hint: "active medication ที่กินอยู่" },
       { label: "Lab biomarkers", hint: "lipids · vitamins (จาก lab panel)" },
     ],
@@ -22,7 +22,7 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ l
   sleep: {
     intro: "การนอนคือ recovery — กระทบทุก pillar อื่น",
     drivers: [
-      { label: "Subjective quality", hint: "1-10 จาก daily check-in" },
+      { label: "Subjective quality", hint: "1-10 จากประเมินวันนี้" },
       { label: "Sleep duration", hint: "ผ่าน wearable (Phase 6)" },
       { label: "HRV ตอนนอน", hint: "indicator การฟื้นตัว (Phase 6)" },
     ],
@@ -30,7 +30,7 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ l
   activity: {
     intro: "การออกกำลังกาย + การเคลื่อนไหวรวมในวัน สำคัญต่ออายุยืน",
     drivers: [
-      { label: "Energy proxy", hint: "subjective จาก check-in" },
+      { label: "Energy proxy", hint: "subjective จากประเมินวันนี้" },
       { label: "Steps + Zone 2", hint: "ผ่าน wearable (Phase 6)" },
       { label: "VO2 Max", hint: "long-term fitness marker (Phase 6)" },
     ],
@@ -38,7 +38,7 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ l
   stress: {
     intro: "Mental wellbeing — ความเครียดสะสม + อารมณ์ระยะยาว เป็น marker ของหลายปัญหา",
     drivers: [
-      { label: "ความเครียด (1-10)", hint: "subjective จาก daily check-in" },
+      { label: "ความเครียด (1-10)", hint: "subjective จากประเมินวันนี้" },
       { label: "อารมณ์ (1-10)", hint: "blend เข้าคะแนน — อารมณ์ดี = pillar คะแนนขึ้น" },
       { label: "HRV trend", hint: "indicator การฟื้นตัว (Phase 6)" },
       { label: "Stress score", hint: "Garmin/Fitbit (Phase 6)" },
@@ -48,6 +48,7 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ l
     intro: "การมีปฏิสัมพันธ์ทางสังคมที่มีความหมาย — Holt-Lunstad 2010: ความเหงาเพิ่ม mortality risk เทียบเท่าสูบบุหรี่ 15 มวน/วัน",
     drivers: [
       { label: "ระดับการพบปะ", hint: "ไม่มี → ข้อความ → โทร → พบตัว → กิจกรรมกลุ่ม" },
+      { label: "Weekly peak", hint: "คะแนน = พบปะที่ดีที่สุดใน 7 วัน — social health เป็นจังหวะ weekly" },
       { label: "Quality > quantity", hint: "พบตัว 1 คนคุณภาพดี > 100 likes" },
     ],
   },
@@ -116,6 +117,7 @@ export default async function PillarDetailPage({
           dailyTarget,
           qualityScore: day?.qualityScore ?? null,
         },
+        social: { weeklyPeakRating: weeklySocialPeak(checkIns, ci.date) },
       });
       if (!scores) return null;
       return { x: ci.date, y: scores[pillar.key as PillarKey] };
