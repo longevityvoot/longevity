@@ -16,6 +16,27 @@ const CATEGORIES: Array<{ key: FoodCategory | "all"; label: string }> = [
   { key: "dessert", label: CATEGORY_LABEL.dessert },
 ];
 
+type Rating = -2 | -1 | 0 | 1 | 2 | null;
+
+const QUALITY_AXES: Array<{
+  key: "proteinRating" | "vegRating" | "carbRating" | "fatRating";
+  label: string;
+  hint: string;
+}> = [
+  { key: "proteinRating", label: "เนื้อสัตว์ / โปรตีน", hint: "เนื้อ ปลา ไข่ ถั่ว เต้าหู้" },
+  { key: "vegRating",     label: "ผัก / ใยอาหาร",       hint: "รวมวิตามินและแร่ธาตุ" },
+  { key: "carbRating",    label: "ข้าว / แป้ง",          hint: "ข้าว ก๋วยเตี๋ยว ขนมปัง" },
+  { key: "fatRating",     label: "ไขมัน",                hint: "ของทอด กะทิ น้ำมัน" },
+];
+
+const RATING_STEPS: Array<{ v: -2 | -1 | 0 | 1 | 2; label: string; cls: string }> = [
+  { v: -2, label: "ขาดมาก",  cls: "bg-pillar-activity text-white border-pillar-activity" },
+  { v: -1, label: "ขาดนิด",  cls: "bg-pillar-stress-wash text-pillar-stress border-pillar-stress/50" },
+  { v:  0, label: "พอดี",    cls: "bg-pillar-social text-white border-pillar-social" },
+  { v:  1, label: "เกินนิด", cls: "bg-pillar-stress-wash text-pillar-stress border-pillar-stress/50" },
+  { v:  2, label: "เกินมาก", cls: "bg-pillar-activity text-white border-pillar-activity" },
+];
+
 export function FoodPicker() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<FoodCategory | "all">("all");
@@ -24,6 +45,12 @@ export function FoodPicker() {
   const [extra, setExtra] = useState(false);
   const [customName, setCustomName] = useState("");
   const [customKcal, setCustomKcal] = useState("");
+  const [ratings, setRatings] = useState<Record<string, Rating>>({
+    proteinRating: null,
+    vegRating: null,
+    carbRating: null,
+    fatRating: null,
+  });
 
   // "พิเศษ" bumps the picked portion by 15%. Doesn't apply to custom entry
   // (the user is typing kcal directly there).
@@ -191,10 +218,62 @@ export function FoodPicker() {
         </section>
       )}
 
+      {/* Quality bell-curve self-rating — applies once user has named a meal */}
+      {effectiveDesc ? (
+        <section className="bg-surface border border-border rounded-lg p-4">
+          <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
+            คุณภาพมื้อนี้ <span className="normal-case font-normal italic">(optional)</span>
+          </p>
+          <p className="mt-1 text-[11px] text-ink-4">
+            ประเมินคร่าว ๆ จากที่กิน — ใช้คำนวณ pillar score
+          </p>
+          <div className="mt-3 space-y-3">
+            {QUALITY_AXES.map((axis) => (
+              <div key={axis.key}>
+                <div className="flex items-baseline justify-between">
+                  <p className="text-[12.5px] font-semibold text-ink-2">{axis.label}</p>
+                  <p className="text-[10px] text-ink-4">{axis.hint}</p>
+                </div>
+                <div className="mt-1.5 grid grid-cols-5 gap-1">
+                  {RATING_STEPS.map((step) => {
+                    const selected = ratings[axis.key] === step.v;
+                    return (
+                      <button
+                        key={step.v}
+                        type="button"
+                        onClick={() =>
+                          setRatings((r) => ({
+                            ...r,
+                            [axis.key]: r[axis.key] === step.v ? null : step.v,
+                          }))
+                        }
+                        className={`h-9 rounded-md text-[10.5px] font-semibold border transition-colors ${
+                          selected ? step.cls : "bg-canvas border-border text-ink-3"
+                        }`}
+                      >
+                        {step.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <input type="hidden" name="description" value={effectiveDesc} />
       <input type="hidden" name="kcal" value={String(effectiveKcal)} />
       <input type="hidden" name="foodKey" value={picked?.key ?? ""} />
       <input type="hidden" name="portion" value={String(portion)} />
+      {QUALITY_AXES.map((axis) => (
+        <input
+          key={axis.key}
+          type="hidden"
+          name={axis.key}
+          value={ratings[axis.key] != null ? String(ratings[axis.key]) : ""}
+        />
+      ))}
 
       <div className="fixed left-0 right-0 bottom-0 bg-surface/95 backdrop-blur border-t border-border px-5 py-3 z-10 pb-safe">
         <div className="max-w-[420px] mx-auto">

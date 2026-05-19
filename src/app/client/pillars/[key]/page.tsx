@@ -6,7 +6,7 @@ import { PILLARS, type PillarKey } from "@/lib/pillars";
 import { scoreFromCheckIn } from "@/lib/scoring";
 import { DonutScore } from "@/components/charts/DonutScore";
 import { TrendChart } from "@/components/charts/TrendChart";
-import { estimateBMR, estimateDailyTarget, getDailyKcalHistory } from "@/lib/meals";
+import { estimateBMR, estimateDailyTarget, getDailyNutritionHistory } from "@/lib/meals";
 import { getLatestLBM } from "@/lib/body";
 import { ageFromDOB } from "@/lib/clients";
 
@@ -80,7 +80,7 @@ export default async function PillarDetailPage({
   const days = range === "7" ? 7 : range === "90" ? 90 : 30;
   const since = new Date();
   since.setDate(since.getDate() - days);
-  const [checkIns, profile, kcalHistory, latestLbm] = await Promise.all([
+  const [checkIns, profile, nutritionHistory, latestLbm] = await Promise.all([
     prisma.dailyCheckIn.findMany({
       where: { userId: session.user.id, date: { gte: since } },
       orderBy: { date: "asc" },
@@ -89,7 +89,7 @@ export default async function PillarDetailPage({
       where: { userId: session.user.id },
       select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true },
     }),
-    getDailyKcalHistory(session.user.id, days),
+    getDailyNutritionHistory(session.user.id, days),
     getLatestLBM(session.user.id),
   ]);
 
@@ -108,9 +108,13 @@ export default async function PillarDetailPage({
   type Point = { x: Date; y: number };
   const points: Point[] = checkIns
     .map((ci) => {
-      const kcal = kcalHistory.get(ci.date.toISOString().slice(0, 10)) ?? 0;
+      const day = nutritionHistory.get(ci.date.toISOString().slice(0, 10));
       const scores = scoreFromCheckIn(ci, {
-        nutrition: { kcalToday: kcal, dailyTarget },
+        nutrition: {
+          kcalToday: day?.kcal ?? 0,
+          dailyTarget,
+          qualityScore: day?.qualityScore ?? null,
+        },
       });
       if (!scores) return null;
       return { x: ci.date, y: scores[pillar.key as PillarKey] };

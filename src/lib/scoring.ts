@@ -5,9 +5,14 @@ export type PillarScores = Record<PillarKey, number>;
 
 // Optional context layered on top of the daily check-in to compute richer
 // pillar scores. Currently only nutrition uses it — kcal logged today vs
-// daily target maps to a closeness score.
+// daily target maps to a closeness score, blended with bell-curve quality
+// self-ratings if the user filled them in.
 export type ScoringContext = {
-  nutrition?: { kcalToday: number; dailyTarget: number | null };
+  nutrition?: {
+    kcalToday: number;
+    dailyTarget: number | null;
+    qualityScore?: number | null; // 0-100, null when no meal was rated
+  };
 };
 
 // Phase 2 scoring: heuristic from today's check-in plus optional context.
@@ -45,26 +50,42 @@ export function scoreFromCheckIn(
   };
 }
 
-// Nutrition pillar score logic:
-//   - meal data + target known → closeness-to-target score
-//   - meal data without target → presence reward (70)
-//   - no meal data → fall back to nutritionNotes presence (70 or 50)
+// Nutrition pillar score logic. Two signals blended 50/50 when both
+// available; falls back gracefully when one is missing.
+//
+//   kcal closeness (0-100): kcalToday vs dailyTarget
+//   quality       (0-100): user's bell-curve self-rating across macro axes
+//
+// Final precedence:
+//   meals + target + ratings  → 0.5 * closeness + 0.5 * quality
+//   meals + target            → closeness only
+//   meals + ratings           → quality only (no target available)
+//   meals only                → presence reward 70
+//   no meals                  → fall back to nutritionNotes (70 or 50)
 function scoreNutrition(
   c: DailyCheckIn,
   nctx: ScoringContext["nutrition"],
 ): number {
   if (nctx && nctx.kcalToday > 0) {
-    if (nctx.dailyTarget && nctx.dailyTarget > 0) {
-      const ratio = nctx.kcalToday / nctx.dailyTarget;
-      const off = Math.abs(ratio - 1);
-      if (off <= 0.1) return 85;
-      if (off <= 0.2) return 75;
-      if (off <= 0.3) return 65;
-      return 55;
+    const closeness = kcalClosenessScore(nctx.kcalToday, nctx.dailyTarget);
+    const quality = nctx.qualityScore ?? null;
+    if (closeness != null && quality != null) {
+      return Math.round(0.5 * closeness + 0.5 * quality);
     }
+    if (closeness != null) return closeness;
+    if (quality != null) return quality;
     return 70;
   }
   return c.nutritionNotes?.trim() ? 70 : 50;
+}
+
+function kcalClosenessScore(kcal: number, target: number | null): number | null {
+  if (!target || target <= 0) return null;
+  const off = Math.abs(kcal / target - 1);
+  if (off <= 0.1) return 85;
+  if (off <= 0.2) return 75;
+  if (off <= 0.3) return 65;
+  return 55;
 }
 
 export function overallScore(scores: PillarScores | null): number | null {

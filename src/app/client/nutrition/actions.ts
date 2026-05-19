@@ -6,6 +6,13 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { todayLocalDate } from "@/lib/dates";
 
+function parseRating(raw: FormDataEntryValue | null): number | null {
+  if (raw == null || raw === "") return null;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < -2 || n > 2) return null;
+  return n;
+}
+
 export async function addMeal(form: FormData) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
@@ -29,6 +36,10 @@ export async function addMeal(form: FormData) {
       kcal: kcal && Number.isFinite(kcal) ? Math.round(kcal) : null,
       foodKey,
       portion: Number.isFinite(portion) ? portion : 1,
+      proteinRating: parseRating(form.get("proteinRating")),
+      vegRating:     parseRating(form.get("vegRating")),
+      carbRating:    parseRating(form.get("carbRating")),
+      fatRating:     parseRating(form.get("fatRating")),
     },
   });
 

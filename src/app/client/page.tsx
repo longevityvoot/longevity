@@ -15,6 +15,7 @@ import {
   estimateDailyTarget,
   getMealsForDay,
   totalKcal,
+  dailyMealQuality,
 } from "@/lib/meals";
 import { getLatestLBM } from "@/lib/body";
 import { ageFromDOB } from "@/lib/clients";
@@ -73,8 +74,16 @@ export default async function ClientHome() {
     dailyTarget = estimateDailyTarget(bmr);
   }
 
-  const nutritionToday = { kcalToday: totalKcal(todayMeals), dailyTarget };
-  const nutritionYesterday = { kcalToday: totalKcal(yesterdayMeals), dailyTarget };
+  const nutritionToday = {
+    kcalToday: totalKcal(todayMeals),
+    dailyTarget,
+    qualityScore: dailyMealQuality(todayMeals),
+  };
+  const nutritionYesterday = {
+    kcalToday: totalKcal(yesterdayMeals),
+    dailyTarget,
+    qualityScore: dailyMealQuality(yesterdayMeals),
+  };
   const scores = scoreFromCheckIn(todayCheckIn, { nutrition: nutritionToday });
   const prevScores = scoreFromCheckIn(yesterdayCheckIn, { nutrition: nutritionYesterday });
   const overall = overallScore(scores);
