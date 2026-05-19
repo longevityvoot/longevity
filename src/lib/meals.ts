@@ -34,22 +34,35 @@ export async function getDailyKcalHistory(userId: string, days = 14) {
   return byDay;
 }
 
-// Mifflin-St Jeor BMR (kcal/day) — base for daily target
-// male:   10 * kg + 6.25 * cm - 5 * age + 5
-// female: 10 * kg + 6.25 * cm - 5 * age - 161
+// BMR estimate. When lean body mass (LBM) is known we use Katch-McArdle —
+// more accurate for individuals because it accounts for body composition.
+// Otherwise we fall back to Mifflin-St Jeor which uses total weight only.
+//
+// Katch-McArdle:    370 + 21.6 * LBM (kg)
+// Mifflin-St Jeor male:   10 * kg + 6.25 * cm - 5 * age + 5
+// Mifflin-St Jeor female: 10 * kg + 6.25 * cm - 5 * age - 161
 export function estimateBMR({
   gender,
   weightKg,
   heightCm,
   ageYears,
+  lbmKg,
 }: {
   gender: string;
   weightKg: number;
   heightCm: number;
   ageYears: number;
+  lbmKg?: number | null;
 }): number {
+  if (lbmKg != null && lbmKg > 0) {
+    return Math.round(370 + 21.6 * lbmKg);
+  }
   const base = 10 * weightKg + 6.25 * heightCm - 5 * ageYears;
   return Math.round(gender === "male" ? base + 5 : base - 161);
+}
+
+export function bmrMethod(lbmKg: number | null | undefined): "katch-mcardle" | "mifflin-st-jeor" {
+  return lbmKg != null && lbmKg > 0 ? "katch-mcardle" : "mifflin-st-jeor";
 }
 
 // Sedentary multiplier: BMR * 1.4 — light activity. Coach can tune later.

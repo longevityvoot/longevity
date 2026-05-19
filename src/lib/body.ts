@@ -42,3 +42,33 @@ export async function getRecentVitals(userId: string, type: "bp" | "glucose", li
     take: limit,
   });
 }
+
+export async function getLatestBodyFatPct(userId: string) {
+  return prisma.bodyMeasurement.findFirst({
+    where: { userId, type: "bodyFat" },
+    orderBy: { measuredAt: "desc" },
+  });
+}
+
+export async function getLatestMuscleMass(userId: string) {
+  return prisma.bodyMeasurement.findFirst({
+    where: { userId, type: "muscleMass" },
+    orderBy: { measuredAt: "desc" },
+  });
+}
+
+// Lean body mass derived from latest weight + latest body fat %.
+// Falls back to null if either is missing or the body-fat reading is older
+// than 30 days (stale composition shouldn't override Mifflin-St Jeor).
+export async function getLatestLBM(userId: string): Promise<number | null> {
+  const [weight, fat] = await Promise.all([
+    getLatestWeight(userId),
+    getLatestBodyFatPct(userId),
+  ]);
+  if (!weight || !fat) return null;
+  const ageMs = Date.now() - fat.measuredAt.getTime();
+  const thirtyDays = 30 * 86400000;
+  if (ageMs > thirtyDays) return null;
+  if (fat.value <= 0 || fat.value >= 100) return null;
+  return +(weight.value * (1 - fat.value / 100)).toFixed(2);
+}

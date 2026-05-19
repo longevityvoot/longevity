@@ -144,6 +144,48 @@ function WeightForm({
         />
       </section>
       {insight ? <InsightCard text={insight} /> : null}
+      <section className="bg-surface border border-border rounded-lg p-4">
+        <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
+          จากเครื่องชั่ง <span className="text-ink-4 normal-case font-normal italic">(optional)</span>
+        </p>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          <label className="block">
+            <span className="text-[11px] text-ink-3">% ไขมัน</span>
+            <div className="relative mt-1">
+              <input
+                name="bodyFatPct"
+                type="number"
+                inputMode="decimal"
+                step={0.1}
+                min={3}
+                max={70}
+                placeholder=""
+                className="w-full h-11 rounded-md border border-border-strong pl-3 pr-9 text-[16px] font-num focus:outline-none focus:border-ink"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink-4 pointer-events-none">%</span>
+            </div>
+          </label>
+          <label className="block">
+            <span className="text-[11px] text-ink-3">มวลกล้ามเนื้อ</span>
+            <div className="relative mt-1">
+              <input
+                name="muscleMassKg"
+                type="number"
+                inputMode="decimal"
+                step={0.1}
+                min={10}
+                max={120}
+                placeholder=""
+                className="w-full h-11 rounded-md border border-border-strong pl-3 pr-10 text-[16px] font-num focus:outline-none focus:border-ink"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink-4 pointer-events-none">kg</span>
+            </div>
+          </label>
+        </div>
+        <p className="text-[10px] text-ink-4 mt-2">
+          ถ้าเครื่องชั่งวัด body composition ให้ใส่เพิ่ม — ระบบจะใช้ % ไขมันคำนวณ BMR ที่แม่นขึ้น (Katch-McArdle)
+        </p>
+      </section>
       <ContextRadios
         legend="ช่วงเวลา"
         name="context"
