@@ -13,6 +13,7 @@ export async function logBodyMeasurement(type: "weight" | "waist", form: FormDat
   if (!Number.isFinite(value)) return;
   const context = (form.get("context") as string | null) ?? null;
   const notes = ((form.get("notes") as string | null) ?? "").trim() || null;
+  const measuredAt = new Date();
 
   await prisma.bodyMeasurement.create({
     data: {
@@ -20,11 +21,43 @@ export async function logBodyMeasurement(type: "weight" | "waist", form: FormDat
       type,
       value,
       unit: type === "weight" ? "kg" : "cm",
-      measuredAt: new Date(),
+      measuredAt,
       context,
       notes,
     },
   });
+
+  if (type === "weight") {
+    const fatRaw = form.get("bodyFatPct");
+    const fatPct = fatRaw && fatRaw !== "" ? Number(fatRaw) : null;
+    if (fatPct != null && Number.isFinite(fatPct) && fatPct > 0 && fatPct < 100) {
+      await prisma.bodyMeasurement.create({
+        data: {
+          userId: session.user.id,
+          type: "bodyFat",
+          value: fatPct,
+          unit: "%",
+          measuredAt,
+          context,
+        },
+      });
+    }
+
+    const muscleRaw = form.get("muscleMassKg");
+    const muscleMass = muscleRaw && muscleRaw !== "" ? Number(muscleRaw) : null;
+    if (muscleMass != null && Number.isFinite(muscleMass) && muscleMass > 0 && muscleMass < value) {
+      await prisma.bodyMeasurement.create({
+        data: {
+          userId: session.user.id,
+          type: "muscleMass",
+          value: muscleMass,
+          unit: "kg",
+          measuredAt,
+          context,
+        },
+      });
+    }
+  }
 
   redirect("/client/body");
 }

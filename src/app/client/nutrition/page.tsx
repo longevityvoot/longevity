@@ -7,9 +7,10 @@ import {
   totalKcal,
   estimateBMR,
   estimateDailyTarget,
+  bmrMethod,
   MEAL_TYPES,
 } from "@/lib/meals";
-import { getLatestWeight } from "@/lib/body";
+import { getLatestWeight, getLatestLBM } from "@/lib/body";
 import { ageFromDOB } from "@/lib/clients";
 import { deleteMeal } from "./actions";
 
@@ -17,19 +18,21 @@ export default async function NutritionPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const [meals, profile, latestWeight] = await Promise.all([
+  const [meals, profile, latestWeight, latestLbm] = await Promise.all([
     getMealsForDay(session.user.id),
     prisma.clientProfile.findUnique({
       where: { userId: session.user.id },
       select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true },
     }),
     getLatestWeight(session.user.id),
+    getLatestLBM(session.user.id),
   ]);
 
   const totalToday = totalKcal(meals);
 
   let dailyTarget: number | null = null;
   let bmr: number | null = null;
+  let method: "katch-mcardle" | "mifflin-st-jeor" = "mifflin-st-jeor";
   if (profile) {
     const weight = latestWeight?.value ?? profile.weightKg;
     bmr = estimateBMR({
@@ -37,7 +40,9 @@ export default async function NutritionPage() {
       weightKg: weight,
       heightCm: profile.heightCm,
       ageYears: ageFromDOB(profile.dateOfBirth),
+      lbmKg: latestLbm,
     });
+    method = bmrMethod(latestLbm);
     dailyTarget = estimateDailyTarget(bmr);
   }
 
@@ -116,7 +121,8 @@ export default async function NutritionPage() {
               </p>
               {bmr != null ? (
                 <p className="text-[10px] text-ink-4 mt-0.5">
-                  BMR {bmr} · activity factor 1.4
+                  BMR {bmr} · activity factor 1.4 ·{" "}
+                  {method === "katch-mcardle" ? "Katch-McArdle (LBM)" : "Mifflin-St Jeor"}
                 </p>
               ) : null}
             </>
