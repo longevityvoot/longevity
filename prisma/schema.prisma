@@ -39,6 +39,7 @@ model User {
   sessionsAsCoach  Session[] @relation("CoachSessions")
 
   dailyCheckIns    DailyCheckIn[]
+  weeklyReflections WeeklyReflection[]
   healthMetrics    HealthMetric[]
   messages         Message[]
   invoices         Invoice[]
@@ -143,6 +144,29 @@ model DailyCheckIn {
   notes String?
 
   @@unique([userId, date])
+}
+
+// Weekly reflection — captures behavior aggregates that are naturally
+// weekly (social pattern peak, alcohol units/week, sugary drinks total,
+// smoking days). Daily forms stay short; weekly forms hold the
+// substance + social signals that drive those pillar scores.
+model WeeklyReflection {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStart DateTime @db.Date // Monday of the week (Bangkok-anchored)
+
+  alcoholUnits     Float?
+  sugaryDrinkCount Int?
+  smokeDays        Int?    // 0-7
+  socialKind       String? // "none" | "text" | "call" | "in-person" | "group"
+  notes            String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, weekStart])
+  @@index([userId, weekStart])
 }
 
 model HealthMetric {

@@ -12,13 +12,6 @@ function intOrNull(form: FormData, key: string): number | null {
   return Number.isFinite(n) ? Math.round(n) : null;
 }
 
-function floatOrNull(form: FormData, key: string): number | null {
-  const raw = form.get(key);
-  if (raw == null || raw === "") return null;
-  const n = Number(raw);
-  return Number.isFinite(n) ? n : null;
-}
-
 function trimmedOrNull(form: FormData, key: string): string | null {
   const raw = form.get(key);
   if (typeof raw !== "string") return null;
@@ -31,21 +24,11 @@ export async function saveCheckIn(form: FormData) {
   if (!session?.user?.id) redirect("/login");
 
   const date = todayLocalDate();
-  const socialKindRaw = trimmedOrNull(form, "socialKind");
-  const allowedSocial = ["none", "text", "call", "in-person", "group"];
-  const socialKind = socialKindRaw && allowedSocial.includes(socialKindRaw) ? socialKindRaw : null;
-
   const data = {
     energyLevel: intOrNull(form, "energyLevel"),
     moodLevel: intOrNull(form, "moodLevel"),
     sleepQuality: intOrNull(form, "sleepQuality"),
     stressLevel: intOrNull(form, "stressLevel"),
-    socialActivities: trimmedOrNull(form, "socialActivities"),
-    socialKind,
-    alcoholUnits: floatOrNull(form, "alcoholUnits"),
-    caffeineCount: intOrNull(form, "caffeineCount"),
-    sugaryDrinkCount: intOrNull(form, "sugaryDrinkCount"),
-    smokedToday: form.get("smokedToday") === "on",
     notes: trimmedOrNull(form, "notes"),
   };
 

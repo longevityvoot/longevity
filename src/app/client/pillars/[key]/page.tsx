@@ -3,12 +3,17 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PILLARS, type PillarKey } from "@/lib/pillars";
-import { scoreFromCheckIn, weeklySocialPeak } from "@/lib/scoring";
+import {
+  scoreFromCheckIn,
+  substancesCtxFromWeekly,
+  socialCtxFromWeekly,
+} from "@/lib/scoring";
 import { DonutScore } from "@/components/charts/DonutScore";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { estimateBMR, estimateDailyTarget, getDailyNutritionHistory } from "@/lib/meals";
 import { getLatestLBM } from "@/lib/body";
 import { ageFromDOB } from "@/lib/clients";
+import { mondayOf, dateKey } from "@/lib/dates";
 
 const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ label: string; hint: string }> }> = {
   nutrition: {
@@ -47,17 +52,16 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ l
   social: {
     intro: "การมีปฏิสัมพันธ์ทางสังคมที่มีความหมาย — Holt-Lunstad 2010: ความเหงาเพิ่ม mortality risk เทียบเท่าสูบบุหรี่ 15 มวน/วัน",
     drivers: [
-      { label: "ระดับการพบปะ", hint: "ไม่มี → ข้อความ → โทร → พบตัว → กิจกรรมกลุ่ม" },
-      { label: "Weekly peak", hint: "คะแนน = พบปะที่ดีที่สุดใน 7 วัน — social health เป็นจังหวะ weekly" },
+      { label: "Peak engagement สัปดาห์", hint: "บันทึกใน 'สรุปสัปดาห์' — ไม่มี → ข้อความ → โทร → พบตัว → กลุ่ม" },
       { label: "Quality > quantity", hint: "พบตัว 1 คนคุณภาพดี > 100 likes" },
     ],
   },
   substances: {
-    intro: "พฤติกรรมการบริโภคที่กระทบสุขภาพระยะยาว — กาแฟดำไม่ใส่น้ำตาลถูกถอดออกจาก scoring เพราะ evidence เป็นบวก",
+    intro: "พฤติกรรมการบริโภคที่กระทบสุขภาพระยะยาว — บันทึกรวมในสรุปสัปดาห์",
     drivers: [
-      { label: "แอลกอฮอล์", hint: "drinks ต่อวัน — มะเร็ง 7 ชนิด, ตับ" },
-      { label: "เครื่องดื่มน้ำตาลสูง", hint: "น้ำอัดลม, ชานม, น้ำผลไม้, กาแฟใส่น้ำตาล/นม" },
-      { label: "บุหรี่ / บุหรี่ไฟฟ้า / ยาเส้น", hint: "yes/no วันนี้" },
+      { label: "แอลกอฮอล์ /สัปดาห์", hint: "CDC moderate ≤14 drinks/สัปดาห์ (ชาย), ≤7 (หญิง)" },
+      { label: "เครื่องดื่มน้ำตาลสูง /สัปดาห์", hint: "น้ำอัดลม, ชานม, น้ำผลไม้, กาแฟใส่น้ำตาล/นม" },
+      { label: "วันที่สูบ /สัปดาห์", hint: "บุหรี่ / บุหรี่ไฟฟ้า / ยาเส้น — 0-7 วัน" },
     ],
   },
 };
@@ -82,7 +86,7 @@ export default async function PillarDetailPage({
   const days = range === "7" ? 7 : range === "90" ? 90 : 30;
   const since = new Date();
   since.setDate(since.getDate() - days);
-  const [checkIns, profile, nutritionHistory, latestLbm] = await Promise.all([
+  const [checkIns, profile, nutritionHistory, latestLbm, weeklies] = await Promise.all([
     prisma.dailyCheckIn.findMany({
       where: { userId: session.user.id, date: { gte: since } },
       orderBy: { date: "asc" },
@@ -93,7 +97,12 @@ export default async function PillarDetailPage({
     }),
     getDailyNutritionHistory(session.user.id, days),
     getLatestLBM(session.user.id),
+    prisma.weeklyReflection.findMany({
+      where: { userId: session.user.id, weekStart: { gte: mondayOf(since) } },
+      orderBy: { weekStart: "asc" },
+    }),
   ]);
+  const weeklyByKey = new Map(weeklies.map((w) => [dateKey(w.weekStart), w]));
 
   let dailyTarget: number | null = null;
   if (profile) {
@@ -110,14 +119,16 @@ export default async function PillarDetailPage({
   type Point = { x: Date; y: number };
   const points: Point[] = checkIns
     .map((ci) => {
-      const day = nutritionHistory.get(ci.date.toISOString().slice(0, 10));
+      const day = nutritionHistory.get(dateKey(ci.date));
+      const w = weeklyByKey.get(dateKey(mondayOf(ci.date))) ?? null;
       const scores = scoreFromCheckIn(ci, {
         nutrition: {
           kcalToday: day?.kcal ?? 0,
           dailyTarget,
           qualityScore: day?.qualityScore ?? null,
         },
-        social: { weeklyPeakRating: weeklySocialPeak(checkIns, ci.date) },
+        social: socialCtxFromWeekly(w),
+        substances: substancesCtxFromWeekly(w),
       });
       if (!scores) return null;
       return { x: ci.date, y: scores[pillar.key as PillarKey] };
