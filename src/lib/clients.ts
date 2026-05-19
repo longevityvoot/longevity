@@ -16,10 +16,14 @@ export type ClientRowDTO = {
 // List active clients with computed today-scores. Coach + admin see everyone;
 // in Phase 4 we don't filter by assignedCoachId yet because there's only one
 // designer using the system — refine when multi-coach lands.
+//
+// Filter by ClientProfile presence rather than role so a COACH/ADMIN who
+// dogfoods through the client side (own LINE account onboards) also shows up
+// in the designer console list.
 export async function listClients(): Promise<ClientRowDTO[]> {
   const today = todayLocalDate();
   const clients = await prisma.user.findMany({
-    where: { role: "CLIENT" },
+    where: { clientProfile: { isNot: null } },
     select: {
       id: true,
       name: true,
@@ -92,7 +96,7 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
       dailyCheckIns: { orderBy: { date: "desc" }, take: 14 },
     },
   });
-  if (!user || user.role !== "CLIENT") return null;
+  if (!user || !user.clientProfile) return null;
 
   const recentCheckIns = user.dailyCheckIns.map((ci) => {
     const scores = scoreFromCheckIn(ci);
