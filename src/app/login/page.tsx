@@ -9,7 +9,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
   const lineConfigured = !!(process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRET);
 
   return (
-    <main className="min-h-screen bg-canvas flex items-start justify-center px-5 pt-10 pb-10">
+    <main className="min-h-screen bg-canvas flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-[360px]">
         <div className="flex flex-col items-center text-center">
           <FlowerHero size={240} />
@@ -28,23 +28,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
         ) : null}
 
         <div className="mt-8 space-y-3">
-          {googleConfigured ? (
-            <form
-              action={async () => {
-                "use server";
-                await signIn("google", { redirectTo: from });
-              }}
-            >
-              <button
-                type="submit"
-                className="w-full h-12 rounded-md border border-border-strong bg-surface font-semibold text-[14px] text-ink-2 flex items-center justify-center gap-2"
-              >
-                <GoogleIcon />
-                เข้าสู่ระบบด้วย Google
-              </button>
-            </form>
-          ) : null}
-
           {lineConfigured ? (
             <form
               action={async () => {
@@ -71,57 +54,24 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
               เข้าสู่ระบบด้วย LINE (เร็วๆนี้)
             </button>
           )}
-        </div>
 
-        <div className="mt-6 relative">
-          <div className="absolute inset-y-1/2 inset-x-0 border-t border-border" />
-          <p className="relative bg-canvas inline-block px-3 left-1/2 -translate-x-1/2 text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-            หรือ
-          </p>
+          {googleConfigured ? (
+            <form
+              action={async () => {
+                "use server";
+                await signIn("google", { redirectTo: from });
+              }}
+            >
+              <button
+                type="submit"
+                className="w-full h-12 rounded-md border border-border-strong bg-surface font-semibold text-[14px] text-ink-2 flex items-center justify-center gap-2"
+              >
+                <GoogleIcon />
+                เข้าสู่ระบบด้วย Google
+              </button>
+            </form>
+          ) : null}
         </div>
-
-        <form
-          action={async (formData) => {
-            "use server";
-            await signIn("credentials", {
-              email: formData.get("email"),
-              password: formData.get("password"),
-              redirectTo: from,
-            });
-          }}
-          className="mt-6 space-y-3"
-        >
-          <label className="block">
-            <span className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-              อีเมล
-            </span>
-            <input
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              className="mt-1 w-full h-12 rounded-md border border-border-strong px-3 text-[15px]"
-            />
-          </label>
-          <label className="block">
-            <span className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-              รหัสผ่าน
-            </span>
-            <input
-              name="password"
-              type="password"
-              required
-              autoComplete="current-password"
-              className="mt-1 w-full h-12 rounded-md border border-border-strong px-3 text-[15px]"
-            />
-          </label>
-          <button
-            type="submit"
-            className="w-full h-12 rounded-md bg-ink text-white font-semibold text-[15px]"
-          >
-            เข้าสู่ระบบด้วยอีเมล
-          </button>
-        </form>
 
         <p className="mt-6 text-center text-[11px] text-ink-4">
           ยังไม่มี account — designer จะส่ง invite ทาง LINE
