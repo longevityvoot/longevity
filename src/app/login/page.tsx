@@ -74,7 +74,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
         </div>
 
         <p className="mt-6 text-center text-[11px] text-ink-4">
-          ยังไม่มี account — designer จะส่ง invite ทาง LINE
+          เข้าด้วย LINE ครั้งแรก ระบบจะสร้าง account ให้อัตโนมัติ
         </p>
       </div>
     </main>
