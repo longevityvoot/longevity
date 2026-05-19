@@ -21,8 +21,13 @@ export function FoodPicker() {
   const [category, setCategory] = useState<FoodCategory | "all">("all");
   const [picked, setPicked] = useState<FoodItem | null>(null);
   const [portion, setPortion] = useState(1);
+  const [extra, setExtra] = useState(false);
   const [customName, setCustomName] = useState("");
   const [customKcal, setCustomKcal] = useState("");
+
+  // "พิเศษ" bumps the picked portion by 15%. Doesn't apply to custom entry
+  // (the user is typing kcal directly there).
+  const extraMultiplier = extra ? 1.15 : 1;
 
   const results = useMemo(() => {
     let pool = THAI_FOODS;
@@ -39,12 +44,12 @@ export function FoodPicker() {
   }, [query, category]);
 
   const effectiveKcal = picked
-    ? Math.round(picked.kcal * portion)
+    ? Math.round(picked.kcal * portion * extraMultiplier)
     : customKcal
     ? Number(customKcal) || 0
     : 0;
   const effectiveDesc = picked
-    ? `${picked.name} (${picton(portion)} ${picked.unit})`
+    ? `${picked.name}${extra ? " (พิเศษ)" : ""} · ${picton(portion)} ${picked.unit}`
     : customName;
 
   return (
@@ -161,10 +166,21 @@ export function FoodPicker() {
                 </button>
               ))}
             </div>
+            <button
+              type="button"
+              onClick={() => setExtra(!extra)}
+              className={`mt-2 w-full h-10 rounded-md text-[13px] font-semibold border inline-flex items-center justify-center gap-2 ${
+                extra
+                  ? "bg-ink text-white border-ink"
+                  : "bg-canvas border-border-strong text-ink-2"
+              }`}
+            >
+              {extra ? "✓" : "+"} พิเศษ <span className="text-[11px] opacity-80">(+15%)</span>
+            </button>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-[36px] font-bold font-num tabular-nums text-ink leading-none">
-              {Math.round(picked.kcal * portion)}
+              {Math.round(picked.kcal * portion * extraMultiplier)}
             </span>
             <span className="text-[13px] text-ink-4">kcal</span>
           </div>
