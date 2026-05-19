@@ -28,9 +28,9 @@ export function FlowerHero({ size = 220 }: Props) {
       aria-hidden="true"
       style={{ display: "block" }}
     >
-      {/* Petals */}
+      {/* Petals — rotated 30° so no petal sits at 12 or 6 o'clock */}
       {orderedColors.map((color, i) => {
-        const angle = (i / petalCount) * 360;
+        const angle = (i / petalCount) * 360 + 30;
         return (
           <g key={`${color}-${i}`} transform={`rotate(${angle} ${cx} ${cy})`}>
             <ellipse
