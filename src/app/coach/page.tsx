@@ -28,6 +28,12 @@ export default async function CoachDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <Link
+              href="/client"
+              className="text-[12px] text-ink-3 hover:underline"
+            >
+              มุม client →
+            </Link>
+            <Link
               href="/coach/clients/new"
               className="h-10 px-4 inline-flex items-center rounded-md bg-ink text-white text-[13px] font-semibold"
             >
