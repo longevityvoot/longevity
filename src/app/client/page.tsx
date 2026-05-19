@@ -10,6 +10,14 @@ import { DonutScore } from "@/components/charts/DonutScore";
 import { getUpcomingSessionForClient } from "@/lib/sessions";
 import { listMessages, threadIdForClient } from "@/lib/messages";
 import { greetingFor, bangkokHour } from "@/lib/greeting";
+import {
+  estimateBMR,
+  estimateDailyTarget,
+  getMealsForDay,
+  totalKcal,
+} from "@/lib/meals";
+import { getLatestLBM } from "@/lib/body";
+import { ageFromDOB } from "@/lib/clients";
 
 export default async function ClientHome() {
   const session = await auth();
@@ -19,26 +27,56 @@ export default async function ClientHome() {
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  const [todayCheckIn, yesterdayCheckIn, recent14, upcoming, recentMessages] =
-    await Promise.all([
-      prisma.dailyCheckIn.findUnique({
-        where: { userId_date: { userId: session.user.id, date: today } },
-      }),
-      prisma.dailyCheckIn.findUnique({
-        where: { userId_date: { userId: session.user.id, date: yesterday } },
-      }),
-      prisma.dailyCheckIn.findMany({
-        where: { userId: session.user.id },
-        orderBy: { date: "desc" },
-        take: 14,
-        select: { date: true },
-      }),
-      getUpcomingSessionForClient(session.user.id),
-      listMessages(threadIdForClient(session.user.id), 3),
-    ]);
+  const [
+    todayCheckIn,
+    yesterdayCheckIn,
+    recent14,
+    upcoming,
+    recentMessages,
+    todayMeals,
+    yesterdayMeals,
+    profile,
+    latestLbm,
+  ] = await Promise.all([
+    prisma.dailyCheckIn.findUnique({
+      where: { userId_date: { userId: session.user.id, date: today } },
+    }),
+    prisma.dailyCheckIn.findUnique({
+      where: { userId_date: { userId: session.user.id, date: yesterday } },
+    }),
+    prisma.dailyCheckIn.findMany({
+      where: { userId: session.user.id },
+      orderBy: { date: "desc" },
+      take: 14,
+      select: { date: true },
+    }),
+    getUpcomingSessionForClient(session.user.id),
+    listMessages(threadIdForClient(session.user.id), 3),
+    getMealsForDay(session.user.id, today),
+    getMealsForDay(session.user.id, yesterday),
+    prisma.clientProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true },
+    }),
+    getLatestLBM(session.user.id),
+  ]);
 
-  const scores = scoreFromCheckIn(todayCheckIn);
-  const prevScores = scoreFromCheckIn(yesterdayCheckIn);
+  let dailyTarget: number | null = null;
+  if (profile) {
+    const bmr = estimateBMR({
+      gender: profile.gender,
+      weightKg: profile.weightKg,
+      heightCm: profile.heightCm,
+      ageYears: ageFromDOB(profile.dateOfBirth),
+      lbmKg: latestLbm,
+    });
+    dailyTarget = estimateDailyTarget(bmr);
+  }
+
+  const nutritionToday = { kcalToday: totalKcal(todayMeals), dailyTarget };
+  const nutritionYesterday = { kcalToday: totalKcal(yesterdayMeals), dailyTarget };
+  const scores = scoreFromCheckIn(todayCheckIn, { nutrition: nutritionToday });
+  const prevScores = scoreFromCheckIn(yesterdayCheckIn, { nutrition: nutritionYesterday });
   const overall = overallScore(scores);
   const prevOverall = overallScore(prevScores);
   const overallDelta = overall != null && prevOverall != null ? overall - prevOverall : null;

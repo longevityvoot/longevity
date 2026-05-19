@@ -1,6 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { scoreFromCheckIn, overallScore, type PillarScores } from "@/lib/scoring";
 import { todayLocalDate } from "@/lib/dates";
+import {
+  estimateBMR,
+  estimateDailyTarget,
+  getDailyKcalHistory,
+  getMealsForDay,
+  totalKcal,
+} from "@/lib/meals";
+import { getLatestLBM } from "@/lib/body";
 
 export type ClientRowDTO = {
   id: string;
@@ -98,8 +106,25 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
   });
   if (!user || !user.clientProfile) return null;
 
+  const [todayMeals, kcalHistory, latestLbm] = await Promise.all([
+    getMealsForDay(id, today),
+    getDailyKcalHistory(id, 14),
+    getLatestLBM(id),
+  ]);
+  const bmr = estimateBMR({
+    gender: user.clientProfile.gender,
+    weightKg: user.clientProfile.weightKg,
+    heightCm: user.clientProfile.heightCm,
+    ageYears: ageFromDOB(user.clientProfile.dateOfBirth),
+    lbmKg: latestLbm,
+  });
+  const dailyTarget = estimateDailyTarget(bmr);
+
   const recentCheckIns = user.dailyCheckIns.map((ci) => {
-    const scores = scoreFromCheckIn(ci);
+    const kcal = kcalHistory.get(ci.date.toISOString().slice(0, 10)) ?? 0;
+    const scores = scoreFromCheckIn(ci, {
+      nutrition: { kcalToday: kcal, dailyTarget },
+    });
     return {
       date: ci.date,
       scores,
@@ -111,7 +136,9 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
   const todayCI = user.dailyCheckIns.find(
     (ci) => ci.date.getTime() === today.getTime(),
   ) ?? null;
-  const todayScores = scoreFromCheckIn(todayCI);
+  const todayScores = scoreFromCheckIn(todayCI, {
+    nutrition: { kcalToday: totalKcal(todayMeals), dailyTarget },
+  });
 
   return {
     id: user.id,
