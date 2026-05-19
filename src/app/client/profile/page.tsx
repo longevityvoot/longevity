@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { ageFromDOB } from "@/lib/clients";
+import { ageFromDOB, isSyntheticLineEmail } from "@/lib/clients";
 
 export default async function ClientProfilePage() {
   const session = await auth();
@@ -23,7 +23,9 @@ export default async function ClientProfilePage() {
           <h1 className="text-[22px] font-semibold tracking-tight text-ink mt-0.5">
             {session.user.name}
           </h1>
-          <p className="text-[12px] text-ink-4 mt-0.5">{session.user.email}</p>
+          {isSyntheticLineEmail(session.user.email) ? null : (
+            <p className="text-[12px] text-ink-4 mt-0.5">{session.user.email}</p>
+          )}
         </header>
 
         <section className="mt-6 bg-surface border border-border rounded-lg p-4">
