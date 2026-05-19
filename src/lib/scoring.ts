@@ -33,12 +33,8 @@ export function scoreFromCheckIn(
   const stress  = clamp((stressScore + moodScore) / 2);
   const activity = clamp((c.energyLevel ?? 5) * 10);
   const nutrition = scoreNutrition(c, ctx?.nutrition);
-  const social    = c.socialActivities?.trim() ? 70 : 50;
-
-  let substances = 100;
-  substances -= (c.alcoholUnits ?? 0) * 10;
-  substances -= (c.caffeineCount ?? 0) * 3;
-  if (c.smokedToday) substances -= 30;
+  const social    = scoreSocial(c);
+  const substances = scoreSubstances(c);
 
   return {
     nutrition,
@@ -46,8 +42,39 @@ export function scoreFromCheckIn(
     activity,
     stress,
     social,
-    substances: clamp(substances),
+    substances,
   };
+}
+
+// Social pillar — structured single-choice mapping based on Harvard 75-year
+// study + Holt-Lunstad 2010 mortality meta-analysis. Falls back to legacy
+// free-text presence reward (70) for older check-ins before socialKind was
+// added; empty → 50.
+function scoreSocial(c: DailyCheckIn): number {
+  switch (c.socialKind) {
+    case "none":      return 25;
+    case "text":      return 45;
+    case "call":      return 60;
+    case "in-person": return 80;
+    case "group":     return 90;
+    default:
+      return c.socialActivities?.trim() ? 70 : 50;
+  }
+}
+
+// Substances pillar — only count items with strong evidence of harm:
+//   alcohol  -10/drink
+//   smoking/vape  -30 if yes
+//   sugary drinks  -8/cup (น้ำอัดลม, น้ำหวาน, น้ำผลไม้, ชานม, กาแฟใส่น้ำตาล/นม)
+// Caffeine is no longer scored — 1-4 cups/day of black coffee has net
+// positive evidence (reduced all-cause mortality, CVD, T2DM). The field
+// is kept for future sleep-timing correlation.
+function scoreSubstances(c: DailyCheckIn): number {
+  let s = 100;
+  s -= (c.alcoholUnits ?? 0) * 10;
+  s -= (c.sugaryDrinkCount ?? 0) * 8;
+  if (c.smokedToday) s -= 30;
+  return clamp(s);
 }
 
 // Nutrition pillar score logic. Two signals blended 50/50 when both
@@ -88,10 +115,32 @@ function kcalClosenessScore(kcal: number, target: number | null): number | null 
   return 55;
 }
 
+// Evidence-weighted contribution of each pillar to the overall Longevity
+// Score. Drawn from cardiovascular + metabolic + mortality literature:
+//   - Sleep / activity / nutrition: largest modifiable life-expectancy drivers
+//   - Stress / social: comparable to lifestyle factors (Holt-Lunstad 2010)
+//   - Substances: lower weight because it's near-max for non-smokers /
+//     non-drinkers and would otherwise inflate the overall score
+export const PILLAR_WEIGHTS: Record<PillarKey, number> = {
+  sleep:      1.2,
+  activity:   1.2,
+  nutrition:  1.2,
+  stress:     1.0,
+  social:     1.0,
+  substances: 0.4,
+};
+
 export function overallScore(scores: PillarScores | null): number | null {
   if (!scores) return null;
-  const values = Object.values(scores);
-  return Math.round(values.reduce((s, v) => s + v, 0) / values.length);
+  let num = 0;
+  let den = 0;
+  for (const [key, val] of Object.entries(scores) as Array<[PillarKey, number]>) {
+    const w = PILLAR_WEIGHTS[key] ?? 1;
+    num += val * w;
+    den += w;
+  }
+  if (den === 0) return null;
+  return Math.round(num / den);
 }
 
 function clamp(v: number) {

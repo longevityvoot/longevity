@@ -31,6 +31,10 @@ export async function saveCheckIn(form: FormData) {
   if (!session?.user?.id) redirect("/login");
 
   const date = todayLocalDate();
+  const socialKindRaw = trimmedOrNull(form, "socialKind");
+  const allowedSocial = ["none", "text", "call", "in-person", "group"];
+  const socialKind = socialKindRaw && allowedSocial.includes(socialKindRaw) ? socialKindRaw : null;
+
   const data = {
     energyLevel: intOrNull(form, "energyLevel"),
     moodLevel: intOrNull(form, "moodLevel"),
@@ -38,8 +42,10 @@ export async function saveCheckIn(form: FormData) {
     stressLevel: intOrNull(form, "stressLevel"),
     nutritionNotes: trimmedOrNull(form, "nutritionNotes"),
     socialActivities: trimmedOrNull(form, "socialActivities"),
+    socialKind,
     alcoholUnits: floatOrNull(form, "alcoholUnits"),
     caffeineCount: intOrNull(form, "caffeineCount"),
+    sugaryDrinkCount: intOrNull(form, "sugaryDrinkCount"),
     smokedToday: form.get("smokedToday") === "on",
     notes: trimmedOrNull(form, "notes"),
   };

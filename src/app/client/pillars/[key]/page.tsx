@@ -45,17 +45,18 @@ const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ l
     ],
   },
   social: {
-    intro: "การมีปฏิสัมพันธ์ทางสังคมที่มีความหมาย",
+    intro: "การมีปฏิสัมพันธ์ทางสังคมที่มีความหมาย — Holt-Lunstad 2010: ความเหงาเพิ่ม mortality risk เทียบเท่าสูบบุหรี่ 15 มวน/วัน",
     drivers: [
-      { label: "Social notes", hint: "บันทึกใน daily check-in" },
+      { label: "ระดับการพบปะ", hint: "ไม่มี → ข้อความ → โทร → พบตัว → กิจกรรมกลุ่ม" },
+      { label: "Quality > quantity", hint: "พบตัว 1 คนคุณภาพดี > 100 likes" },
     ],
   },
   substances: {
-    intro: "แอลกอฮอล์ · caffeine · บุหรี่ — designer แนะนำ baseline",
+    intro: "พฤติกรรมการบริโภคที่กระทบสุขภาพระยะยาว — กาแฟดำไม่ใส่น้ำตาลถูกถอดออกจาก scoring เพราะ evidence เป็นบวก",
     drivers: [
-      { label: "แอลกอฮอล์", hint: "drinks ต่อวัน" },
-      { label: "Caffeine", hint: "แก้วต่อวัน · timing สำคัญ" },
-      { label: "บุหรี่", hint: "yes/no วันนี้" },
+      { label: "แอลกอฮอล์", hint: "drinks ต่อวัน — มะเร็ง 7 ชนิด, ตับ" },
+      { label: "เครื่องดื่มน้ำตาลสูง", hint: "น้ำอัดลม, ชานม, น้ำผลไม้, กาแฟใส่น้ำตาล/นม" },
+      { label: "บุหรี่ / บุหรี่ไฟฟ้า / ยาเส้น", hint: "yes/no วันนี้" },
     ],
   },
 };
