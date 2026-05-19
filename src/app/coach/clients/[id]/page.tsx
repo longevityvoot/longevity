@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { getClientDetail, ageFromDOB } from "@/lib/clients";
+import { getClientDetail, ageFromDOB, isSyntheticLineEmail } from "@/lib/clients";
 import { PILLARS } from "@/lib/pillars";
 import { MultiDonut } from "@/components/charts/MultiDonut";
 import { listSessionsForClient } from "@/lib/sessions";
@@ -49,7 +49,9 @@ export default async function ClientDetailPage({
             <h1 className="text-[24px] font-semibold tracking-tight text-ink mt-0.5">
               {client.name}
             </h1>
-            <p className="text-[12px] text-ink-4 mt-0.5">{client.email}</p>
+            {isSyntheticLineEmail(client.email) ? null : (
+              <p className="text-[12px] text-ink-4 mt-0.5">{client.email}</p>
+            )}
           </div>
         </header>
 

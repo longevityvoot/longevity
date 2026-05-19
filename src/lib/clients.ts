@@ -143,3 +143,9 @@ export function ageFromDOB(dob: Date): number {
   if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age -= 1;
   return age;
 }
+
+// LINE Login doesn't grant email scope, so we synthesize `line-<sub>@line.local`
+// to satisfy NextAuth's email requirement. Don't surface those to users.
+export function isSyntheticLineEmail(email: string | null | undefined): boolean {
+  return !!email && email.startsWith("line-") && email.endsWith("@line.local");
+}

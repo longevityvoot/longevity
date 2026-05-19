@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
-import { listClients } from "@/lib/clients";
+import { listClients, isSyntheticLineEmail } from "@/lib/clients";
 import { PILLARS } from "@/lib/pillars";
 import { DonutScore } from "@/components/charts/DonutScore";
 
@@ -85,7 +85,9 @@ export default async function CoachDashboard() {
                       <p className="text-[15px] font-semibold text-ink truncate">
                         {c.name}
                       </p>
-                      <p className="text-[12px] text-ink-4 truncate">{c.email}</p>
+                      {isSyntheticLineEmail(c.email) ? null : (
+                        <p className="text-[12px] text-ink-4 truncate">{c.email}</p>
+                      )}
                       <p className="text-[12px] text-ink-3 mt-1">
                         {c.hasCheckedInToday
                           ? "check-in วันนี้แล้ว"
