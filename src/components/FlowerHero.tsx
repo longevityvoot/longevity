@@ -1,4 +1,4 @@
-import { PILLARS } from "@/lib/pillars";
+import { PILLARS, COLOR_WHEEL_ORDER } from "@/lib/pillars";
 
 type Props = {
   size?: number;
@@ -6,15 +6,19 @@ type Props = {
   centerLabel?: string;
 };
 
-// Murakami-inspired six-petal flower. Each petal carries one pillar color
-// + a tiny pillar label, arranged tightly around an ink-circle wordmark.
-//
-// Petals are teardrop ellipses positioned above center then rotated in 60°
-// steps. A subtle ink stroke keeps the cartoon feel without being heavy.
+// Six-petal flower. Petals are flat fills (no gradient) in matte
+// primary+secondary colors arranged in color-wheel order starting at
+// 12 o'clock and going clockwise: red, orange, yellow, green, blue,
+// purple.
 export function FlowerHero({ size = 220, centerLabel = "L" }: Props) {
   const cx = 120;
   const cy = 120;
-  const petalCount = 6;
+  const petalCount = COLOR_WHEEL_ORDER.length;
+
+  const orderedColors = COLOR_WHEEL_ORDER.map((key) => {
+    const p = PILLARS.find((p) => p.key === key);
+    return p?.hex ?? "#5A5A7A";
+  });
 
   return (
     <svg
@@ -24,51 +28,24 @@ export function FlowerHero({ size = 220, centerLabel = "L" }: Props) {
       aria-hidden="true"
       style={{ display: "block" }}
     >
-      <defs>
-        {PILLARS.map((p) => (
-          <radialGradient
-            key={p.key}
-            id={`flower-${p.key}`}
-            cx="50%"
-            cy="35%"
-            r="65%"
-          >
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.45" />
-            <stop offset="60%" stopColor={p.hex} stopOpacity="1" />
-            <stop offset="100%" stopColor={p.hex} stopOpacity="1" />
-          </radialGradient>
-        ))}
-      </defs>
-
       {/* Petals */}
-      {PILLARS.map((p, i) => {
+      {orderedColors.map((color, i) => {
         const angle = (i / petalCount) * 360;
         return (
-          <g key={p.key} transform={`rotate(${angle} ${cx} ${cy})`}>
+          <g key={`${color}-${i}`} transform={`rotate(${angle} ${cx} ${cy})`}>
             <ellipse
               cx={cx}
               cy={cy - 58}
               rx={42}
               ry={56}
-              fill={`url(#flower-${p.key})`}
-              stroke="#14142B"
-              strokeOpacity="0.08"
-              strokeWidth={1.5}
+              fill={color}
             />
           </g>
         );
       })}
 
       {/* Center disk */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={46}
-        fill="#FFFFFF"
-        stroke="#14142B"
-        strokeOpacity="0.08"
-        strokeWidth={1.5}
-      />
+      <circle cx={cx} cy={cy} r={46} fill="#F6F7FB" />
       <text
         x={cx}
         y={cy - 6}
