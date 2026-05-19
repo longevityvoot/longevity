@@ -222,14 +222,12 @@ export default async function ClientHome() {
           </div>
         </section>
 
-        {/* Body / Labs / Meds shortcuts */}
+        {/* Labs / Meds shortcuts (body + nutrition are in the floating nav) */}
         <section className="mt-6">
           <h2 className="text-[14px] font-semibold text-ink mb-3 px-1">
             บันทึก
           </h2>
           <div className="grid grid-cols-2 gap-2.5">
-            <ShortcutTile href="/client/nutrition" label="อาหาร" hint="kcal วันนี้" icon={<UtensilIcon />} tone="nutrition" />
-            <ShortcutTile href="/client/body" label="บอดี้" hint="น้ำหนัก · BP" icon={<HeartIcon />} tone="activity" />
             <ShortcutTile href="/client/labs" label="ผลแล็บ" hint="เลือด" icon={<FlaskIcon />} tone="substances" />
             <ShortcutTile href="/client/meds" label="ยา" hint="วันนี้" icon={<PillIcon />} tone="stress" />
           </div>
@@ -242,13 +240,13 @@ export default async function ClientHome() {
         >
           <div className="flex items-center justify-between">
             <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
-              คุยกับ designer
+              คุยกับ Longevity Designer
             </p>
             <span className="text-[12px] text-ink-3">→</span>
           </div>
           <p className="text-[14px] text-ink-2 mt-1.5 line-clamp-2">
             {lastMessage
-              ? `${lastMessage.user.role === "CLIENT" ? "คุณ" : "designer"}: ${lastMessage.content}`
+              ? `${lastMessage.user.role === "CLIENT" ? "คุณ" : "Longevity Designer"}: ${lastMessage.content}`
               : "ยังไม่มีข้อความ — เริ่มถามได้เลย"}
           </p>
         </Link>

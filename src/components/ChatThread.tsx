@@ -64,7 +64,7 @@ export function ChatThread({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[12px] font-semibold text-ink leading-tight truncate">
-                        {mine ? "คุณ" : designer ? "designer" : m.user.name}
+                        {mine ? "คุณ" : designer ? "Longevity Designer" : m.user.name}
                       </p>
                       <p className="text-[10px] text-ink-4 leading-tight">
                         {formatTime(m.createdAt)}
