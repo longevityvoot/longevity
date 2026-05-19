@@ -148,28 +148,32 @@ export function FoodPicker() {
           <p className="text-[12px] text-ink-3">ต่อ {picked.unit}</p>
           <div className="mt-4">
             <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
-              จำนวน
+              ขนาดที่กิน
             </p>
-            <div className="mt-2 grid grid-cols-5 gap-2">
-              {[0.5, 1, 1.5, 2, 3].map((p) => (
+            <div className="mt-2 grid grid-cols-4 gap-2">
+              {[0.25, 0.5, 0.75, 1].map((p) => (
                 <button
                   key={p}
                   type="button"
                   onClick={() => setPortion(p)}
-                  className={`h-10 rounded-md text-[13px] font-semibold font-num border ${
+                  className={`h-14 rounded-md text-[13px] font-semibold border flex flex-col items-center justify-center gap-1 ${
                     portion === p
                       ? "bg-ink text-white border-ink"
                       : "bg-canvas border-border text-ink-2"
                   }`}
                 >
-                  {picton(p)}
+                  <PlateIcon fill={p} active={portion === p} />
+                  <span className="text-[11px] font-num">{plateLabel(p)}</span>
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-[10px] text-ink-4">
+              กิน 2 จาน? บันทึก 2 ครั้ง
+            </p>
             <button
               type="button"
               onClick={() => setExtra(!extra)}
-              className={`mt-2 w-full h-10 rounded-md text-[13px] font-semibold border inline-flex items-center justify-center gap-2 ${
+              className={`mt-3 w-full h-10 rounded-md text-[13px] font-semibold border inline-flex items-center justify-center gap-2 ${
                 extra
                   ? "bg-ink text-white border-ink"
                   : "bg-canvas border-border-strong text-ink-2"
@@ -217,9 +221,45 @@ export function FoodPicker() {
 }
 
 function picton(p: number): string {
+  if (p === 0.25) return "¼";
   if (p === 0.5) return "½";
+  if (p === 0.75) return "¾";
   if (p === 1) return "1";
   if (p === 1.5) return "1½";
   if (Number.isInteger(p)) return String(p);
   return String(p);
+}
+
+function plateLabel(p: number): string {
+  if (p === 0.25) return "¼ จาน";
+  if (p === 0.5) return "½ จาน";
+  if (p === 0.75) return "¾ จาน";
+  if (p === 1) return "เต็มจาน";
+  return `${p} จาน`;
+}
+
+// SVG plate filled clockwise per fraction. Active state inverts colors so
+// the selected option reads against the ink background.
+function PlateIcon({ fill, active }: { fill: number; active: boolean }) {
+  const cx = 12;
+  const cy = 12;
+  const r = 8;
+  const ring = active ? "#FFFFFF" : "#5A5A7A";
+  const accent = active ? "#FFFFFF" : "#14142B";
+  // Path arc from 12 o'clock clockwise by `fill * 360`.
+  const angle = fill * 360 - 0.0001; // avoid full-circle == zero arc
+  const large = angle > 180 ? 1 : 0;
+  const rad = (a: number) => ((a - 90) * Math.PI) / 180;
+  const x = cx + r * Math.cos(rad(angle));
+  const y = cy + r * Math.sin(rad(angle));
+  const d =
+    fill >= 0.999
+      ? `M ${cx - r} ${cy} a ${r} ${r} 0 1 1 ${r * 2} 0 a ${r} ${r} 0 1 1 ${-r * 2} 0`
+      : `M ${cx} ${cy} L ${cx} ${cy - r} A ${r} ${r} 0 ${large} 1 ${x.toFixed(2)} ${y.toFixed(2)} Z`;
+  return (
+    <svg width={22} height={22} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={ring} strokeWidth={1.5} />
+      <path d={d} fill={accent} opacity={fill >= 0.999 ? 1 : 0.85} />
+    </svg>
+  );
 }
