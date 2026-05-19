@@ -13,12 +13,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "pillar-nutrition":  { DEFAULT: "#00C9A7", wash: "#E0F8F2" },
-        "pillar-sleep":      { DEFAULT: "#2E5BFF", wash: "#DFE6FF" },
-        "pillar-activity":   { DEFAULT: "#FF6B6B", wash: "#FFE3E3" },
-        "pillar-stress":     { DEFAULT: "#FFA940", wash: "#FFF1DC" },
-        "pillar-social":     { DEFAULT: "#52C41A", wash: "#E5F7D9" },
-        "pillar-substances": { DEFAULT: "#722ED1", wash: "#ECE0F8" },
+        // Matte primary+secondary palette mapped to the color wheel.
+        // wash = ~85% lightness for soft surface fills.
+        "pillar-nutrition":  { DEFAULT: "#C9A848", wash: "#F2EBCB" }, // yellow
+        "pillar-sleep":      { DEFAULT: "#4A6FA5", wash: "#D6DEEC" }, // blue
+        "pillar-activity":   { DEFAULT: "#C45151", wash: "#F3DCDC" }, // red
+        "pillar-stress":     { DEFAULT: "#D38442", wash: "#F4E0CE" }, // orange
+        "pillar-social":     { DEFAULT: "#5E8B4D", wash: "#DDE7D5" }, // green
+        "pillar-substances": { DEFAULT: "#7D5C95", wash: "#E2D7E6" }, // purple
         ink: {
           DEFAULT: "#14142B",
           2: "#2D2D55",
