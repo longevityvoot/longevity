@@ -111,12 +111,21 @@ export default async function ClientProfilePage() {
           </Link>
         </section>
 
+        {session.user.role === "COACH" || session.user.role === "ADMIN" ? (
+          <Link
+            href="/coach"
+            className="mt-6 w-full h-11 inline-flex items-center justify-center rounded-md bg-ink text-white text-[14px] font-semibold"
+          >
+            ← มุม designer
+          </Link>
+        ) : null}
+
         <form
           action={async () => {
             "use server";
             await signOut({ redirectTo: "/login" });
           }}
-          className="mt-6"
+          className="mt-3"
         >
           <button className="w-full h-11 rounded-md border border-border-strong text-[14px] font-semibold text-ink-2">
             ออกจากระบบ

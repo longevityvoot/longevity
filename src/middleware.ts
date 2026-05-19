@@ -19,9 +19,9 @@ export default auth((req) => {
   if (pathname.startsWith("/coach") && role !== "COACH" && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/client", req.nextUrl.origin));
   }
-  if (pathname.startsWith("/client") && role === "COACH") {
-    return NextResponse.redirect(new URL("/coach", req.nextUrl.origin));
-  }
+  // COACH / ADMIN can use /client too (designer dogfoods the client side as
+  // their own case study). The /client layout still gates by ClientProfile
+  // so they have to onboard once before the dashboard shows up.
   return NextResponse.next();
 });
 
