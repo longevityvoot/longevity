@@ -48,16 +48,29 @@ export function FlowerHero({ size = 220 }: Props) {
       <circle cx={cx} cy={cy} r={50} fill="#F6F7FB" />
       <text
         x={cx}
-        y={cy}
+        y={cy - 6}
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize="17"
+        fontSize="13"
         fontWeight={800}
         fill="#14142B"
         fontFamily="Inter, system-ui, sans-serif"
-        style={{ letterSpacing: "-0.02em" }}
+        style={{ letterSpacing: "0.08em" }}
       >
-        Longevity
+        LONGEVITY
+      </text>
+      <text
+        x={cx}
+        y={cy + 10}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize="13"
+        fontWeight={500}
+        fill="#5A5A7A"
+        fontFamily="Inter, system-ui, sans-serif"
+        style={{ letterSpacing: "0em" }}
+      >
+        designer
       </text>
     </svg>
   );
