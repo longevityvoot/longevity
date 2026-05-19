@@ -15,20 +15,20 @@ const ITEMS: Item[] = [
     href: "/client",
     label: "หน้าหลัก",
     match: (p) =>
-      p === "/client" || p.startsWith("/client/checkin") || p.startsWith("/client/pillars"),
+      p === "/client" || p.startsWith("/client/checkin") || p.startsWith("/client/pillars") || p.startsWith("/client/chat"),
     icon: HomeIcon,
   },
   {
     href: "/client/body",
     label: "บอดี้",
-    match: (p) => p.startsWith("/client/body") || p.startsWith("/client/labs") || p.startsWith("/client/meds") || p.startsWith("/client/nutrition"),
+    match: (p) => p.startsWith("/client/body") || p.startsWith("/client/labs") || p.startsWith("/client/meds"),
     icon: BodyIcon,
   },
   {
-    href: "/client/chat",
-    label: "แชท",
-    match: (p) => p.startsWith("/client/chat"),
-    icon: ChatIcon,
+    href: "/client/nutrition",
+    label: "อาหาร",
+    match: (p) => p.startsWith("/client/nutrition"),
+    icon: UtensilIcon,
   },
   {
     href: "/client/profile",
@@ -98,16 +98,13 @@ function BodyIcon(active: boolean) {
   );
 }
 
-function ChatIcon(active: boolean) {
+function UtensilIcon(active: boolean) {
   return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M4 6a2 2 0 012-2h12a2 2 0 012 2v9a2 2 0 01-2 2h-7l-4 3v-3H6a2 2 0 01-2-2V6z"
-        stroke="currentColor"
-        strokeWidth={1.75}
-        strokeLinejoin="round"
-        fill={active ? "currentColor" : "none"}
-      />
+    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7 3v8a2 2 0 002 2v8" fill={active ? "currentColor" : "none"} />
+      <path d="M5 3v6" />
+      <path d="M9 3v6" />
+      <path d="M16 3c-1.5 0-3 1.5-3 5s1.5 5 3 5v8" fill={active ? "currentColor" : "none"} />
     </svg>
   );
 }

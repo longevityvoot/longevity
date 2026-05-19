@@ -41,7 +41,7 @@ export default async function ClientProfilePage() {
               <Row k="น้ำหนักเริ่มต้น" v={`${profile.weightKg} kg`} />
               <Row k="wearable" v={profile.wearableType ?? "ไม่มี"} />
               {profile.assignedCoach ? (
-                <Row k="designer" v={profile.assignedCoach.name} />
+                <Row k="Longevity Designer" v={profile.assignedCoach.name} />
               ) : null}
             </dl>
           ) : (
