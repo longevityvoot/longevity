@@ -6,6 +6,9 @@ import { PILLARS, type PillarKey } from "@/lib/pillars";
 import { scoreFromCheckIn } from "@/lib/scoring";
 import { DonutScore } from "@/components/charts/DonutScore";
 import { TrendChart } from "@/components/charts/TrendChart";
+import { estimateBMR, estimateDailyTarget, getDailyKcalHistory } from "@/lib/meals";
+import { getLatestLBM } from "@/lib/body";
+import { ageFromDOB } from "@/lib/clients";
 
 const PILLAR_DESCRIPTIONS: Record<PillarKey, { intro: string; drivers: Array<{ label: string; hint: string }> }> = {
   nutrition: {
@@ -77,15 +80,38 @@ export default async function PillarDetailPage({
   const days = range === "7" ? 7 : range === "90" ? 90 : 30;
   const since = new Date();
   since.setDate(since.getDate() - days);
-  const checkIns = await prisma.dailyCheckIn.findMany({
-    where: { userId: session.user.id, date: { gte: since } },
-    orderBy: { date: "asc" },
-  });
+  const [checkIns, profile, kcalHistory, latestLbm] = await Promise.all([
+    prisma.dailyCheckIn.findMany({
+      where: { userId: session.user.id, date: { gte: since } },
+      orderBy: { date: "asc" },
+    }),
+    prisma.clientProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true },
+    }),
+    getDailyKcalHistory(session.user.id, days),
+    getLatestLBM(session.user.id),
+  ]);
+
+  let dailyTarget: number | null = null;
+  if (profile) {
+    const bmr = estimateBMR({
+      gender: profile.gender,
+      weightKg: profile.weightKg,
+      heightCm: profile.heightCm,
+      ageYears: ageFromDOB(profile.dateOfBirth),
+      lbmKg: latestLbm,
+    });
+    dailyTarget = estimateDailyTarget(bmr);
+  }
 
   type Point = { x: Date; y: number };
   const points: Point[] = checkIns
     .map((ci) => {
-      const scores = scoreFromCheckIn(ci);
+      const kcal = kcalHistory.get(ci.date.toISOString().slice(0, 10)) ?? 0;
+      const scores = scoreFromCheckIn(ci, {
+        nutrition: { kcalToday: kcal, dailyTarget },
+      });
       if (!scores) return null;
       return { x: ci.date, y: scores[pillar.key as PillarKey] };
     })
