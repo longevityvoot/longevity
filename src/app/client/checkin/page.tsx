@@ -21,14 +21,13 @@ export default async function CheckInPage() {
     month: "short",
   });
 
-  // Count filled vs total — gives the "X/8" header progress feel
-  const totalFields = 8;
+  // Count filled vs total — gives the "X/7" header progress feel
+  const totalFields = 7;
   let filled = 0;
   if (existing?.energyLevel != null) filled++;
   if (existing?.moodLevel != null) filled++;
   if (existing?.sleepQuality != null) filled++;
   if (existing?.stressLevel != null) filled++;
-  if (existing?.nutritionNotes) filled++;
   if (existing?.socialKind || existing?.socialActivities) filled++;
   if (
     (existing?.alcoholUnits ?? 0) > 0 ||
@@ -53,7 +52,10 @@ export default async function CheckInPage() {
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-ink-3 leading-tight">{dateLabel}</p>
             <p className="text-[15px] font-semibold text-ink leading-tight">
-              Check-in วันนี้
+              ประเมินวันนี้
+            </p>
+            <p className="text-[10px] text-ink-4 leading-tight mt-0.5">
+              ทำก่อนนอน — สรุปทั้งวัน
             </p>
           </div>
           <span
@@ -102,13 +104,6 @@ export default async function CheckInPage() {
           highLabel="เครียดมาก"
         />
 
-        <TextSection
-          name="nutritionNotes"
-          title="โภชนาการ"
-          question="มื้อสำคัญ / สิ่งที่กินวันนี้"
-          defaultValue={existing?.nutritionNotes ?? ""}
-          placeholder="เช่น เช้ากินข้าวต้ม · เที่ยงสลัด · เย็นปลานึ่ง"
-        />
         <Section title="สังคม" question="วันนี้ปฏิสัมพันธ์กับคนแบบไหน?">
           <SocialKindPicker defaultValue={existing?.socialKind ?? null} />
           <textarea
@@ -159,7 +154,7 @@ export default async function CheckInPage() {
               style={{ boxShadow: "0 4px 12px rgba(20, 20, 43, 0.18)" }}
             >
               <CheckIcon />
-              <span>บันทึก check-in</span>
+              <span>บันทึกประเมิน</span>
             </button>
             <p className="mt-1.5 text-[10px] text-ink-4 text-center">
               แก้ไขทีหลังได้ · designer เห็นข้อมูลของคุณ

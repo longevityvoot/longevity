@@ -97,7 +97,7 @@ export default async function NewSessionPage({
               name="actionItems"
               rows={4}
               className="mt-1 w-full rounded-md border border-border-strong px-3 py-2 text-[14px] resize-none font-mono"
-              placeholder="เพิ่ม Zone 2 อย่างน้อย 90 นาที/สัปดาห์&#10;ลด caffeine หลังบ่าย 2&#10;กรอก check-in ทุกวัน"
+              placeholder="เพิ่ม Zone 2 อย่างน้อย 90 นาที/สัปดาห์&#10;ลด caffeine หลังบ่าย 2&#10;ประเมินทุกวัน"
             />
           </label>
 

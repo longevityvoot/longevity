@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { scoreFromCheckIn, overallScore, type PillarScores } from "@/lib/scoring";
+import { scoreFromCheckIn, overallScore, weeklySocialPeak, type PillarScores } from "@/lib/scoring";
 import { todayLocalDate } from "@/lib/dates";
 import {
   estimateBMR,
@@ -53,7 +53,7 @@ export async function listClients(): Promise<ClientRowDTO[]> {
       !!latest && latest.date.getTime() === today.getTime();
 
     const alerts: string[] = [];
-    if (!hasToday) alerts.push("ยังไม่ check-in วันนี้");
+    if (!hasToday) alerts.push("ยังไม่ประเมินวันนี้");
     if (overall != null && overall < 50) alerts.push("คะแนนรวมต่ำ");
     if (scores && scores.sleep < 40) alerts.push("นอนไม่ดี");
     if (scores && scores.stress < 40) alerts.push("เครียดสูง");
@@ -129,6 +129,7 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
         dailyTarget,
         qualityScore: day?.qualityScore ?? null,
       },
+      social: { weeklyPeakRating: weeklySocialPeak(user.dailyCheckIns, ci.date) },
     });
     return {
       date: ci.date,
@@ -147,6 +148,7 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
       dailyTarget,
       qualityScore: dailyMealQuality(todayMeals),
     },
+    social: { weeklyPeakRating: weeklySocialPeak(user.dailyCheckIns, today) },
   });
 
   return {

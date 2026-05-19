@@ -40,7 +40,6 @@ export async function saveCheckIn(form: FormData) {
     moodLevel: intOrNull(form, "moodLevel"),
     sleepQuality: intOrNull(form, "sleepQuality"),
     stressLevel: intOrNull(form, "stressLevel"),
-    nutritionNotes: trimmedOrNull(form, "nutritionNotes"),
     socialActivities: trimmedOrNull(form, "socialActivities"),
     socialKind,
     alcoholUnits: floatOrNull(form, "alcoholUnits"),

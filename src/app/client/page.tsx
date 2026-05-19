@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PILLARS } from "@/lib/pillars";
-import { scoreFromCheckIn, overallScore } from "@/lib/scoring";
+import { scoreFromCheckIn, overallScore, weeklySocialPeak } from "@/lib/scoring";
 import { todayLocalDate } from "@/lib/dates";
 import { MultiDonut } from "@/components/charts/MultiDonut";
 import { DonutScore } from "@/components/charts/DonutScore";
@@ -49,7 +49,7 @@ export default async function ClientHome() {
       where: { userId: session.user.id },
       orderBy: { date: "desc" },
       take: 14,
-      select: { date: true },
+      select: { date: true, socialKind: true, socialActivities: true },
     }),
     getUpcomingSessionForClient(session.user.id),
     listMessages(threadIdForClient(session.user.id), 3),
@@ -84,8 +84,16 @@ export default async function ClientHome() {
     dailyTarget,
     qualityScore: dailyMealQuality(yesterdayMeals),
   };
-  const scores = scoreFromCheckIn(todayCheckIn, { nutrition: nutritionToday });
-  const prevScores = scoreFromCheckIn(yesterdayCheckIn, { nutrition: nutritionYesterday });
+  const socialToday = { weeklyPeakRating: weeklySocialPeak(recent14, today) };
+  const socialYesterday = { weeklyPeakRating: weeklySocialPeak(recent14, yesterday) };
+  const scores = scoreFromCheckIn(todayCheckIn, {
+    nutrition: nutritionToday,
+    social: socialToday,
+  });
+  const prevScores = scoreFromCheckIn(yesterdayCheckIn, {
+    nutrition: nutritionYesterday,
+    social: socialYesterday,
+  });
   const overall = overallScore(scores);
   const prevOverall = overallScore(prevScores);
   const overallDelta = overall != null && prevOverall != null ? overall - prevOverall : null;
@@ -161,7 +169,7 @@ export default async function ClientHome() {
                 </div>
               ) : (
                 <p className="text-[12px] text-ink-3 mt-2">
-                  ยังไม่ได้กรอก check-in วันนี้
+                  ยังไม่ได้ประเมินวันนี้
                 </p>
               )}
             </div>
@@ -185,7 +193,7 @@ export default async function ClientHome() {
             </span>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] text-ink font-medium">
-                Check-in มา{" "}
+                ประเมินมา{" "}
                 <span className="font-num font-bold text-pillar-nutrition">
                   {streak}
                 </span>{" "}
@@ -211,7 +219,7 @@ export default async function ClientHome() {
           }
         >
           <span className="text-[15px] font-semibold">
-            {todayCheckIn == null ? "กรอก check-in วันนี้" : "แก้ check-in วันนี้"}
+            {todayCheckIn == null ? "ประเมินวันนี้" : "แก้ประเมินวันนี้"}
           </span>
           <span className="text-[18px]">→</span>
         </Link>
