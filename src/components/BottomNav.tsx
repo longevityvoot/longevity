@@ -40,7 +40,7 @@ const ITEMS: Item[] = [
 
 // Hide the nav on focused flows where the page owns the bottom band itself
 // (full-page form with sticky save, modal-like quick-log, etc).
-const HIDE_ON = ["/client/checkin", "/client/body/log", "/client/labs/new", "/client/nutrition/add"];
+const HIDE_ON = ["/client/checkin", "/client/weekly", "/client/body/log", "/client/labs/new", "/client/nutrition/add"];
 
 export function BottomNav() {
   const pathname = usePathname();

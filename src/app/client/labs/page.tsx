@@ -12,6 +12,7 @@ const CATEGORY_HEX: Record<LabCategory, string> = {
   kidney: "#2E5BFF",
   inflammation: "#722ED1",
   vitamins: "#00C9A7",
+  blood: "#C45151",
   other: "#5A5A7A",
 };
 

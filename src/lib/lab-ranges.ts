@@ -5,6 +5,7 @@ export type LabCategory =
   | "kidney"
   | "inflammation"
   | "vitamins"
+  | "blood"
   | "other";
 
 export type LabFlag = "low" | "normal" | "high" | "critical";
@@ -44,6 +45,18 @@ export const LAB_RANGES: Record<string, LabSpec> = {
   "vitamin-d":         { key: "vitamin-d",         name: "Vitamin D (25-OH)", category: "vitamins", unit: "ng/mL", low: 30, high: 100 },
   "vitamin-b12":       { key: "vitamin-b12",       name: "Vitamin B12",       category: "vitamins", unit: "pg/mL", low: 200, high: 900 },
   "ferritin":          { key: "ferritin",          name: "Ferritin",          category: "vitamins", unit: "ng/mL", low: 30, high: 400 },
+
+  // CBC — Complete Blood Count. Ranges are adult averages; sex-specific
+  // reference splits (RBC, Hb, Hct) are folded into a unisex midrange
+  // until per-profile ranges land in Phase 2.
+  "wbc":               { key: "wbc",               name: "WBC",               category: "blood", unit: "10³/µL", low: 4.0, high: 11.0 },
+  "rbc":               { key: "rbc",               name: "RBC",               category: "blood", unit: "10⁶/µL", low: 4.2, high: 5.7 },
+  "hemoglobin":        { key: "hemoglobin",        name: "Hemoglobin (Hb)",   category: "blood", unit: "g/dL",   low: 12.0, high: 17.0 },
+  "hematocrit":        { key: "hematocrit",        name: "Hematocrit (Hct)",  category: "blood", unit: "%",      low: 36, high: 50 },
+  "platelets":         { key: "platelets",         name: "Platelets",         category: "blood", unit: "10³/µL", low: 150, high: 450 },
+  "mcv":               { key: "mcv",               name: "MCV",               category: "blood", unit: "fL",     low: 80, high: 100 },
+  "mch":               { key: "mch",               name: "MCH",               category: "blood", unit: "pg",     low: 27, high: 33 },
+  "mchc":              { key: "mchc",              name: "MCHC",              category: "blood", unit: "g/dL",   low: 32, high: 36 },
 };
 
 export function computeLabFlag(spec: LabSpec, value: number): LabFlag {
@@ -85,6 +98,11 @@ export const LAB_TEMPLATES: Array<{ key: string; label: string; tests: string[] 
     label: "Inflammation",
     tests: ["hs-crp", "esr"],
   },
+  {
+    key: "cbc",
+    label: "CBC (เลือดทั่วไป)",
+    tests: ["wbc", "rbc", "hemoglobin", "hematocrit", "platelets", "mcv", "mch", "mchc"],
+  },
 ];
 
 export function formatRange(spec: LabSpec): string {
@@ -116,5 +134,6 @@ export const CATEGORY_LABEL: Record<LabCategory, string> = {
   kidney: "ไต",
   inflammation: "อักเสบ",
   vitamins: "วิตามิน",
+  blood: "เลือดทั่วไป",
   other: "อื่นๆ",
 };

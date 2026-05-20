@@ -55,7 +55,7 @@ function UnitToggle({
           type="button"
           onClick={() => onChange(u)}
           className={`text-[10px] font-semibold h-5 px-2 rounded-pill ${
-            unit === u ? "bg-pillar-activity text-white" : "text-ink-3"
+            unit === u ? "bg-pillar-sleep text-white" : "text-ink-3"
           }`}
         >
           {u}

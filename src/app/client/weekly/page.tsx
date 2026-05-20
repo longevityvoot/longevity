@@ -65,14 +65,14 @@ export default async function WeeklyReflectionPage() {
         action={saveWeeklyReflection}
         className="max-w-[420px] mx-auto px-5 pt-5 space-y-4"
       >
-        <Section title="สังคม" question="สัปดาห์นี้พบปะคนแบบไหนดีที่สุด?">
+        <Section title="สังคม" question="สัปดาห์นี้พบปะคนแบบไหนดีที่สุด?" tone="social">
           <SocialKindPicker defaultValue={existing?.socialKind ?? null} />
-          <p className="mt-2 text-[10.5px] text-ink-4 leading-snug">
+          <p className="mt-2 text-[10.5px] text-ink-3 leading-snug">
             คะแนน = best engagement ของสัปดาห์ (family dinner วันอาทิตย์เดียวก็พอ)
           </p>
         </Section>
 
-        <Section title="แอลกอฮอล์" question="กี่ drinks ทั้งสัปดาห์?">
+        <Section title="แอลกอฮอล์" question="กี่ drinks ทั้งสัปดาห์?" tone="activity">
           <NumField
             name="alcoholUnits"
             unit="drinks/สัปดาห์"
@@ -81,12 +81,12 @@ export default async function WeeklyReflectionPage() {
             min="0"
             max="60"
           />
-          <p className="mt-2 text-[10.5px] text-ink-4 leading-snug">
+          <p className="mt-2 text-[10.5px] text-ink-3 leading-snug">
             CDC moderate: ≤14/สัปดาห์ (ชาย) · ≤7 (หญิง)
           </p>
         </Section>
 
-        <Section title="เครื่องดื่มน้ำตาลสูง" question="กี่แก้วทั้งสัปดาห์?">
+        <Section title="เครื่องดื่มน้ำตาลสูง" question="กี่แก้วทั้งสัปดาห์?" tone="nutrition">
           <NumField
             name="sugaryDrinkCount"
             unit="แก้ว/สัปดาห์"
@@ -95,12 +95,12 @@ export default async function WeeklyReflectionPage() {
             min="0"
             max="60"
           />
-          <p className="mt-2 text-[10.5px] text-ink-4 leading-snug">
+          <p className="mt-2 text-[10.5px] text-ink-3 leading-snug">
             น้ำอัดลม · น้ำหวาน · น้ำผลไม้ · ชานมไข่มุก · กาแฟใส่น้ำตาล/นม
           </p>
         </Section>
 
-        <Section title="บุหรี่ / บุหรี่ไฟฟ้า / ยาเส้น" question="กี่วันในสัปดาห์?">
+        <Section title="บุหรี่ / บุหรี่ไฟฟ้า / ยาเส้น" question="กี่วันในสัปดาห์?" tone="substances">
           <NumField
             name="smokeDays"
             unit="วัน/สัปดาห์"
@@ -128,8 +128,8 @@ export default async function WeeklyReflectionPage() {
           <div className="max-w-[420px] mx-auto">
             <button
               type="submit"
-              className="w-full h-12 rounded-md bg-ink text-white font-semibold text-[15px]"
-              style={{ boxShadow: "0 4px 12px rgba(20, 20, 43, 0.18)" }}
+              className="w-full h-12 rounded-md bg-pillar-substances text-white font-semibold text-[15px]"
+              style={{ boxShadow: "0 4px 12px rgba(125, 92, 149, 0.30)" }}
             >
               บันทึกสรุปสัปดาห์
             </button>
@@ -143,19 +143,43 @@ export default async function WeeklyReflectionPage() {
   );
 }
 
+type SectionTone = "activity" | "stress" | "sleep" | "social" | "nutrition" | "substances";
+
+const TONE_BG: Record<SectionTone, { bg: string; title: string }> = {
+  activity:   { bg: "bg-pillar-activity-wash border-pillar-activity/30",     title: "text-pillar-activity" },
+  stress:     { bg: "bg-pillar-stress-wash border-pillar-stress/30",         title: "text-pillar-stress" },
+  sleep:      { bg: "bg-pillar-sleep-wash border-pillar-sleep/30",           title: "text-pillar-sleep" },
+  social:     { bg: "bg-pillar-social-wash border-pillar-social/30",         title: "text-pillar-social" },
+  nutrition:  { bg: "bg-pillar-nutrition-wash border-pillar-nutrition/30",   title: "text-pillar-nutrition" },
+  substances: { bg: "bg-pillar-substances-wash border-pillar-substances/30", title: "text-pillar-substances" },
+};
+
 function Section({
   title,
   question,
   children,
+  tone,
 }: {
   title: string;
   question?: string;
   children: React.ReactNode;
+  tone?: SectionTone;
 }) {
+  const cls = tone ? TONE_BG[tone] : null;
   return (
-    <section className="bg-surface rounded-xl p-5 border border-border">
+    <section
+      className={`rounded-xl p-5 border ${
+        cls ? cls.bg : "bg-surface border-border"
+      }`}
+    >
       <div className="mb-3">
-        <h2 className="text-[16px] font-semibold text-ink leading-tight">{title}</h2>
+        <h2
+          className={`text-[16px] font-semibold leading-tight ${
+            cls ? cls.title : "text-ink"
+          }`}
+        >
+          {title}
+        </h2>
         {question ? (
           <p className="text-[12px] text-ink-3 mt-0.5">{question}</p>
         ) : null}

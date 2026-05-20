@@ -24,7 +24,10 @@ export default async function NewLabPage({
         <Link href="/client/labs" className="text-[13px] text-ink-3 inline-flex items-center gap-1">
           ← กลับ
         </Link>
-        <h1 className="mt-3 text-[22px] font-semibold tracking-tight text-ink">
+        <p className="mt-3 text-[10px] uppercase tracking-[0.1em] text-pillar-substances font-bold">
+          Lab results
+        </p>
+        <h1 className="text-[22px] font-semibold tracking-tight text-ink">
           เพิ่มผลตรวจ
         </h1>
         <p className="text-[12px] text-ink-3 mt-1">
@@ -38,7 +41,7 @@ export default async function NewLabPage({
               href={`/client/labs/new?tmpl=${t.key}`}
               className={`h-9 px-3 inline-flex items-center rounded-pill text-[12px] font-semibold ${
                 t.key === active.key
-                  ? "bg-ink text-white"
+                  ? "bg-pillar-substances text-white"
                   : "bg-surface border border-border text-ink-2"
               }`}
             >
@@ -124,7 +127,8 @@ export default async function NewLabPage({
 
           <button
             type="submit"
-            className="w-full h-12 rounded-md bg-pillar-activity text-white font-semibold text-[15px]"
+            className="w-full h-12 rounded-md bg-pillar-substances text-white font-semibold text-[15px]"
+            style={{ boxShadow: "0 4px 12px rgba(125, 92, 149, 0.30)" }}
           >
             ส่งให้ designer review
           </button>
