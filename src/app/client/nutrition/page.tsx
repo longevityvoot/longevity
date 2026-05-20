@@ -127,7 +127,7 @@ export default async function NutritionPage() {
                         value: (bmr / dailyTarget) * 100,
                         color: "#4A6FA5",
                         label: "BMR",
-                        afterColor: "#5E8B4D",
+                        zoneTrackColor: "#C5D5BB",
                       }
                     : undefined
                 }
@@ -135,7 +135,7 @@ export default async function NutritionPage() {
             </div>
             <p className="text-[10.5px] text-ink-3 mt-1.5">
               <span className="font-semibold text-pillar-sleep">|</span> BMR ขั้นต่ำ ·{" "}
-              <span className="font-semibold text-pillar-social">เขียว</span> = ช่วงเป้าหมายปลอดภัย
+              <span className="font-semibold text-pillar-social">เขียวจาง</span> = ช่วงเป้าหมายต้องเติมให้ถึง
             </p>
 
             <p className="mt-2 text-[13px] font-num font-semibold text-ink-2">

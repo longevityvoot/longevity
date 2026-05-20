@@ -15,9 +15,10 @@ type Props = {
   /** Color of the big center number. Defaults to ink. */
   textColor?: string;
   /** Optional reference tick on the ring at a given 0-100 position.
-   *  `afterColor` recolors filled segments that fall past the mark — used
-   *  to call out a "target zone" (e.g. BMR → TDEE is the healthy band). */
-  mark?: { value: number; color?: string; label?: string; afterColor?: string };
+   *  `zoneTrackColor` re-colors the UNFILLED track past the mark — used
+   *  to highlight a "target zone" (e.g. BMR → TDEE band) so the user
+   *  sees the goal area even when the ring isn't filled yet. */
+  mark?: { value: number; color?: string; label?: string; zoneTrackColor?: string };
 };
 
 // Garmin-style segmented arc donut. N rounded segments with a fixed angular
@@ -51,14 +52,14 @@ export function DonutScore({
         const start = i * (segDeg + gapDeg);
         const end = start + segDeg;
         const isFilled = i < filled;
-        // Past the mark? Compare segment center to mark angle.
+        // Past the mark? Tint the UNFILLED track to indicate target zone.
         const past =
-          markAngle != null && mark?.afterColor != null && start + segDeg / 2 >= markAngle;
+          markAngle != null && mark?.zoneTrackColor != null && start + segDeg / 2 >= markAngle;
         const fillColor = isFilled
-          ? past
-            ? (mark!.afterColor as string)
-            : color
-          : trackColor;
+          ? color
+          : past
+            ? (mark!.zoneTrackColor as string)
+            : trackColor;
         return (
           <path
             key={i}
