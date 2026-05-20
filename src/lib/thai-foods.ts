@@ -234,20 +234,20 @@ export const THAI_FOODS: FoodItem[] = [
   // numbers below are mid-range averages across common Thai-market SKUs.
   // Mix with water (no extra kcal). Adding skim milk adds ~80 kcal/cup.
   { key: "bodykey-shake",        name: "BodyKey Meal Shake (Amway)",     kcal: 215, unit: "1 ซอง (~50g)",  category: "supplement", keywords: ["bodykey", "body key", "บอดี้คีย์", "บอดี้คีย", "บอดี้ คีย์", "amway", "แอมเวย์", "meal replacement", "นูทริไลท์", "shake", "เชค"] },
-  { key: "nutrilite-plant-pro",  name: "Nutrilite All Plant Protein",     kcal: 40,  unit: "1 scoop (10g)", category: "supplement", keywords: ["nutrilite", "นูทริไลท์", "amway protein", "แอมเวย์", "plant protein", "soy"] },
-  { key: "whey-concentrate",     name: "Whey Protein Concentrate",        kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["whey", "เวย์", "concentrate", "wpc"] },
-  { key: "whey-isolate",         name: "Whey Protein Isolate",            kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["whey isolate", "เวย์ไอโซเลต", "wpi"] },
-  { key: "whey-hydrolyzed",      name: "Whey Hydrolyzed",                 kcal: 105, unit: "1 scoop (30g)", category: "supplement", keywords: ["hydrolyzed whey", "wph"] },
-  { key: "casein-protein",       name: "Casein Protein",                  kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["casein", "เคซีน", "เคซีน"] },
-  { key: "plant-protein-blend",  name: "Plant Protein (ถั่ว/ข้าว/กัญชง)",  kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["plant protein", "pea", "rice", "vegan"] },
-  { key: "soy-protein-isolate",  name: "Soy Protein Isolate",             kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["soy protein", "ถั่วเหลือง"] },
+  { key: "nutrilite-plant-pro",  name: "Nutrilite All Plant Protein",     kcal: 40,  unit: "1 scoop (10g)", category: "supplement", keywords: ["nutrilite", "นูทริไลท์", "amway protein", "แอมเวย์", "แอมเวย์โปรตีน", "plant protein", "soy", "โปรตีน"] },
+  { key: "whey-concentrate",     name: "Whey Protein Concentrate",        kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["whey", "เวย์", "concentrate", "wpc", "โปรตีน"] },
+  { key: "whey-isolate",         name: "Whey Protein Isolate",            kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["whey isolate", "เวย์ไอโซเลต", "wpi", "โปรตีน"] },
+  { key: "whey-hydrolyzed",      name: "Whey Hydrolyzed",                 kcal: 105, unit: "1 scoop (30g)", category: "supplement", keywords: ["hydrolyzed whey", "wph", "เวย์", "โปรตีน"] },
+  { key: "casein-protein",       name: "Casein Protein",                  kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["casein", "เคซีน", "โปรตีน"] },
+  { key: "plant-protein-blend",  name: "Plant Protein (ถั่ว/ข้าว/กัญชง)",  kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["plant protein", "pea", "rice", "vegan", "โปรตีน", "โปรตีนพืช"] },
+  { key: "soy-protein-isolate",  name: "Soy Protein Isolate",             kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["soy protein", "ถั่วเหลือง", "โปรตีน"] },
   { key: "collagen-peptides",    name: "Collagen Peptides",               kcal: 40,  unit: "1 scoop (10g)", category: "supplement", keywords: ["collagen", "คอลลาเจน"] },
-  { key: "mass-gainer",          name: "Mass Gainer (high carb)",         kcal: 600, unit: "1 serving (~150g)", category: "supplement", keywords: ["mass gainer", "weight gainer", "เพิ่มน้ำหนัก"] },
-  { key: "egg-white-protein",    name: "Egg White Protein",               kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["egg white", "albumin", "ไข่ขาว"] },
+  { key: "mass-gainer",          name: "Mass Gainer (high carb)",         kcal: 600, unit: "1 serving (~150g)", category: "supplement", keywords: ["mass gainer", "weight gainer", "เพิ่มน้ำหนัก", "โปรตีน"] },
+  { key: "egg-white-protein",    name: "Egg White Protein",               kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["egg white", "albumin", "ไข่ขาว", "โปรตีน"] },
   { key: "bcaa-drink",           name: "BCAA (no calorie)",               kcal: 5,   unit: "1 แก้ว",       category: "supplement", keywords: ["bcaa", "amino"] },
   { key: "pre-workout",          name: "Pre-Workout (no sugar)",          kcal: 10,  unit: "1 แก้ว",       category: "supplement", keywords: ["pre workout", "preworkout", "พรีเวิร์ค"] },
-  { key: "protein-bar-generic",  name: "Protein Bar (ทั่วไป)",            kcal: 200, unit: "1 แท่ง (60g)", category: "supplement", keywords: ["protein bar", "โปรตีนบาร์"] },
-  { key: "protein-shake-rtd",    name: "Protein Shake พร้อมดื่ม (RTD)",    kcal: 160, unit: "1 ขวด (350ml)", category: "supplement", keywords: ["rtd", "ready to drink", "shake"] },
+  { key: "protein-bar-generic",  name: "Protein Bar (ทั่วไป)",            kcal: 200, unit: "1 แท่ง (60g)", category: "supplement", keywords: ["protein bar", "โปรตีนบาร์", "โปรตีน"] },
+  { key: "protein-shake-rtd",    name: "Protein Shake พร้อมดื่ม (RTD)",    kcal: 160, unit: "1 ขวด (350ml)", category: "supplement", keywords: ["rtd", "ready to drink", "shake", "โปรตีน", "โปรตีนชง"] },
 ];
 
 export function searchFoods(query: string, limit = 30): FoodItem[] {
