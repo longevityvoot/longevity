@@ -87,7 +87,8 @@ export default async function LabsPage() {
             </p>
             <Link
               href="/client/labs/new"
-              className="mt-4 inline-flex items-center px-4 h-10 rounded-md bg-pillar-activity text-white text-[13px] font-semibold"
+              className="mt-4 inline-flex items-center px-4 h-10 rounded-md bg-pillar-substances text-white text-[13px] font-semibold"
+              style={{ boxShadow: "0 4px 12px rgba(125, 92, 149, 0.30)" }}
             >
               เพิ่มผลตรวจแรก
             </Link>
