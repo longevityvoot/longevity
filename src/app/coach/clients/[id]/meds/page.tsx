@@ -9,7 +9,7 @@ import {
   SOURCE_LABEL,
   SOURCE_TONE,
 } from "@/lib/medications";
-import { setStatus } from "./actions";
+import { setStatus, deleteMedication } from "./actions";
 
 export default async function CoachMedsPage({
   params,
@@ -141,6 +141,16 @@ function MedRow({
           </button>
         </form>
       )}
+      <form action={deleteMedication.bind(null, med.id, clientId)}>
+        <button
+          type="submit"
+          className="size-9 rounded-md border border-border-strong text-[14px] text-pillar-activity hover:bg-pillar-activity-wash"
+          title="ลบรายการนี้ (เผื่อใส่ผิด — ลบ log ทั้งหมดด้วย)"
+          aria-label="ลบรายการ"
+        >
+          ✕
+        </button>
+      </form>
     </li>
   );
 }

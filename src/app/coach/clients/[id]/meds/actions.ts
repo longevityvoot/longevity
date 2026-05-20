@@ -24,3 +24,15 @@ export async function setStatus(
   });
   revalidatePath(`/coach/clients/${clientId}/meds`);
 }
+
+// Delete a medication / supplement entry — for entry-mistake cleanup.
+// MedicationLog rows cascade via the schema's onDelete: Cascade.
+export async function deleteMedication(medId: string, clientId: string) {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+  if (session.user.role !== "COACH" && session.user.role !== "ADMIN") {
+    redirect("/client");
+  }
+  await prisma.medication.delete({ where: { id: medId } });
+  revalidatePath(`/coach/clients/${clientId}/meds`);
+}
