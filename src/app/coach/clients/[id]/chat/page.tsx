@@ -17,9 +17,9 @@ export default async function CoachChatPage({
 
   const client = await prisma.user.findUnique({
     where: { id: clientId },
-    select: { id: true, name: true, role: true },
+    select: { id: true, name: true, clientProfile: { select: { id: true } } },
   });
-  if (!client || client.role !== "CLIENT") notFound();
+  if (!client || !client.clientProfile) notFound();
 
   const threadId = threadIdForClient(clientId);
   const messages = await listMessages(threadId);

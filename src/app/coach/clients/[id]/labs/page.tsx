@@ -15,9 +15,9 @@ export default async function CoachLabsListPage({
 
   const client = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, name: true, role: true },
+    select: { id: true, name: true, clientProfile: { select: { id: true } } },
   });
-  if (!client || client.role !== "CLIENT") notFound();
+  if (!client || !client.clientProfile) notFound();
 
   const panels = await listPanelsForUser(id);
 

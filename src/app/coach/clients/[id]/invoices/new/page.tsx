@@ -15,9 +15,9 @@ export default async function NewInvoicePage({
 
   const client = await prisma.user.findUnique({
     where: { id: clientId },
-    select: { id: true, name: true, role: true },
+    select: { id: true, name: true, clientProfile: { select: { id: true } } },
   });
-  if (!client || client.role !== "CLIENT") notFound();
+  if (!client || !client.clientProfile) notFound();
 
   const today = new Date();
   const due = new Date();
