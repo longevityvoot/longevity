@@ -119,6 +119,62 @@ export function healthyMuscleMassKgRange(
   };
 }
 
+// Predicted skeletal muscle mass (kg) using Lee et al. 2000 anthropometric
+// equation, adjusted for Asian populations (race factor -1.2). Used to
+// center brand-specific "Normal" bands when the user logs muscle in kg.
+//
+//   SM = 0.244·BW + 7.8·Ht(m) + 6.6·gender(M=1) - 0.098·age + race - 3.3
+export function predictedSMM(
+  heightCm: number | null,
+  weightKg: number | null,
+  ageYears: number | null,
+  gender: string | null,
+): number | null {
+  if (!heightCm || !weightKg || !ageYears) return null;
+  const heightM = heightCm / 100;
+  const isMale = gender === "male" ? 1 : 0;
+  const race = -1.2; // Asian factor per Lee et al. 2000
+  return +(
+    0.244 * weightKg +
+    7.8 * heightM +
+    6.6 * isMale -
+    0.098 * ageYears -
+    3.3 +
+    race
+  ).toFixed(1);
+}
+
+// Brand-aware muscle mass (kg) band centered on predicted SMM. Different
+// consumer BIA scales widen the band differently — InBody/Tanita run
+// tighter, Xiaomi/Omron looser. Predicted SMM gets a small upward bias
+// for InBody/Tanita because their published "Normal" mid-point sits
+// slightly above Lee's anthropometric prediction.
+export function muscleKgRangeForBrand(
+  brand: string | null,
+  predicted: number | null,
+): { low: number; high: number } | null {
+  if (predicted == null) return null;
+  const bias: Record<string, number> = {
+    inbody: 1.08,
+    tanita: 1.06,
+    omron:  1.0,
+    xiaomi: 1.0,
+  };
+  const width: Record<string, [number, number]> = {
+    inbody: [0.92, 1.15], // tighter, predicted-for-frame
+    tanita: [0.92, 1.15],
+    omron:  [0.88, 1.18], // population reference, wider
+    xiaomi: [0.80, 1.20], // BIA less accurate, widest tolerance
+  };
+  const key = brand ?? "";
+  const center = predicted * (bias[key] ?? 1.0);
+  const [lo, hi] = width[key] ?? [0.85, 1.18];
+  return {
+    low: +(center * lo).toFixed(1),
+    high: +(center * hi).toFixed(1),
+  };
+}
+
 export function rangeFlag(
   value: number,
   low: number,

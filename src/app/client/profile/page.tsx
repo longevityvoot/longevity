@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ageFromDOB, isSyntheticLineEmail } from "@/lib/clients";
+import { setScaleBrand } from "./actions";
 
 export default async function ClientProfilePage() {
   const session = await auth();
@@ -87,6 +88,34 @@ export default async function ClientProfilePage() {
           <p className="text-[11px] text-ink-4 mt-3">
             แก้ cadence ได้ผ่าน designer ในเฟส 1 — Settings page มาเฟสถัดไป
           </p>
+        </section>
+
+        <section className="mt-3 bg-surface border border-border rounded-lg p-4">
+          <h2 className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+            เครื่องชั่ง body composition
+          </h2>
+          <p className="text-[11px] text-ink-3 mt-1 leading-snug">
+            ระบบจะปรับเกณฑ์มวลกล้าม/ไขมัน ให้ match กับ algorithm ของเครื่อง
+          </p>
+          <form action={setScaleBrand} className="mt-3 flex items-center gap-2">
+            <select
+              name="scaleBrand"
+              defaultValue={profile?.scaleBrand ?? ""}
+              className="flex-1 h-10 rounded-md border border-border-strong px-3 text-[14px] bg-surface focus:outline-none focus:border-ink"
+            >
+              <option value="">— ไม่ระบุ —</option>
+              <option value="inbody">InBody (H20N, H30 home)</option>
+              <option value="omron">Omron HBF series</option>
+              <option value="tanita">Tanita</option>
+              <option value="xiaomi">Xiaomi Mi Body</option>
+            </select>
+            <button
+              type="submit"
+              className="h-10 px-4 rounded-md bg-ink text-white text-[13px] font-semibold"
+            >
+              บันทึก
+            </button>
+          </form>
         </section>
 
         <section className="mt-3 bg-surface border border-border rounded-lg p-4 space-y-3">
