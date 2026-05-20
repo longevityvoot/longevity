@@ -95,9 +95,9 @@ export function DonutScore({
           {label}
         </text>
       ) : null}
-      {mark && markAngle != null
+      {mark && markAngle != null && mark.color
         ? (() => {
-            const tickColor = mark.color ?? "#14142B";
+            const tickColor = mark.color;
             const tickOuter = polarToCartesian(cx, cy, r + thickness / 2 + 5, markAngle);
             const tickInner = polarToCartesian(cx, cy, r - thickness / 2 - 1, markAngle);
             const labelPos = polarToCartesian(cx, cy, r + thickness / 2 + 14, markAngle);
