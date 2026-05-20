@@ -12,6 +12,8 @@ type Props = {
   label?: string;
   /** Override the big center number (e.g. "—" when empty). */
   display?: string;
+  /** Color of the big center number. Defaults to ink. */
+  textColor?: string;
 };
 
 // Garmin-style segmented arc donut. N rounded segments with a fixed angular
@@ -27,6 +29,7 @@ export function DonutScore({
   trackColor = "#ECECF2",
   label,
   display,
+  textColor = "#14142B",
 }: Props) {
   const cx = size / 2;
   const cy = size / 2;
@@ -59,7 +62,7 @@ export function DonutScore({
         dominantBaseline="central"
         fontSize={size * 0.3}
         fontWeight={700}
-        fill="#14142B"
+        fill={textColor}
         style={{ fontVariantNumeric: "tabular-nums" }}
       >
         {text}
