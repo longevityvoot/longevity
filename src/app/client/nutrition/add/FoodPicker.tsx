@@ -100,7 +100,7 @@ export function FoodPicker() {
                 onClick={() => setCategory(c.key)}
                 className={`h-8 px-3 inline-flex items-center rounded-pill text-[11px] font-semibold whitespace-nowrap shrink-0 ${
                   c.key === category
-                    ? "bg-ink text-white"
+                    ? "bg-pillar-nutrition text-white"
                     : "bg-canvas text-ink-3 border border-border"
                 }`}
               >
@@ -188,7 +188,7 @@ export function FoodPicker() {
                   onClick={() => setPortion(p)}
                   className={`h-14 rounded-md text-[13px] font-semibold border flex flex-col items-center justify-center gap-1 ${
                     portion === p
-                      ? "bg-ink text-white border-ink"
+                      ? "bg-pillar-nutrition text-white border-pillar-nutrition"
                       : "bg-canvas border-border text-ink-2"
                   }`}
                 >
@@ -205,7 +205,7 @@ export function FoodPicker() {
               onClick={() => setExtra(!extra)}
               className={`mt-3 w-full h-10 rounded-md text-[13px] font-semibold border inline-flex items-center justify-center gap-2 ${
                 extra
-                  ? "bg-ink text-white border-ink"
+                  ? "bg-pillar-nutrition text-white border-pillar-nutrition"
                   : "bg-canvas border-border-strong text-ink-2"
               }`}
             >
@@ -213,10 +213,10 @@ export function FoodPicker() {
             </button>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-[36px] font-bold font-num tabular-nums text-ink leading-none">
+            <span className="text-[36px] font-bold font-num tabular-nums text-pillar-nutrition leading-none">
               {Math.round(picked.kcal * portion * extraMultiplier)}
             </span>
-            <span className="text-[13px] text-ink-4">kcal</span>
+            <span className="text-[13px] text-pillar-nutrition/70">kcal</span>
           </div>
         </section>
       )}
@@ -285,12 +285,12 @@ export function FoodPicker() {
             disabled={!effectiveDesc}
             className={`w-full h-12 rounded-md font-semibold text-[15px] ${
               effectiveDesc
-                ? "bg-pillar-activity text-white"
+                ? "bg-pillar-nutrition text-white"
                 : "bg-canvas border border-border text-ink-4"
             }`}
             style={
               effectiveDesc
-                ? { boxShadow: "0 4px 12px rgba(255, 107, 107, 0.25)" }
+                ? { boxShadow: "0 4px 12px rgba(201, 168, 72, 0.30)" }
                 : undefined
             }
           >
@@ -326,8 +326,8 @@ function PlateIcon({ fill, active }: { fill: number; active: boolean }) {
   const cx = 12;
   const cy = 12;
   const r = 8;
-  const ring = active ? "#FFFFFF" : "#5A5A7A";
-  const accent = active ? "#FFFFFF" : "#14142B";
+  const ring = active ? "#FFFFFF" : "#C9A848";
+  const accent = active ? "#FFFFFF" : "#C9A848";
   // Path arc from 12 o'clock clockwise by `fill * 360`.
   const angle = fill * 360 - 0.0001; // avoid full-circle == zero arc
   const large = angle > 180 ? 1 : 0;
