@@ -10,6 +10,7 @@ import { todayLocalDate, mondayOf, dateKey } from "@/lib/dates";
 import {
   estimateBMR,
   estimateDailyTarget,
+  estimateDailyGoal,
   getDailyNutritionHistory,
   getMealsForDay,
   totalKcal,
@@ -140,7 +141,7 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
     ageYears: ageFromDOB(user.clientProfile.dateOfBirth),
     lbmKg: latestLbm,
   });
-  const dailyTarget = estimateDailyTarget(bmr);
+  const dailyTarget = estimateDailyGoal(estimateDailyTarget(bmr));
   const weeklyByKey = new Map(weeklies.map((w) => [dateKey(w.weekStart), w]));
   const weeklyFor = (d: Date) => weeklyByKey.get(dateKey(mondayOf(d))) ?? null;
 

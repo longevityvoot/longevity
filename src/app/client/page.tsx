@@ -20,6 +20,7 @@ import { greetingFor, bangkokHour } from "@/lib/greeting";
 import {
   estimateBMR,
   estimateDailyTarget,
+  estimateDailyGoal,
   getMealsForDay,
   totalKcal,
   dailyMealQuality,
@@ -89,7 +90,7 @@ export default async function ClientHome() {
       ageYears: ageFromDOB(profile.dateOfBirth),
       lbmKg: latestLbm,
     });
-    dailyTarget = estimateDailyTarget(bmr);
+    dailyTarget = estimateDailyGoal(estimateDailyTarget(bmr));
   }
 
   const nutritionToday = {

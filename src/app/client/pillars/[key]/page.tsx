@@ -10,7 +10,7 @@ import {
 } from "@/lib/scoring";
 import { DonutScore } from "@/components/charts/DonutScore";
 import { TrendChart } from "@/components/charts/TrendChart";
-import { estimateBMR, estimateDailyTarget, getDailyNutritionHistory } from "@/lib/meals";
+import { estimateBMR, estimateDailyTarget, estimateDailyGoal, getDailyNutritionHistory } from "@/lib/meals";
 import { getLatestLBM } from "@/lib/body";
 import { ageFromDOB } from "@/lib/clients";
 import { mondayOf, dateKey } from "@/lib/dates";
@@ -113,7 +113,7 @@ export default async function PillarDetailPage({
       ageYears: ageFromDOB(profile.dateOfBirth),
       lbmKg: latestLbm,
     });
-    dailyTarget = estimateDailyTarget(bmr);
+    dailyTarget = estimateDailyGoal(estimateDailyTarget(bmr));
   }
 
   type Point = { x: Date; y: number };
