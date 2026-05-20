@@ -171,6 +171,15 @@ export default async function BodyPage({
           </nav>
         </section>
 
+        {/* Primary CTA — prominent record button */}
+        <Link
+          href="/client/body/log"
+          className="mt-3 w-full h-12 rounded-md bg-pillar-activity text-white font-semibold text-[15px] inline-flex items-center justify-center gap-2"
+          style={{ boxShadow: "0 4px 12px rgba(196, 81, 81, 0.30)" }}
+        >
+          + บันทึกการวัดวันนี้
+        </Link>
+
         {/* Vitals card row */}
         <section className="mt-3 grid grid-cols-3 gap-2.5">
           <VitalCard
