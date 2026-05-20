@@ -199,6 +199,10 @@ export default async function BodyPage({
             />
           </div>
 
+          <p className="mt-3 text-[9.5px] text-ink-4 leading-snug">
+            อ้างอิง: BMI 18.5–22.9 (WHO Asia-Pacific) · % ไขมัน (Omron HBF) · กล้ามเนื้อ (InBody adult Asian)
+          </p>
+
           <div className="mt-5 pt-4 border-t border-pillar-sleep/20">
             <p className="text-[10px] uppercase tracking-wider text-pillar-sleep font-bold mb-2">
               แนวโน้มน้ำหนัก

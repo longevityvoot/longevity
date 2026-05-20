@@ -57,29 +57,39 @@ export async function getLatestMuscleMass(userId: string) {
   });
 }
 
-// Ideal weight range from BMI 18.5–24.9 × height². Returns null when
-// height isn't known. The "healthy" band on the body hero range bar.
+// Ideal weight range. WHO Asia-Pacific BMI cutoff (also Thai MOPH /
+// Thai Diabetes Association guideline): BMI 18.5–22.9 is normal —
+// >=23 is overweight, >=25 obese. This is tighter than the global
+// WHO band (25/30) because Asian populations show metabolic risk at
+// lower BMI thresholds.
 export function idealWeightRange(heightCm: number | null): { low: number; high: number } | null {
   if (!heightCm || heightCm <= 0) return null;
   const m = heightCm / 100;
   return {
     low: +(18.5 * m * m).toFixed(1),
-    high: +(24.9 * m * m).toFixed(1),
+    high: +(22.9 * m * m).toFixed(1),
   };
 }
 
-// Healthy body-fat % band by gender. Defaults to the wider unisex band
-// (10–25%) when gender is missing.
+// Healthy body-fat % band. Tuned to the Omron HBF series reference
+// adopted by most Thai-market smart scales:
+//   Male:   10–19.9% normal (≥20 slightly high, ≥25 high)
+//   Female: 20–29.9% normal (≥30 slightly high, ≥35 high)
+// Unisex fallback widens to 10–28%.
 export function healthyBodyFatRange(gender: string | null): { low: number; high: number } {
-  if (gender === "male") return { low: 10, high: 20 };
-  if (gender === "female") return { low: 18, high: 28 };
-  return { low: 10, high: 25 };
+  if (gender === "male") return { low: 10, high: 19.9 };
+  if (gender === "female") return { low: 20, high: 29.9 };
+  return { low: 10, high: 28 };
 }
 
-// Healthy skeletal-muscle % band by gender. Adults; athletic skews higher.
+// Healthy skeletal-muscle % band. Tuned to InBody adult Asian reference
+// (also Omron SMM% for ages 20–59):
+//   Male:   33.3–39.3% normal (≥39.4 athletic)
+//   Female: 24.3–30.3% normal (≥30.4 athletic)
+// Unisex fallback covers both.
 export function healthyMuscleMassRange(gender: string | null): { low: number; high: number } {
-  if (gender === "male") return { low: 33, high: 39 };
-  if (gender === "female") return { low: 25, high: 31 };
+  if (gender === "male") return { low: 33.3, high: 39.3 };
+  if (gender === "female") return { low: 24.3, high: 30.3 };
   return { low: 28, high: 36 };
 }
 
