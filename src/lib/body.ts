@@ -82,15 +82,17 @@ export function healthyBodyFatRange(gender: string | null): { low: number; high:
   return { low: 10, high: 28 };
 }
 
-// Healthy skeletal-muscle % band. Tuned to InBody adult Asian reference
-// (also Omron SMM% for ages 20–59):
-//   Male:   33.3–39.3% normal (≥39.4 athletic)
-//   Female: 24.3–30.3% normal (≥30.4 athletic)
-// Unisex fallback covers both.
+// Skeletal-muscle % healthy band — widened upper edge to cover InBody's
+// "normal" classification which includes athletic builds (the 33.3 floor
+// stays, the 39.3 ceiling extends to ~45 to keep gym-active users from
+// being flagged as "high"). Above the ceiling is still "good" (athletic),
+// just past the reference band; UI treats high-muscle as a positive flag.
+//   Male:   33.3–45% normal+athletic
+//   Female: 24.3–37% normal+athletic
 export function healthyMuscleMassRange(gender: string | null): { low: number; high: number } {
-  if (gender === "male") return { low: 33.3, high: 39.3 };
-  if (gender === "female") return { low: 24.3, high: 30.3 };
-  return { low: 28, high: 36 };
+  if (gender === "male") return { low: 33.3, high: 45 };
+  if (gender === "female") return { low: 24.3, high: 37 };
+  return { low: 28, high: 42 };
 }
 
 export function rangeFlag(

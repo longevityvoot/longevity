@@ -5,6 +5,9 @@ type Props = {
   flag: "low" | "normal" | "high" | "critical";
   width?: number;
   height?: number;
+  /** When true, the "high" flag colors the dot green instead of orange —
+   *  used for metrics where being above range is good (e.g. muscle mass). */
+  highIsGood?: boolean;
 };
 
 // Horizontal range bar: dim track + green band for the reference range,
@@ -16,6 +19,7 @@ export function RangeBar({
   flag,
   width = 200,
   height = 28,
+  highIsGood = false,
 }: Props) {
   // Build a viewport that comfortably contains the band + the dot
   const lo = low ?? value;
@@ -40,6 +44,8 @@ export function RangeBar({
   const dotFill =
     flag === "critical"
       ? "#FF4D4F"
+      : flag === "high" && highIsGood
+      ? "#52C41A"
       : flag === "high" || flag === "low"
       ? "#FFA940"
       : "#52C41A";
