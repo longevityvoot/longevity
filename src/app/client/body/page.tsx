@@ -218,6 +218,7 @@ export default async function BodyPage({
               barValue={muscleDisplay?.value ?? null}
               low={muscleDisplay?.rangeLow ?? null}
               high={muscleDisplay?.rangeHigh ?? null}
+              highIsGood
               note={
                 muscleDisplay
                   ? muscleAdvice(
@@ -370,6 +371,7 @@ function MetricRow({
   low,
   high,
   note,
+  highIsGood = false,
 }: {
   label: string;
   value: string;
@@ -377,6 +379,7 @@ function MetricRow({
   low: number | null;
   high: number | null;
   note: string | null;
+  highIsGood?: boolean;
 }) {
   const flag =
     barValue == null || low == null || high == null
@@ -390,7 +393,7 @@ function MetricRow({
       </div>
       {barValue != null && low != null && high != null ? (
         <div className="mt-1.5">
-          <RangeBar value={barValue} low={low} high={high} flag={flag} width={320} height={20} />
+          <RangeBar value={barValue} low={low} high={high} flag={flag} highIsGood={highIsGood} width={320} height={20} />
           <div className="flex items-baseline justify-between mt-0.5 text-[10px] font-num text-ink-4">
             <span>{low}</span>
             <span>{high}</span>
@@ -435,7 +438,7 @@ function muscleAdvice(
   if (value < range.low) {
     return `ควรเพิ่มอีก ${(range.low - value).toFixed(1)}${u} — เพิ่มโปรตีน + เวท`;
   }
-  if (value > range.high) return `กล้ามดีมาก (สูงกว่าเกณฑ์ปกติ)${equivPct}`;
+  if (value > range.high) return `ระดับ athletic — กล้ามมาก${equivPct}`;
   return `อยู่ในเกณฑ์ปกติ (${range.low}–${range.high}${u})${equivPct}`;
 }
 
