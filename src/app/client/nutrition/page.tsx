@@ -109,34 +109,48 @@ export default async function NutritionPage() {
               เป้าหมายวันนี้
             </p>
 
-            <div className="mt-4 flex justify-center">
-              <DonutScore
-                value={pct == null ? null : Math.min(100, pct)}
-                size={220}
-                thickness={11}
-                segments={18}
-                gapDeg={3}
-                color="#C9A848"
-                trackColor="#FFFFFFAA"
-                display={totalToday.toLocaleString()}
-                label={`/${dailyTarget.toLocaleString()} kcal`}
-                textColor="#C9A848"
-                mark={
-                  bmr != null
-                    ? {
-                        value: (bmr / dailyTarget) * 100,
-                        color: "#4A6FA5",
-                        label: "BMR",
-                        zoneTrackColor: "#C5D5BB",
+            {(() => {
+              const overflow = pct != null && pct > 100;
+              const ringColor = overflow ? "#C45151" : "#C9A848";
+              return (
+                <>
+                  <div className="mt-4 flex justify-center">
+                    <DonutScore
+                      value={pct == null ? null : Math.min(100, pct)}
+                      size={220}
+                      thickness={11}
+                      segments={18}
+                      gapDeg={3}
+                      color={ringColor}
+                      trackColor="#FFFFFFAA"
+                      display={totalToday.toLocaleString()}
+                      label={`/${dailyTarget.toLocaleString()} kcal`}
+                      textColor={ringColor}
+                      mark={
+                        bmr != null
+                          ? {
+                              value: (bmr / dailyTarget) * 100,
+                              color: "#4A6FA5",
+                              label: "BMR",
+                              zoneTrackColor: "#C5D5BB",
+                            }
+                          : undefined
                       }
-                    : undefined
-                }
-              />
-            </div>
-            <p className="text-[10.5px] text-ink-3 mt-1.5">
-              <span className="font-semibold text-pillar-sleep">|</span> BMR ขั้นต่ำ ·{" "}
-              <span className="font-semibold text-pillar-social">เขียวจาง</span> = ช่วงเป้าหมายต้องเติมให้ถึง
-            </p>
+                    />
+                  </div>
+                  <p className="text-[10.5px] text-ink-3 mt-1.5">
+                    <span className="font-semibold text-pillar-sleep">|</span> BMR ขั้นต่ำ ·{" "}
+                    <span className="font-semibold text-pillar-social">เขียวจาง</span> = เป้าหมายต้องเติมให้ถึง
+                    {overflow ? (
+                      <>
+                        {" · "}
+                        <span className="font-semibold text-pillar-activity">แดง</span> = เกิน TDEE
+                      </>
+                    ) : null}
+                  </p>
+                </>
+              );
+            })()}
 
             <p className="mt-2 text-[13px] font-num font-semibold text-ink-2">
               {pct ?? 0}% ของเป้า
