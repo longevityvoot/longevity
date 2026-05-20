@@ -207,61 +207,81 @@ export default async function ClientHome() {
           </div>
         </section>
 
-        {/* Streak strip */}
-        {streak > 0 ? (
+        {/* Quick action row — streak · daily · weekly as 3 tap targets */}
+        <section className="mt-3 grid grid-cols-3 gap-2">
           <Link
             href="/client/checkin"
-            className="mt-3 bg-surface rounded-lg border border-border px-4 py-3 flex items-center gap-3"
+            className="rounded-lg border border-border bg-surface px-3 py-3 flex flex-col items-center text-center"
+            aria-label={`ประเมินมา ${streak} วันติด`}
           >
-            <span className="size-9 rounded-full bg-pillar-nutrition-wash text-pillar-nutrition inline-flex items-center justify-center font-num font-bold text-[14px]">
+            <p className="text-[10px] uppercase tracking-wider text-ink-4 font-bold">
+              ประเมินมา
+            </p>
+            <p className="text-[26px] font-bold font-num tabular-nums leading-none mt-1 text-pillar-nutrition">
               {streak}
-            </span>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] text-ink font-medium">
-                ประเมินมา{" "}
-                <span className="font-num font-bold text-pillar-nutrition">
-                  {streak}
-                </span>{" "}
-                วันติด
-              </p>
-              <p className="text-[11px] text-ink-4">เก่งมาก — ดูประวัติ →</p>
-            </div>
+            </p>
+            <p className="text-[10px] text-ink-4 mt-0.5">วันติด</p>
           </Link>
-        ) : null}
 
-        {/* Primary CTAs — daily + weekly */}
-        <Link
-          href="/client/checkin"
-          className={`mt-3 w-full h-12 rounded-md inline-flex items-center justify-between px-5 ${
-            todayCheckIn == null
-              ? "bg-pillar-activity text-white"
-              : "bg-surface border border-border-strong text-ink-2"
-          }`}
-          style={
-            todayCheckIn == null
-              ? { boxShadow: "0 4px 12px rgba(255, 107, 107, 0.25)" }
-              : undefined
-          }
-        >
-          <span className="text-[15px] font-semibold">
-            {todayCheckIn == null ? "ประเมินวันนี้" : "แก้ประเมินวันนี้"}
-          </span>
-          <span className="text-[18px]">→</span>
-        </Link>
+          <Link
+            href="/client/checkin"
+            className={`rounded-lg px-3 py-3 flex flex-col items-center text-center border ${
+              todayCheckIn == null
+                ? "bg-pillar-activity text-white border-pillar-activity"
+                : "bg-surface border-border text-ink-3"
+            }`}
+            style={
+              todayCheckIn == null
+                ? { boxShadow: "0 4px 12px rgba(196, 81, 81, 0.25)" }
+                : undefined
+            }
+          >
+            <p
+              className={`text-[10px] uppercase tracking-wider font-bold ${
+                todayCheckIn == null ? "text-white/80" : "text-ink-4"
+              }`}
+            >
+              วันนี้
+            </p>
+            <p className="text-[12px] font-semibold mt-1.5 leading-tight">
+              {todayCheckIn == null ? "ประเมิน" : "แก้ประเมิน"}
+            </p>
+            <p
+              className={`text-[10px] mt-0.5 ${
+                todayCheckIn == null ? "text-white/70" : "text-ink-4"
+              }`}
+            >
+              {todayCheckIn == null ? "ยังไม่ทำ" : "บันทึกแล้ว"}
+            </p>
+          </Link>
 
-        <Link
-          href="/client/weekly"
-          className={`mt-2 w-full h-11 rounded-md inline-flex items-center justify-between px-5 border ${
-            thisWeekly == null
-              ? "bg-pillar-social-wash border-pillar-social/40 text-pillar-social"
-              : "bg-surface border-border-strong text-ink-3"
-          }`}
-        >
-          <span className="text-[13px] font-semibold">
-            {thisWeekly == null ? "สรุปสัปดาห์นี้ — รอบันทึก" : "แก้สรุปสัปดาห์นี้"}
-          </span>
-          <span className="text-[16px]">→</span>
-        </Link>
+          <Link
+            href="/client/weekly"
+            className={`rounded-lg px-3 py-3 flex flex-col items-center text-center border ${
+              thisWeekly == null
+                ? "bg-pillar-social-wash border-pillar-social/40 text-pillar-social"
+                : "bg-surface border-border text-ink-3"
+            }`}
+          >
+            <p
+              className={`text-[10px] uppercase tracking-wider font-bold ${
+                thisWeekly == null ? "text-pillar-social/80" : "text-ink-4"
+              }`}
+            >
+              สัปดาห์
+            </p>
+            <p className="text-[12px] font-semibold mt-1.5 leading-tight">
+              {thisWeekly == null ? "สรุป" : "แก้สรุป"}
+            </p>
+            <p
+              className={`text-[10px] mt-0.5 ${
+                thisWeekly == null ? "text-pillar-social/70" : "text-ink-4"
+              }`}
+            >
+              {thisWeekly == null ? "ยังไม่ทำ" : "บันทึกแล้ว"}
+            </p>
+          </Link>
+        </section>
 
         {/* 6 pillar tiles */}
         <section className="mt-6">
