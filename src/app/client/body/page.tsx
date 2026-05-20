@@ -86,11 +86,38 @@ export default async function BodyPage({
   const fatRange = healthyBodyFatRange(profile?.gender ?? null);
   const muscleRange = healthyMuscleMassRange(profile?.gender ?? null);
 
-  // Muscle mass percentage (if stored as kg, convert against weight).
-  const musclePct = (() => {
-    if (!latestMuscle || !latestWeight) return null;
-    if (latestMuscle.unit === "%") return latestMuscle.value;
-    return +((latestMuscle.value / latestWeight.value) * 100).toFixed(1);
+  // Muscle row: show value in the same unit the user logged in. The
+  // healthy range (stored as %) gets converted to kg when the user logged
+  // their muscle mass in kg, so the range bar reads in matching units.
+  const muscleDisplay = (() => {
+    if (!latestMuscle) {
+      return null;
+    }
+    const unit = latestMuscle.unit === "%" ? "%" : "kg";
+    const value = latestMuscle.value;
+    const weight = latestWeight?.value ?? null;
+    if (unit === "%") {
+      return {
+        unit: "%" as const,
+        value,
+        valueDisplay: `${value.toFixed(1)}%`,
+        rangeLow: muscleRange.low,
+        rangeHigh: muscleRange.high,
+        pctEquivalent: value,
+      };
+    }
+    // unit = kg: convert range % → kg via current weight (if known).
+    const rangeLowKg = weight != null ? +((muscleRange.low / 100) * weight).toFixed(1) : null;
+    const rangeHighKg = weight != null ? +((muscleRange.high / 100) * weight).toFixed(1) : null;
+    const pctEquivalent = weight != null ? +((value / weight) * 100).toFixed(1) : null;
+    return {
+      unit: "kg" as const,
+      value,
+      valueDisplay: `${value.toFixed(1)} kg`,
+      rangeLow: rangeLowKg,
+      rangeHigh: rangeHighKg,
+      pctEquivalent,
+    };
   })();
 
   return (
@@ -186,14 +213,19 @@ export default async function BodyPage({
               }
             />
             <MetricRow
-              label="กล้ามเนื้อ %"
-              value={musclePct != null ? `${musclePct.toFixed(1)}%` : "—"}
-              barValue={musclePct}
-              low={muscleRange.low}
-              high={muscleRange.high}
+              label={muscleDisplay?.unit === "kg" ? "กล้ามเนื้อ" : "กล้ามเนื้อ %"}
+              value={muscleDisplay?.valueDisplay ?? "—"}
+              barValue={muscleDisplay?.value ?? null}
+              low={muscleDisplay?.rangeLow ?? null}
+              high={muscleDisplay?.rangeHigh ?? null}
               note={
-                musclePct != null
-                  ? muscleAdvice(musclePct, muscleRange)
+                muscleDisplay
+                  ? muscleAdvice(
+                      muscleDisplay.value,
+                      { low: muscleDisplay.rangeLow ?? muscleRange.low, high: muscleDisplay.rangeHigh ?? muscleRange.high },
+                      muscleDisplay.unit,
+                      muscleDisplay.pctEquivalent,
+                    )
                   : "บันทึกมวลกล้ามจากเครื่องชั่ง"
               }
             />
@@ -392,12 +424,19 @@ function fatAdvice(value: number, range: { low: number; high: number }): string 
   return `อยู่ในเกณฑ์ปกติ (${range.low}–${range.high}%)`;
 }
 
-function muscleAdvice(value: number, range: { low: number; high: number }): string {
+function muscleAdvice(
+  value: number,
+  range: { low: number; high: number },
+  unit: "kg" | "%",
+  pctEquivalent: number | null,
+): string {
+  const u = unit === "kg" ? "kg" : "%";
+  const equivPct = pctEquivalent != null && unit === "kg" ? ` (≈ ${pctEquivalent.toFixed(1)}%)` : "";
   if (value < range.low) {
-    return `ควรเพิ่มอีก ${(range.low - value).toFixed(1)}% — เพิ่มโปรตีน + เวท`;
+    return `ควรเพิ่มอีก ${(range.low - value).toFixed(1)}${u} — เพิ่มโปรตีน + เวท`;
   }
-  if (value > range.high) return `กล้ามดีมาก (สูงกว่าเกณฑ์ปกติ)`;
-  return `อยู่ในเกณฑ์ปกติ (${range.low}–${range.high}%)`;
+  if (value > range.high) return `กล้ามดีมาก (สูงกว่าเกณฑ์ปกติ)${equivPct}`;
+  return `อยู่ในเกณฑ์ปกติ (${range.low}–${range.high}${u})${equivPct}`;
 }
 
 type VitalTone = "activity" | "nutrition" | "stress" | "sleep" | "social" | "substances";
