@@ -81,7 +81,7 @@ export default async function BodyPage({
             ←
           </Link>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.1em] text-pillar-activity font-bold">
+            <p className="text-[10px] uppercase tracking-[0.1em] text-pillar-sleep font-bold">
               Vitals
             </p>
             <p className="text-[15px] font-semibold text-ink leading-tight">
@@ -90,7 +90,7 @@ export default async function BodyPage({
           </div>
           <Link
             href="/client/body/log"
-            className="text-[12px] text-pillar-activity font-bold"
+            className="text-[12px] text-pillar-sleep font-bold"
           >
             +บันทึก
           </Link>
@@ -118,16 +118,16 @@ export default async function BodyPage({
         </section>
 
         {/* Weight hero */}
-        <section className="mt-4 bg-pillar-activity-wash rounded-2xl p-5 border border-pillar-activity/30">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-pillar-activity font-bold">
+        <section className="mt-4 bg-pillar-sleep-wash rounded-2xl p-5 border border-pillar-sleep/30">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-pillar-sleep font-bold">
             น้ำหนัก
           </p>
           {latestWeight ? (
             <div className="mt-1 flex items-baseline gap-3">
-              <span className="text-[56px] font-bold font-num tabular-nums leading-none text-pillar-activity">
+              <span className="text-[56px] font-bold font-num tabular-nums leading-none text-pillar-sleep">
                 {latestWeight.value}
               </span>
-              <span className="text-[14px] text-pillar-activity/70 font-medium">kg</span>
+              <span className="text-[14px] text-pillar-sleep/70 font-medium">kg</span>
               {weightDelta != null && weightDelta !== 0 ? (
                 <span
                   className={`text-[12px] font-semibold px-2 py-0.5 rounded-pill ml-auto ${
@@ -147,10 +147,10 @@ export default async function BodyPage({
             <TrendChart
               data={weightHistory.map((m) => ({ x: m.measuredAt, y: m.value }))}
               height={120}
-              color="#C45151"
+              color="#4A6FA5"
             />
           </div>
-          <nav className="mt-3 inline-flex bg-white/60 border border-pillar-activity/20 rounded-pill p-1 gap-0.5">
+          <nav className="mt-3 inline-flex bg-white/60 border border-pillar-sleep/20 rounded-pill p-1 gap-0.5">
             {[
               { v: "7", label: "7 วัน" },
               { v: "30", label: "30 วัน" },
@@ -161,8 +161,8 @@ export default async function BodyPage({
                 href={`/client/body?range=${r.v}`}
                 className={`px-3.5 h-7 rounded-pill text-[11px] font-semibold inline-flex items-center ${
                   range === r.v
-                    ? "bg-pillar-activity text-white"
-                    : "text-pillar-activity/80"
+                    ? "bg-pillar-sleep text-white"
+                    : "text-pillar-sleep/80"
                 }`}
               >
                 {r.label}
@@ -174,8 +174,8 @@ export default async function BodyPage({
         {/* Primary CTA — prominent record button */}
         <Link
           href="/client/body/log"
-          className="mt-3 w-full h-12 rounded-md bg-pillar-activity text-white font-semibold text-[15px] inline-flex items-center justify-center gap-2"
-          style={{ boxShadow: "0 4px 12px rgba(196, 81, 81, 0.30)" }}
+          className="mt-3 w-full h-12 rounded-md bg-pillar-sleep text-white font-semibold text-[15px] inline-flex items-center justify-center gap-2"
+          style={{ boxShadow: "0 4px 12px rgba(74, 111, 165, 0.30)" }}
         >
           + บันทึกการวัดวันนี้
         </Link>
@@ -271,7 +271,7 @@ export default async function BodyPage({
 type VitalTone = "activity" | "nutrition" | "stress" | "sleep" | "social" | "substances";
 
 const TONE_CLASSES: Record<VitalTone, { bg: string; label: string; value: string }> = {
-  activity:   { bg: "bg-pillar-activity-wash border-pillar-activity/30",     label: "text-pillar-activity",   value: "text-pillar-activity" },
+  activity:   { bg: "bg-pillar-activity-wash border-pillar-activity/30", label: "text-pillar-activity", value: "text-pillar-activity" },
   nutrition:  { bg: "bg-pillar-nutrition-wash border-pillar-nutrition/30",   label: "text-pillar-nutrition",  value: "text-pillar-nutrition" },
   stress:     { bg: "bg-pillar-stress-wash border-pillar-stress/30",         label: "text-pillar-stress",     value: "text-pillar-stress" },
   sleep:      { bg: "bg-pillar-sleep-wash border-pillar-sleep/30",           label: "text-pillar-sleep",      value: "text-pillar-sleep" },

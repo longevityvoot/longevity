@@ -70,6 +70,7 @@ export default async function CheckInPage() {
           defaultValue={existing?.energyLevel ?? null}
           lowLabel="หมดแรง"
           highLabel="สดชื่นมาก"
+          tone="activity"
         />
         <ScaleSection
           name="moodLevel"
@@ -78,6 +79,7 @@ export default async function CheckInPage() {
           defaultValue={existing?.moodLevel ?? null}
           lowLabel="แย่"
           highLabel="ดีมาก"
+          tone="stress"
         />
         <ScaleSection
           name="sleepQuality"
@@ -86,6 +88,7 @@ export default async function CheckInPage() {
           defaultValue={existing?.sleepQuality ?? null}
           lowLabel="แย่"
           highLabel="หลับสนิทดี"
+          tone="sleep"
         />
         <ScaleSection
           name="stressLevel"
@@ -94,6 +97,7 @@ export default async function CheckInPage() {
           defaultValue={existing?.stressLevel ?? null}
           lowLabel="สบาย"
           highLabel="เครียดมาก"
+          tone="stress"
         />
 
         <section className="bg-pillar-social-wash border border-pillar-social/30 rounded-lg p-3.5">
@@ -122,8 +126,8 @@ export default async function CheckInPage() {
           <div className="max-w-[420px] mx-auto">
             <button
               type="submit"
-              className="w-full h-12 rounded-md bg-ink text-white font-semibold text-[15px] inline-flex items-center justify-center gap-2"
-              style={{ boxShadow: "0 4px 12px rgba(20, 20, 43, 0.18)" }}
+              className="w-full h-12 rounded-md bg-pillar-stress text-white font-semibold text-[15px] inline-flex items-center justify-center gap-2"
+              style={{ boxShadow: "0 4px 12px rgba(211, 132, 66, 0.30)" }}
             >
               <CheckIcon />
               <span>บันทึกประเมิน</span>
@@ -138,6 +142,17 @@ export default async function CheckInPage() {
   );
 }
 
+type SectionTone = "activity" | "stress" | "sleep" | "social" | "nutrition" | "substances" | undefined;
+
+const TONE_BG: Record<NonNullable<SectionTone>, { bg: string; title: string }> = {
+  activity:   { bg: "bg-pillar-activity-wash border-pillar-activity/30",     title: "text-pillar-activity" },
+  stress:     { bg: "bg-pillar-stress-wash border-pillar-stress/30",         title: "text-pillar-stress" },
+  sleep:      { bg: "bg-pillar-sleep-wash border-pillar-sleep/30",           title: "text-pillar-sleep" },
+  social:     { bg: "bg-pillar-social-wash border-pillar-social/30",         title: "text-pillar-social" },
+  nutrition:  { bg: "bg-pillar-nutrition-wash border-pillar-nutrition/30",   title: "text-pillar-nutrition" },
+  substances: { bg: "bg-pillar-substances-wash border-pillar-substances/30", title: "text-pillar-substances" },
+};
+
 function ScaleSection({
   name,
   title,
@@ -145,6 +160,7 @@ function ScaleSection({
   defaultValue,
   lowLabel,
   highLabel,
+  tone,
 }: {
   name: string;
   title: string;
@@ -152,9 +168,10 @@ function ScaleSection({
   defaultValue: number | null;
   lowLabel: string;
   highLabel: string;
+  tone?: SectionTone;
 }) {
   return (
-    <Section title={title} question={question}>
+    <Section title={title} question={question} tone={tone}>
       <ScaleInput
         name={name}
         defaultValue={defaultValue}
@@ -172,6 +189,7 @@ function TextSection({
   defaultValue,
   placeholder,
   rows = 2,
+  tone,
 }: {
   name: string;
   title: string;
@@ -179,15 +197,16 @@ function TextSection({
   defaultValue: string;
   placeholder: string;
   rows?: number;
+  tone?: SectionTone;
 }) {
   return (
-    <Section title={title} question={question}>
+    <Section title={title} question={question} tone={tone}>
       <textarea
         name={name}
         defaultValue={defaultValue}
         rows={rows}
         placeholder={placeholder}
-        className="w-full rounded-md border border-border-strong px-3 py-2 text-[14px] resize-none focus:outline-none focus:border-ink"
+        className="w-full rounded-md border border-border-strong px-3 py-2 text-[14px] resize-none focus:outline-none focus:border-ink bg-white/70"
       />
     </Section>
   );
@@ -197,15 +216,28 @@ function Section({
   title,
   question,
   children,
+  tone,
 }: {
   title: string;
   question?: string;
   children: React.ReactNode;
+  tone?: SectionTone;
 }) {
+  const cls = tone ? TONE_BG[tone] : null;
   return (
-    <section className="bg-surface rounded-xl p-5 border border-border">
+    <section
+      className={`rounded-xl p-5 border ${
+        cls ? cls.bg : "bg-surface border-border"
+      }`}
+    >
       <div className="mb-3">
-        <h2 className="text-[16px] font-semibold text-ink leading-tight">{title}</h2>
+        <h2
+          className={`text-[16px] font-semibold leading-tight ${
+            cls ? cls.title : "text-ink"
+          }`}
+        >
+          {title}
+        </h2>
         {question ? (
           <p className="text-[12px] text-ink-3 mt-0.5">{question}</p>
         ) : null}

@@ -86,7 +86,7 @@ export default async function QuickLogPage({
             ✕
           </Link>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.1em] text-pillar-activity font-bold">
+            <p className="text-[10px] uppercase tracking-[0.1em] text-pillar-sleep font-bold">
               Vitals
             </p>
             <p className="text-[15px] font-semibold text-ink leading-tight">
@@ -104,7 +104,7 @@ export default async function QuickLogPage({
               href={`/client/body/log?tab=${t.key}`}
               className={`h-10 inline-flex items-center justify-center rounded-md text-[12.5px] font-semibold ${
                 t.key === active.key
-                  ? "bg-pillar-activity text-white"
+                  ? "bg-pillar-sleep text-white"
                   : "bg-surface border border-border text-ink-2"
               }`}
             >
@@ -113,7 +113,7 @@ export default async function QuickLogPage({
           ))}
         </nav>
 
-        <p className="mt-5 text-[20px] font-semibold text-pillar-activity text-center">
+        <p className="mt-5 text-[20px] font-semibold text-pillar-sleep text-center">
           {active.question}
         </p>
 
@@ -334,7 +334,7 @@ function ContextRadios({
         {options.map((o) => (
           <label
             key={o.v}
-            className="inline-flex items-center gap-1.5 px-3.5 h-9 rounded-pill border border-border-strong text-[13px] cursor-pointer has-[:checked]:bg-pillar-activity has-[:checked]:text-white has-[:checked]:border-pillar-activity"
+            className="inline-flex items-center gap-1.5 px-3.5 h-9 rounded-pill border border-border-strong text-[13px] cursor-pointer has-[:checked]:bg-pillar-sleep has-[:checked]:text-white has-[:checked]:border-pillar-sleep"
           >
             <input
               type="radio"
@@ -371,8 +371,8 @@ function SubmitButton() {
   return (
     <button
       type="submit"
-      className="w-full h-12 rounded-md bg-pillar-activity text-white font-semibold text-[15px]"
-      style={{ boxShadow: "0 4px 12px rgba(196, 81, 81, 0.30)" }}
+      className="w-full h-12 rounded-md bg-pillar-sleep text-white font-semibold text-[15px]"
+      style={{ boxShadow: "0 4px 12px rgba(74, 111, 165, 0.30)" }}
     >
       บันทึก
     </button>
