@@ -100,6 +100,15 @@ model ClientProfile {
   // for SMM kg/% — Omron, InBody, Tanita, and Xiaomi each report and
   // classify muscle mass slightly differently.
   scaleBrand            String?  // "omron" | "inbody" | "tanita" | "xiaomi"
+  // Activity multiplier for TDEE calculation. BMR × this = TDEE.
+  // Default 1.4 (light/sedentary). Coach can override per client based
+  // on actual activity level — common values:
+  //   1.2  sedentary (desk, < 5000 steps)
+  //   1.375 light (1–3 days/wk exercise)
+  //   1.55 moderate (3–5 days/wk)
+  //   1.725 active (6–7 days/wk)
+  //   1.9  very active (heavy training + manual job)
+  activityFactor        Float?
   googleHealthConnected Boolean  @default(false)
   googleHealthTokens    Json?
 

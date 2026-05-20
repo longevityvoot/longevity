@@ -70,7 +70,7 @@ export default async function ClientHome() {
     getMealsForDay(session.user.id, yesterday),
     prisma.clientProfile.findUnique({
       where: { userId: session.user.id },
-      select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true },
+      select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true, activityFactor: true },
     }),
     getLatestLBM(session.user.id),
     prisma.weeklyReflection.findUnique({
@@ -90,7 +90,7 @@ export default async function ClientHome() {
       ageYears: ageFromDOB(profile.dateOfBirth),
       lbmKg: latestLbm,
     });
-    dailyTarget = estimateDailyGoal(estimateDailyTarget(bmr));
+    dailyTarget = estimateDailyGoal(estimateDailyTarget(bmr, profile.activityFactor ?? 1.4));
   }
 
   const nutritionToday = {

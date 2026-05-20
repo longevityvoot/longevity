@@ -93,7 +93,7 @@ export default async function PillarDetailPage({
     }),
     prisma.clientProfile.findUnique({
       where: { userId: session.user.id },
-      select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true },
+      select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true, activityFactor: true },
     }),
     getDailyNutritionHistory(session.user.id, days),
     getLatestLBM(session.user.id),
@@ -113,7 +113,7 @@ export default async function PillarDetailPage({
       ageYears: ageFromDOB(profile.dateOfBirth),
       lbmKg: latestLbm,
     });
-    dailyTarget = estimateDailyGoal(estimateDailyTarget(bmr));
+    dailyTarget = estimateDailyGoal(estimateDailyTarget(bmr, profile.activityFactor ?? 1.4));
   }
 
   type Point = { x: Date; y: number };
