@@ -60,12 +60,14 @@ export function FoodPicker() {
   const results = useMemo(() => {
     let pool = THAI_FOODS;
     if (category !== "all") pool = pool.filter((f) => f.category === category);
-    const q = query.trim().toLowerCase();
+    // Normalize: lower-case + strip spaces — so "บอดี้ คีย์" matches "บอดี้คีย์"
+    const norm = (s: string) => s.toLowerCase().replace(/\s+/g, "");
+    const q = norm(query);
     if (q) {
       pool = pool.filter(
         (f) =>
-          f.name.toLowerCase().includes(q) ||
-          f.keywords.some((k) => k.toLowerCase().includes(q)),
+          norm(f.name).includes(q) ||
+          f.keywords.some((k) => norm(k).includes(q)),
       );
     }
     return pool.slice(0, 40);
