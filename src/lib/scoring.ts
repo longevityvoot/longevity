@@ -107,6 +107,21 @@ function kcalClosenessScore(kcal: number, target: number | null): number | null 
 // life-expectancy drivers; stress / social are comparable; substances
 // is down-weighted because it's near-max for non-smokers/non-drinkers
 // and would otherwise inflate the overall score.
+// Banded color for an overall (or pillar) score, going from green at the
+// top to red at the bottom. Stops pick from the existing matte palette:
+//   ≥80  green   (pillar-social)
+//   ≥65  gold    (pillar-nutrition)
+//   ≥50  orange  (pillar-stress)
+//   <50  red     (pillar-activity)
+//   null → neutral grey (ink-4)
+export function scoreColor(value: number | null | undefined): string {
+  if (value == null) return "#8A8AA3";
+  if (value >= 80) return "#5E8B4D";
+  if (value >= 65) return "#C9A848";
+  if (value >= 50) return "#D38442";
+  return "#C45151";
+}
+
 export const PILLAR_WEIGHTS: Record<PillarKey, number> = {
   sleep:      1.2,
   activity:   1.2,

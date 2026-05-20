@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { listClients, isSyntheticLineEmail } from "@/lib/clients";
 import { PILLARS } from "@/lib/pillars";
 import { DonutScore } from "@/components/charts/DonutScore";
+import { scoreColor } from "@/lib/scoring";
 
 export default async function CoachDashboard() {
   const session = await auth();
@@ -79,7 +80,7 @@ export default async function CoachDashboard() {
                       thickness={7}
                       segments={14}
                       gapDeg={4}
-                      color="#14142B"
+                      color={scoreColor(c.overall)}
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-[15px] font-semibold text-ink truncate">
