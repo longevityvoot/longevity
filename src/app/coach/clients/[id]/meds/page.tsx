@@ -22,9 +22,9 @@ export default async function CoachMedsPage({
 
   const client = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, name: true, role: true },
+    select: { id: true, name: true, clientProfile: { select: { id: true } } },
   });
-  if (!client || client.role !== "CLIENT") notFound();
+  if (!client || !client.clientProfile) notFound();
 
   const meds = await listMedications(id);
   const active = meds.filter((m) => m.status === "active");

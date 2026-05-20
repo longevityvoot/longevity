@@ -16,9 +16,9 @@ export default async function NewMedicationPage({
 
   const client = await prisma.user.findUnique({
     where: { id: clientId },
-    select: { id: true, name: true, role: true },
+    select: { id: true, name: true, clientProfile: { select: { id: true } } },
   });
-  if (!client || client.role !== "CLIENT") notFound();
+  if (!client || !client.clientProfile) notFound();
 
   return (
     <main className="min-h-screen bg-canvas">
