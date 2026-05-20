@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { logBodyMeasurement, logBpReading, logGlucoseReading } from "./actions";
 import { BigNumberInput } from "./BigNumberInput";
+import { MuscleMassInput } from "./MuscleMassInput";
 import { getLatestWeight, getLatestWaist, getWeightAround, getWeightHistory } from "@/lib/body";
 
 type SearchParams = Promise<{ tab?: string }>;
@@ -165,22 +166,7 @@ function WeightForm({
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink-4 pointer-events-none">%</span>
             </div>
           </label>
-          <label className="block">
-            <span className="text-[11px] text-ink-3">มวลกล้ามเนื้อ</span>
-            <div className="relative mt-1">
-              <input
-                name="muscleMassKg"
-                type="number"
-                inputMode="decimal"
-                step={0.1}
-                min={10}
-                max={120}
-                placeholder=""
-                className="w-full h-11 rounded-md border border-border-strong pl-3 pr-10 text-[16px] font-num focus:outline-none focus:border-ink"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink-4 pointer-events-none">kg</span>
-            </div>
-          </label>
+          <MuscleMassInput />
         </div>
         <p className="text-[10px] text-ink-4 mt-2">
           ถ้าเครื่องชั่งวัด body composition ให้ใส่เพิ่ม — ระบบจะใช้ % ไขมันคำนวณ BMR ที่แม่นขึ้น (Katch-McArdle)
