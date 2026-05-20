@@ -27,15 +27,20 @@ export default async function AddMealPage({
           >
             ✕
           </Link>
-          <p className="text-[15px] font-semibold text-ink leading-tight flex-1">
-            เพิ่มมื้ออาหาร
-          </p>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.1em] text-pillar-nutrition font-bold">
+              Nutrition
+            </p>
+            <p className="text-[15px] font-semibold text-ink leading-tight">
+              เพิ่มมื้ออาหาร
+            </p>
+          </div>
         </div>
       </header>
 
       <form action={addMeal} className="max-w-[420px] mx-auto px-5 pt-4 space-y-4">
         <section className="bg-surface border border-border rounded-lg p-4">
-          <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
+          <p className="text-[11px] uppercase tracking-wider text-pillar-nutrition font-bold">
             มื้อไหน
           </p>
           <div className="mt-2 grid grid-cols-4 gap-2">
@@ -47,7 +52,7 @@ export default async function AddMealPage({
             ].map((o) => (
               <label
                 key={o.v}
-                className="inline-flex items-center justify-center h-10 rounded-md text-[12.5px] font-semibold border border-border-strong cursor-pointer has-[:checked]:bg-ink has-[:checked]:text-white has-[:checked]:border-ink"
+                className="inline-flex items-center justify-center h-10 rounded-md text-[12.5px] font-semibold border border-border-strong cursor-pointer has-[:checked]:bg-pillar-nutrition has-[:checked]:text-white has-[:checked]:border-pillar-nutrition"
               >
                 <input
                   type="radio"
