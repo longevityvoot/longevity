@@ -82,17 +82,41 @@ export function healthyBodyFatRange(gender: string | null): { low: number; high:
   return { low: 10, high: 28 };
 }
 
-// Skeletal-muscle % healthy band — widened upper edge to cover InBody's
-// "normal" classification which includes athletic builds (the 33.3 floor
-// stays, the 39.3 ceiling extends to ~45 to keep gym-active users from
-// being flagged as "high"). Above the ceiling is still "good" (athletic),
-// just past the reference band; UI treats high-muscle as a positive flag.
+// Skeletal-muscle % healthy band — for when the user logs muscle as a
+// percentage of body weight (Omron HBF style). Wider band rolls athletic
+// into normal so highly active users aren't flagged.
 //   Male:   33.3–45% normal+athletic
 //   Female: 24.3–37% normal+athletic
 export function healthyMuscleMassRange(gender: string | null): { low: number; high: number } {
   if (gender === "male") return { low: 33.3, high: 45 };
   if (gender === "female") return { low: 24.3, high: 37 };
   return { low: 28, high: 42 };
+}
+
+// Skeletal Muscle Mass Index (kg/m²) — SMM / height². The clinical
+// gold standard for diagnosing sarcopenia (AWGS 2019 / EWGSOP).
+//   Male:   < 7.0 sarcopenia, normal 7.0–10.5, athletic > 10.5
+//   Female: < 5.7 sarcopenia, normal 5.7–8.5,  athletic > 8.5
+// Source: Asian Working Group for Sarcopenia (Chen et al., 2020).
+export function smmiRange(gender: string | null): { low: number; high: number } {
+  if (gender === "male") return { low: 7.0, high: 10.5 };
+  if (gender === "female") return { low: 5.7, high: 8.5 };
+  return { low: 6.0, high: 9.5 };
+}
+
+// Convert SMMI kg/m² band to kg by multiplying by height². Returns null
+// when height unknown — caller can fall back to the % band.
+export function healthyMuscleMassKgRange(
+  heightCm: number | null,
+  gender: string | null,
+): { low: number; high: number } | null {
+  if (!heightCm || heightCm <= 0) return null;
+  const m2 = (heightCm / 100) ** 2;
+  const r = smmiRange(gender);
+  return {
+    low: +(r.low * m2).toFixed(1),
+    high: +(r.high * m2).toFixed(1),
+  };
 }
 
 export function rangeFlag(
