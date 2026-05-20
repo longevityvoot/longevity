@@ -226,6 +226,7 @@ export default async function BodyPage({
               barValue={latestWaist?.value ?? null}
               low={waistRange.low}
               high={waistRange.high}
+              hideBar
               note={
                 latestWaist
                   ? waistAdvice(latestWaist.value, waistRange)
@@ -408,6 +409,7 @@ function MetricRow({
   high,
   note,
   highIsGood = false,
+  hideBar = false,
 }: {
   label: string;
   value: string;
@@ -416,6 +418,7 @@ function MetricRow({
   high: number | null;
   note: string | null;
   highIsGood?: boolean;
+  hideBar?: boolean;
 }) {
   const flag =
     barValue == null || low == null || high == null
@@ -427,7 +430,7 @@ function MetricRow({
         <p className="text-[12px] font-semibold text-ink-2">{label}</p>
         <p className="text-[16px] font-num font-bold tabular-nums text-ink">{value}</p>
       </div>
-      {barValue != null && low != null && high != null ? (
+      {hideBar ? null : barValue != null && low != null && high != null ? (
         <div className="mt-1.5">
           <RangeBar value={barValue} low={low} high={high} flag={flag} highIsGood={highIsGood} width={320} height={20} />
           <div className="flex items-baseline justify-between mt-0.5 text-[10px] font-num text-ink-4">
