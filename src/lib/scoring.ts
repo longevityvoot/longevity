@@ -122,6 +122,44 @@ export function scoreColor(value: number | null | undefined): string {
   return "#C45151";
 }
 
+// Soft wash background paired with scoreColor for hero card surfaces.
+// Returns Tailwind classes for bg + border.
+export function scoreBandClasses(value: number | null | undefined): {
+  bg: string;
+  border: string;
+  overline: string;
+} {
+  if (value == null) {
+    return { bg: "bg-surface", border: "border-border", overline: "text-ink-4" };
+  }
+  if (value >= 80) {
+    return {
+      bg: "bg-pillar-social-wash",
+      border: "border-pillar-social/30",
+      overline: "text-pillar-social",
+    };
+  }
+  if (value >= 65) {
+    return {
+      bg: "bg-pillar-nutrition-wash",
+      border: "border-pillar-nutrition/30",
+      overline: "text-pillar-nutrition",
+    };
+  }
+  if (value >= 50) {
+    return {
+      bg: "bg-pillar-stress-wash",
+      border: "border-pillar-stress/30",
+      overline: "text-pillar-stress",
+    };
+  }
+  return {
+    bg: "bg-pillar-activity-wash",
+    border: "border-pillar-activity/30",
+    overline: "text-pillar-activity",
+  };
+}
+
 export const PILLAR_WEIGHTS: Record<PillarKey, number> = {
   sleep:      1.2,
   activity:   1.2,
