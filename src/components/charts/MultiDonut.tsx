@@ -18,6 +18,8 @@ type Props = {
   centerValue?: string;
   /** Small label under center value. */
   centerLabel?: string;
+  /** Color of the centerValue text. Defaults to ink. */
+  centerColor?: string;
 };
 
 // Concentric Garmin-style rings, one per pillar. Outer ring = first item.
@@ -34,6 +36,7 @@ export function MultiDonut({
   trackColor = "#ECECF2",
   centerValue,
   centerLabel,
+  centerColor = "#14142B",
 }: Props) {
   const cx = size / 2;
   const cy = size / 2;
@@ -83,7 +86,7 @@ export function MultiDonut({
           dominantBaseline="central"
           fontSize={valueFont}
           fontWeight={700}
-          fill="#14142B"
+          fill={centerColor}
           style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {centerValue}

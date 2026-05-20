@@ -8,8 +8,11 @@ import {
   getWeightHistory,
   getWeightAround,
   getRecentVitals,
+  getLatestBodyFatPct,
+  getLatestMuscleMass,
 } from "@/lib/body";
 import { TrendChart } from "@/components/charts/TrendChart";
+import { MultiDonut } from "@/components/charts/MultiDonut";
 import { flagTone } from "@/lib/vitals";
 
 type SearchParams = Promise<{ range?: string }>;
@@ -33,6 +36,8 @@ export default async function BodyPage({
     glucose,
     profile,
     weightAtRange,
+    latestBodyFat,
+    latestMuscle,
   ] = await Promise.all([
     getLatestWeight(session.user.id),
     getLatestWaist(session.user.id),
@@ -50,6 +55,8 @@ export default async function BodyPage({
       },
     }),
     getWeightAround(session.user.id, days),
+    getLatestBodyFatPct(session.user.id),
+    getLatestMuscleMass(session.user.id),
   ]);
 
   const weightDelta =
@@ -68,6 +75,18 @@ export default async function BodyPage({
   const latestGlucose = glucose[0]
     ? (glucose[0].values as { value: number })
     : null;
+
+  // Body comp ring fill values (0-100 for the donut).
+  // BMI position within 15-35 range (BMI 25 → 50% fill).
+  const bmiRing = bmi != null ? Math.max(0, Math.min(100, ((bmi - 15) / 20) * 100)) : null;
+  const fatRing = latestBodyFat ? latestBodyFat.value : null;
+  // Muscle: if % use directly; if kg convert against weight.
+  const musclePct = (() => {
+    if (!latestMuscle || !latestWeight) return null;
+    if (latestMuscle.unit === "%") return latestMuscle.value;
+    return +((latestMuscle.value / latestWeight.value) * 100).toFixed(1);
+  })();
+  const muscleRing = musclePct;
 
   return (
     <main className="min-h-screen bg-canvas pb-6">
@@ -117,28 +136,59 @@ export default async function BodyPage({
           ) : null}
         </section>
 
-        {/* Weight hero */}
+        {/* Weight hero — multi-ring body composition + trend */}
         <section className="mt-4 bg-pillar-sleep-wash rounded-2xl p-5 border border-pillar-sleep/30">
           <p className="text-[10px] uppercase tracking-[0.08em] text-pillar-sleep font-bold">
             น้ำหนัก
           </p>
           {latestWeight ? (
-            <div className="mt-1 flex items-baseline gap-3">
-              <span className="text-[56px] font-bold font-num tabular-nums leading-none text-pillar-sleep">
-                {latestWeight.value}
-              </span>
-              <span className="text-[14px] text-pillar-sleep/70 font-medium">kg</span>
-              {weightDelta != null && weightDelta !== 0 ? (
-                <span
-                  className={`text-[12px] font-semibold px-2 py-0.5 rounded-pill ml-auto ${
-                    weightDelta < 0
-                      ? "bg-pillar-social-wash text-pillar-social"
-                      : "bg-white/70 text-pillar-stress"
-                  }`}
-                >
-                  {weightDelta > 0 ? "↑" : "↓"} {Math.abs(weightDelta)} kg
-                </span>
-              ) : null}
+            <div className="mt-3 flex items-center gap-4">
+              <MultiDonut
+                rings={[
+                  { key: "muscle", value: muscleRing, color: "#5E8B4D" }, // outer: muscle (green)
+                  { key: "fat",    value: fatRing,    color: "#D38442" }, // mid: fat (orange)
+                  { key: "bmi",    value: bmiRing,    color: "#4A6FA5" }, // inner: BMI (blue)
+                ]}
+                size={140}
+                thickness={8}
+                ringGap={3}
+                segments={18}
+                gapDeg={3}
+                trackColor="#FFFFFFAA"
+                centerValue={String(latestWeight.value)}
+                centerLabel="kg"
+                centerColor="#4A6FA5"
+              />
+              <div className="flex-1 min-w-0">
+                {weightDelta != null && weightDelta !== 0 ? (
+                  <span
+                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-pill inline-block ${
+                      weightDelta < 0
+                        ? "bg-pillar-social-wash text-pillar-social"
+                        : "bg-white/70 text-pillar-stress"
+                    }`}
+                  >
+                    {weightDelta > 0 ? "↑" : "↓"} {Math.abs(weightDelta)} kg
+                  </span>
+                ) : null}
+                <ul className="mt-2 space-y-1.5 text-[11px]">
+                  <RingLegend
+                    swatch="#4A6FA5"
+                    label="BMI"
+                    value={bmi != null ? bmi.toFixed(1) : "—"}
+                  />
+                  <RingLegend
+                    swatch="#D38442"
+                    label="ไขมัน"
+                    value={fatRing != null ? `${fatRing.toFixed(1)}%` : "—"}
+                  />
+                  <RingLegend
+                    swatch="#5E8B4D"
+                    label="กล้ามเนื้อ"
+                    value={musclePct != null ? `${musclePct.toFixed(1)}%` : "—"}
+                  />
+                </ul>
+              </div>
             </div>
           ) : (
             <p className="text-[20px] text-ink-4 mt-2">ยังไม่มีข้อมูล</p>
@@ -146,7 +196,7 @@ export default async function BodyPage({
           <div className="mt-4">
             <TrendChart
               data={weightHistory.map((m) => ({ x: m.measuredAt, y: m.value }))}
-              height={120}
+              height={100}
               color="#4A6FA5"
             />
           </div>
@@ -265,6 +315,27 @@ export default async function BodyPage({
         </Link>
       </div>
     </main>
+  );
+}
+
+function RingLegend({
+  swatch,
+  label,
+  value,
+}: {
+  swatch: string;
+  label: string;
+  value: string;
+}) {
+  return (
+    <li className="flex items-baseline gap-2">
+      <span
+        className="size-2 rounded-full flex-shrink-0"
+        style={{ backgroundColor: swatch }}
+      />
+      <span className="text-ink-3 flex-1">{label}</span>
+      <span className="font-num font-semibold text-ink-2 tabular-nums">{value}</span>
+    </li>
   );
 }
 

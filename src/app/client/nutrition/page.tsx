@@ -14,6 +14,7 @@ import {
 import { getLatestWeight, getLatestLBM } from "@/lib/body";
 import { ageFromDOB } from "@/lib/clients";
 import { deleteMeal } from "./actions";
+import { DonutScore } from "@/components/charts/DonutScore";
 
 // Soft warm-toned accents for meal-type sections, looping the day:
 // morning gold → midday red-orange → evening blue-violet → snack green.
@@ -107,46 +108,42 @@ export default async function NutritionPage() {
             <p className="text-[10px] uppercase tracking-[0.12em] text-pillar-nutrition font-bold">
               เป้าหมายวันนี้
             </p>
-            <div className="mt-3 flex items-baseline justify-center gap-2">
-              <span className="text-[72px] font-bold font-num tabular-nums leading-none text-pillar-nutrition">
-                {dailyTarget.toLocaleString()}
-              </span>
-              <span className="text-[16px] text-pillar-nutrition/70 font-medium">kcal</span>
+
+            <div className="mt-4 flex justify-center">
+              <DonutScore
+                value={pct == null ? null : Math.min(100, pct)}
+                size={200}
+                thickness={11}
+                segments={18}
+                gapDeg={3}
+                color="#C9A848"
+                trackColor="#FFFFFFAA"
+                display={totalToday.toLocaleString()}
+                label={`/${dailyTarget.toLocaleString()} kcal`}
+                textColor="#C9A848"
+              />
             </div>
+
+            <p className="mt-2 text-[13px] font-num font-semibold text-ink-2">
+              {pct ?? 0}% ของเป้า
+              <span className="text-ink-4 font-normal">
+                {" · "}
+                {totalToday > dailyTarget
+                  ? `เกิน ${(totalToday - dailyTarget).toLocaleString()} kcal`
+                  : `เหลือ ${(dailyTarget - totalToday).toLocaleString()} kcal`}
+              </span>
+            </p>
+
             {bmr != null ? (
-              <p className="text-[11px] text-ink-3 mt-2">
-                BMR <span className="font-num font-semibold text-ink-2">{bmr.toLocaleString()}</span>
+              <p className="text-[11px] text-ink-4 mt-1">
+                BMR <span className="font-num font-semibold text-ink-3">{bmr.toLocaleString()}</span>
                 {" × "}activity 1.4
-                <span className="text-ink-4">
+                <span>
                   {" · "}
                   {method === "katch-mcardle" ? "Katch-McArdle" : "Mifflin-St Jeor"}
                 </span>
               </p>
             ) : null}
-
-            <div className="mt-6 h-3 rounded-pill bg-white/60 overflow-hidden">
-              <div
-                className={`h-full rounded-pill transition-all ${
-                  pct! > 120
-                    ? "bg-pillar-activity"
-                    : pct! < 70
-                    ? "bg-pillar-stress"
-                    : "bg-pillar-nutrition"
-                }`}
-                style={{ width: `${Math.min(100, pct ?? 0)}%` }}
-              />
-            </div>
-
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              <Stat label="กินแล้ว" value={totalToday.toLocaleString()} unit="kcal" />
-              <Stat
-                label={totalToday > dailyTarget ? "เกินเป้า" : "เหลือ"}
-                value={Math.abs(dailyTarget - totalToday).toLocaleString()}
-                unit="kcal"
-                tone={totalToday > dailyTarget ? "warn" : "ok"}
-              />
-              <Stat label="ความคืบหน้า" value={`${pct ?? 0}`} unit="%" />
-            </div>
 
             <div className="mt-5 pt-4 border-t border-pillar-nutrition/20 text-left">
               <p className="text-[11px] uppercase tracking-wider text-pillar-nutrition font-bold">
