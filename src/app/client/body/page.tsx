@@ -90,7 +90,7 @@ export default async function BodyPage({
           </div>
           <Link
             href="/client/body/log"
-            className="text-[12px] text-ink-3 font-semibold"
+            className="text-[12px] text-pillar-activity font-bold"
           >
             +บันทึก
           </Link>
@@ -118,22 +118,22 @@ export default async function BodyPage({
         </section>
 
         {/* Weight hero */}
-        <section className="mt-4 bg-surface rounded-xl p-5 border border-border">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-bold">
+        <section className="mt-4 bg-pillar-activity-wash rounded-2xl p-5 border border-pillar-activity/30">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-pillar-activity font-bold">
             น้ำหนัก
           </p>
           {latestWeight ? (
             <div className="mt-1 flex items-baseline gap-3">
-              <span className="text-[48px] font-bold font-num tabular-nums leading-none text-ink">
+              <span className="text-[56px] font-bold font-num tabular-nums leading-none text-pillar-activity">
                 {latestWeight.value}
               </span>
-              <span className="text-[13px] text-ink-4 font-medium">kg</span>
+              <span className="text-[14px] text-pillar-activity/70 font-medium">kg</span>
               {weightDelta != null && weightDelta !== 0 ? (
                 <span
                   className={`text-[12px] font-semibold px-2 py-0.5 rounded-pill ml-auto ${
                     weightDelta < 0
                       ? "bg-pillar-social-wash text-pillar-social"
-                      : "bg-pillar-stress-wash text-pillar-stress"
+                      : "bg-white/70 text-pillar-stress"
                   }`}
                 >
                   {weightDelta > 0 ? "↑" : "↓"} {Math.abs(weightDelta)} kg
@@ -147,10 +147,10 @@ export default async function BodyPage({
             <TrendChart
               data={weightHistory.map((m) => ({ x: m.measuredAt, y: m.value }))}
               height={120}
-              color="#14142B"
+              color="#C45151"
             />
           </div>
-          <nav className="mt-3 inline-flex bg-canvas border border-border rounded-pill p-1 gap-0.5">
+          <nav className="mt-3 inline-flex bg-white/60 border border-pillar-activity/20 rounded-pill p-1 gap-0.5">
             {[
               { v: "7", label: "7 วัน" },
               { v: "30", label: "30 วัน" },
@@ -161,8 +161,8 @@ export default async function BodyPage({
                 href={`/client/body?range=${r.v}`}
                 className={`px-3.5 h-7 rounded-pill text-[11px] font-semibold inline-flex items-center ${
                   range === r.v
-                    ? "bg-ink text-white"
-                    : "text-ink-3"
+                    ? "bg-pillar-activity text-white"
+                    : "text-pillar-activity/80"
                 }`}
               >
                 {r.label}
@@ -179,6 +179,7 @@ export default async function BodyPage({
             unit="cm"
             href="/client/body/log?tab=waist"
             cadence={profile?.waistCadence ?? "biweekly"}
+            tone="stress"
           />
           <VitalCard
             label="ความดัน"
@@ -187,6 +188,7 @@ export default async function BodyPage({
             href="/client/body/log?tab=bp"
             flag={bp[0]?.flag ?? null}
             cadence={profile?.bpCadence ?? "as-needed"}
+            tone="activity"
           />
           <VitalCard
             label="น้ำตาล"
@@ -195,6 +197,7 @@ export default async function BodyPage({
             href="/client/body/log?tab=glucose"
             flag={glucose[0]?.flag ?? null}
             cadence={profile?.glucoseCadence ?? "as-needed"}
+            tone="nutrition"
           />
         </section>
 
@@ -256,6 +259,17 @@ export default async function BodyPage({
   );
 }
 
+type VitalTone = "activity" | "nutrition" | "stress" | "sleep" | "social" | "substances";
+
+const TONE_CLASSES: Record<VitalTone, { bg: string; label: string; value: string }> = {
+  activity:   { bg: "bg-pillar-activity-wash border-pillar-activity/30",     label: "text-pillar-activity",   value: "text-pillar-activity" },
+  nutrition:  { bg: "bg-pillar-nutrition-wash border-pillar-nutrition/30",   label: "text-pillar-nutrition",  value: "text-pillar-nutrition" },
+  stress:     { bg: "bg-pillar-stress-wash border-pillar-stress/30",         label: "text-pillar-stress",     value: "text-pillar-stress" },
+  sleep:      { bg: "bg-pillar-sleep-wash border-pillar-sleep/30",           label: "text-pillar-sleep",      value: "text-pillar-sleep" },
+  social:     { bg: "bg-pillar-social-wash border-pillar-social/30",         label: "text-pillar-social",     value: "text-pillar-social" },
+  substances: { bg: "bg-pillar-substances-wash border-pillar-substances/30", label: "text-pillar-substances", value: "text-pillar-substances" },
+};
+
 function VitalCard({
   label,
   value,
@@ -263,6 +277,7 @@ function VitalCard({
   href,
   flag,
   cadence,
+  tone,
 }: {
   label: string;
   value: string;
@@ -270,16 +285,18 @@ function VitalCard({
   href: string;
   flag?: string | null;
   cadence: string;
+  tone: VitalTone;
 }) {
+  const cls = TONE_CLASSES[tone];
   return (
     <Link
       href={href}
-      className="bg-surface border border-border rounded-lg p-3 flex flex-col"
+      className={`${cls.bg} border rounded-lg p-3 flex flex-col`}
     >
-      <p className="text-[10px] uppercase tracking-wider text-ink-4 font-bold truncate">
+      <p className={`text-[10px] uppercase tracking-wider font-bold truncate ${cls.label}`}>
         {label}
       </p>
-      <p className="text-[20px] font-bold font-num tabular-nums text-ink leading-none mt-1.5">
+      <p className={`text-[20px] font-bold font-num tabular-nums leading-none mt-1.5 ${cls.value}`}>
         {value}
       </p>
       <p className="text-[10px] text-ink-4 mt-0.5">{unit}</p>
