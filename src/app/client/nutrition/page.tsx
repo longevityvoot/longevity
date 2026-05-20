@@ -112,7 +112,7 @@ export default async function NutritionPage() {
             <div className="mt-4 flex justify-center">
               <DonutScore
                 value={pct == null ? null : Math.min(100, pct)}
-                size={200}
+                size={220}
                 thickness={11}
                 segments={18}
                 gapDeg={3}
@@ -121,8 +121,20 @@ export default async function NutritionPage() {
                 display={totalToday.toLocaleString()}
                 label={`/${dailyTarget.toLocaleString()} kcal`}
                 textColor="#C9A848"
+                mark={
+                  bmr != null
+                    ? {
+                        value: (bmr / dailyTarget) * 100,
+                        color: "#C45151",
+                        label: "BMR",
+                      }
+                    : undefined
+                }
               />
             </div>
+            <p className="text-[10.5px] text-ink-3 mt-1.5">
+              เส้นแดง <span className="font-semibold text-pillar-activity">|</span> BMR — กินไม่ควรต่ำกว่าจุดนี้
+            </p>
 
             <p className="mt-2 text-[13px] font-num font-semibold text-ink-2">
               {pct ?? 0}% ของเป้า
