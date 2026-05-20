@@ -25,13 +25,17 @@ export function RangeBar({
   const span = max - min || 1;
   const xOf = (v: number) => ((v - min) / span) * width;
 
-  const bandX1 = lo > min ? xOf(lo) : 0;
-  const bandX2 = high != null && high < 999 ? xOf(high) : width;
+  const hasLow = low != null && low > 0;
+  const hasHigh = high != null && high < 999;
+  const bandX1 = hasLow ? xOf(low) : 0;
+  const bandX2 = hasHigh ? xOf(high) : width;
   const bandW = Math.max(2, bandX2 - bandX1);
 
   const dotX = Math.max(4, Math.min(width - 4, xOf(value)));
   const cy = height / 2;
   const trackY = cy - 3;
+  const tickY1 = trackY - 4;
+  const tickY2 = trackY + 10;
 
   const dotFill =
     flag === "critical"
@@ -44,6 +48,28 @@ export function RangeBar({
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
       <rect x={0} y={trackY} width={width} height={6} fill="#ECECF2" rx={3} />
       <rect x={bandX1} y={trackY} width={bandW} height={6} fill="#E5F7D9" rx={3} />
+      {hasLow ? (
+        <line
+          x1={bandX1}
+          y1={tickY1}
+          x2={bandX1}
+          y2={tickY2}
+          stroke="#5A5A7A"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+        />
+      ) : null}
+      {hasHigh ? (
+        <line
+          x1={bandX2}
+          y1={tickY1}
+          x2={bandX2}
+          y2={tickY2}
+          stroke="#5A5A7A"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+        />
+      ) : null}
       <circle cx={dotX} cy={cy} r={6} fill={dotFill} stroke="#fff" strokeWidth={2} />
     </svg>
   );
