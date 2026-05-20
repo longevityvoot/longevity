@@ -1,4 +1,4 @@
-import { describeArc } from "./donut-math";
+import { describeArc, polarToCartesian } from "./donut-math";
 
 type Props = {
   /** 0-100 */
@@ -14,6 +14,8 @@ type Props = {
   display?: string;
   /** Color of the big center number. Defaults to ink. */
   textColor?: string;
+  /** Optional reference tick on the ring at a given 0-100 position. */
+  mark?: { value: number; color?: string; label?: string };
 };
 
 // Garmin-style segmented arc donut. N rounded segments with a fixed angular
@@ -30,6 +32,7 @@ export function DonutScore({
   label,
   display,
   textColor = "#14142B",
+  mark,
 }: Props) {
   const cx = size / 2;
   const cy = size / 2;
@@ -79,6 +82,41 @@ export function DonutScore({
           {label}
         </text>
       ) : null}
+      {mark
+        ? (() => {
+            const markAngle = (Math.max(0, Math.min(100, mark.value)) / 100) * 360;
+            const tickColor = mark.color ?? "#14142B";
+            const tickOuter = polarToCartesian(cx, cy, r + thickness / 2 + 5, markAngle);
+            const tickInner = polarToCartesian(cx, cy, r - thickness / 2 - 1, markAngle);
+            const labelPos = polarToCartesian(cx, cy, r + thickness / 2 + 14, markAngle);
+            return (
+              <g>
+                <line
+                  x1={tickInner.x}
+                  y1={tickInner.y}
+                  x2={tickOuter.x}
+                  y2={tickOuter.y}
+                  stroke={tickColor}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                />
+                {mark.label ? (
+                  <text
+                    x={labelPos.x}
+                    y={labelPos.y}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize={size * 0.06}
+                    fontWeight={700}
+                    fill={tickColor}
+                  >
+                    {mark.label}
+                  </text>
+                ) : null}
+              </g>
+            );
+          })()
+        : null}
     </svg>
   );
 }
