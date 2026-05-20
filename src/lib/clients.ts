@@ -101,6 +101,7 @@ export type ClientDetailDTO = {
     wearableType: string | null;
     medicalHistory: string | null;
     allergies: string | null;
+    activityFactor: number | null;
   } | null;
   recentCheckIns: Array<{
     date: Date;
@@ -141,7 +142,8 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
     ageYears: ageFromDOB(user.clientProfile.dateOfBirth),
     lbmKg: latestLbm,
   });
-  const dailyTarget = estimateDailyGoal(estimateDailyTarget(bmr));
+  const tdee = estimateDailyTarget(bmr, user.clientProfile.activityFactor ?? 1.4);
+  const dailyTarget = estimateDailyGoal(tdee);
   const weeklyByKey = new Map(weeklies.map((w) => [dateKey(w.weekStart), w]));
   const weeklyFor = (d: Date) => weeklyByKey.get(dateKey(mondayOf(d))) ?? null;
 
@@ -194,6 +196,7 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
           wearableType: user.clientProfile.wearableType,
           medicalHistory: user.clientProfile.medicalHistory,
           allergies: user.clientProfile.allergies,
+          activityFactor: user.clientProfile.activityFactor,
         }
       : null,
     recentCheckIns,

@@ -35,7 +35,7 @@ export default async function NutritionPage() {
     getMealsForDay(session.user.id),
     prisma.clientProfile.findUnique({
       where: { userId: session.user.id },
-      select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true },
+      select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true, activityFactor: true },
     }),
     getLatestWeight(session.user.id),
     getLatestLBM(session.user.id),
@@ -57,7 +57,7 @@ export default async function NutritionPage() {
       lbmKg: latestLbm,
     });
     method = bmrMethod(latestLbm);
-    tdee = estimateDailyTarget(bmr);
+    tdee = estimateDailyTarget(bmr, profile.activityFactor ?? 1.4);
     dailyTarget = estimateDailyGoal(tdee);
   }
 
@@ -191,10 +191,16 @@ export default async function NutritionPage() {
                   <span className="font-semibold text-ink-2">{tdee?.toLocaleString()}</span>
                 </li>
               </ul>
-              <p className="text-[10px] text-ink-4 mt-2">
-                BMR × activity 1.4 ·{" "}
-                {method === "katch-mcardle" ? "Katch-McArdle" : "Mifflin-St Jeor"}
-              </p>
+              {(() => {
+                const af = profile?.activityFactor ?? 1.4;
+                return (
+                  <p className="text-[10px] text-ink-4 mt-2">
+                    BMR × activity {af.toFixed(af % 1 !== 0 ? 3 : 1)} ·{" "}
+                    {method === "katch-mcardle" ? "Katch-McArdle" : "Mifflin-St Jeor"}
+                    {profile?.activityFactor != null ? " · designer tuned" : ""}
+                  </p>
+                );
+              })()}
               <ul className="mt-3 space-y-1 text-[11px] text-ink-3 leading-snug border-t border-pillar-nutrition/20 pt-2.5">
                 <li className="flex items-start gap-1.5">
                   <span className="text-pillar-stress mt-0.5 font-bold">↓</span>

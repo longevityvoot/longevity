@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getClientDetail, ageFromDOB, isSyntheticLineEmail } from "@/lib/clients";
+import { setClientActivityFactor } from "./actions";
 import { PILLARS } from "@/lib/pillars";
 import { MultiDonut } from "@/components/charts/MultiDonut";
 import { listSessionsForClient } from "@/lib/sessions";
@@ -86,6 +87,51 @@ export default async function ClientDetailPage({
                 <p className="mt-2 text-[13px] text-ink-3">ยังไม่ได้ onboard</p>
               )}
             </section>
+
+            {client.profile ? (
+              <section className="bg-surface border border-border rounded-lg p-4">
+                <h2 className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+                  Activity factor (TDEE)
+                </h2>
+                <p className="text-[11px] text-ink-3 mt-1 leading-snug">
+                  ตัวคูณ BMR สำหรับคำนวณ TDEE — ปรับตามระดับการเคลื่อนไหวของลูกค้า
+                </p>
+                <form
+                  action={setClientActivityFactor.bind(null, client.id)}
+                  className="mt-3"
+                >
+                  <select
+                    name="activityFactor"
+                    defaultValue={
+                      client.profile.activityFactor != null
+                        ? String(client.profile.activityFactor)
+                        : ""
+                    }
+                    className="w-full h-10 rounded-md border border-border-strong px-3 text-[13px] bg-surface focus:outline-none focus:border-ink"
+                  >
+                    <option value="">— ใช้ค่า default (1.4) —</option>
+                    <option value="1.2">1.2 — sedentary (โต๊ะ &lt;5,000 ก้าว)</option>
+                    <option value="1.375">1.375 — light (1–3 วัน/สัปดาห์)</option>
+                    <option value="1.55">1.55 — moderate (3–5 วัน/สัปดาห์)</option>
+                    <option value="1.725">1.725 — active (6–7 วัน/สัปดาห์)</option>
+                    <option value="1.9">1.9 — very active (เทรนหนัก + งานใช้แรง)</option>
+                  </select>
+                  <button
+                    type="submit"
+                    className="mt-2 w-full h-9 rounded-md bg-ink text-white text-[12px] font-semibold"
+                  >
+                    บันทึก
+                  </button>
+                </form>
+                <p className="text-[10px] text-ink-4 mt-2 leading-snug">
+                  ปัจจุบัน:{" "}
+                  <span className="font-num font-semibold text-ink-3">
+                    {client.profile.activityFactor ?? 1.4}
+                  </span>
+                  {client.profile.activityFactor == null ? " (default)" : " (ตั้งโดย designer)"}
+                </p>
+              </section>
+            ) : null}
 
             {client.profile?.longevityGoal ? (
               <section className="bg-surface border border-border rounded-lg p-4">
