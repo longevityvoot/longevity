@@ -15,7 +15,8 @@ export type FoodCategory =
   | "fruit"
   | "drink"
   | "snack"
-  | "dessert";
+  | "dessert"
+  | "supplement";
 
 export type FoodItem = {
   key: string;
@@ -38,6 +39,7 @@ export const CATEGORY_LABEL: Record<FoodCategory, string> = {
   drink: "เครื่องดื่ม",
   snack: "ของว่าง",
   dessert: "ขนมหวาน",
+  supplement: "อาหารเสริม / โปรตีน",
 };
 
 export const THAI_FOODS: FoodItem[] = [
@@ -227,6 +229,27 @@ export const THAI_FOODS: FoodItem[] = [
   { key: "pizza",         name: "พิซซ่า",            kcal: 280, unit: "1 ชิ้น",  category: "snack",  keywords: ["pizza"] },
   { key: "pasta-cream",   name: "พาสต้าครีม",        kcal: 580, unit: "1 จาน",  category: "noodle", keywords: ["pasta", "carbonara"] },
   { key: "salad-caesar",  name: "ซีซาร์สลัด",        kcal: 320, unit: "1 จาน",  category: "salad",  keywords: ["caesar salad"] },
+
+  // Protein supplements — kcal per typical serving. Macros vary by brand;
+  // numbers below are mid-range averages across common Thai-market SKUs.
+  // Mix with water (no extra kcal). Adding skim milk adds ~80 kcal/cup.
+  { key: "bodykey-shake",        name: "BodyKey Meal Shake (Amway)",     kcal: 170, unit: "1 ซอง (38g)",  category: "supplement", keywords: ["bodykey", "amway", "meal replacement", "นูทริไลท์", "shake"] },
+  { key: "bodykey-meal-bar",     name: "BodyKey Meal Bar (Amway)",        kcal: 220, unit: "1 แท่ง (60g)", category: "supplement", keywords: ["bodykey bar", "amway bar", "meal bar"] },
+  { key: "bodykey-snack-bar",    name: "BodyKey Snack Bar (Amway)",       kcal: 150, unit: "1 แท่ง (35g)", category: "supplement", keywords: ["bodykey snack", "amway snack"] },
+  { key: "nutrilite-plant-pro",  name: "Nutrilite All Plant Protein",     kcal: 40,  unit: "1 scoop (10g)", category: "supplement", keywords: ["nutrilite", "amway protein", "plant protein", "soy"] },
+  { key: "whey-concentrate",     name: "Whey Protein Concentrate",        kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["whey", "เวย์", "concentrate", "wpc"] },
+  { key: "whey-isolate",         name: "Whey Protein Isolate",            kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["whey isolate", "เวย์ไอโซเลต", "wpi"] },
+  { key: "whey-hydrolyzed",      name: "Whey Hydrolyzed",                 kcal: 105, unit: "1 scoop (30g)", category: "supplement", keywords: ["hydrolyzed whey", "wph"] },
+  { key: "casein-protein",       name: "Casein Protein",                  kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["casein", "เคซีน", "เคซีน"] },
+  { key: "plant-protein-blend",  name: "Plant Protein (ถั่ว/ข้าว/กัญชง)",  kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["plant protein", "pea", "rice", "vegan"] },
+  { key: "soy-protein-isolate",  name: "Soy Protein Isolate",             kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["soy protein", "ถั่วเหลือง"] },
+  { key: "collagen-peptides",    name: "Collagen Peptides",               kcal: 40,  unit: "1 scoop (10g)", category: "supplement", keywords: ["collagen", "คอลลาเจน"] },
+  { key: "mass-gainer",          name: "Mass Gainer (high carb)",         kcal: 600, unit: "1 serving (~150g)", category: "supplement", keywords: ["mass gainer", "weight gainer", "เพิ่มน้ำหนัก"] },
+  { key: "egg-white-protein",    name: "Egg White Protein",               kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["egg white", "albumin", "ไข่ขาว"] },
+  { key: "bcaa-drink",           name: "BCAA (no calorie)",               kcal: 5,   unit: "1 แก้ว",       category: "supplement", keywords: ["bcaa", "amino"] },
+  { key: "pre-workout",          name: "Pre-Workout (no sugar)",          kcal: 10,  unit: "1 แก้ว",       category: "supplement", keywords: ["pre workout", "preworkout", "พรีเวิร์ค"] },
+  { key: "protein-bar-generic",  name: "Protein Bar (ทั่วไป)",            kcal: 200, unit: "1 แท่ง (60g)", category: "supplement", keywords: ["protein bar", "โปรตีนบาร์"] },
+  { key: "protein-shake-rtd",    name: "Protein Shake พร้อมดื่ม (RTD)",    kcal: 160, unit: "1 ขวด (350ml)", category: "supplement", keywords: ["rtd", "ready to drink", "shake"] },
 ];
 
 export function searchFoods(query: string, limit = 30): FoodItem[] {
