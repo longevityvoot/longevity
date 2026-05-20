@@ -8,6 +8,7 @@ import {
   overallScore,
   substancesCtxFromWeekly,
   socialCtxFromWeekly,
+  scoreColor,
 } from "@/lib/scoring";
 import { todayLocalDate, mondayOf } from "@/lib/dates";
 import { MultiDonut } from "@/components/charts/MultiDonut";
@@ -164,7 +165,10 @@ export default async function ClientHome() {
                 Longevity score
               </p>
               <div className="mt-1 flex items-baseline gap-1">
-                <span className="text-[56px] font-bold font-num tabular-nums leading-none text-ink">
+                <span
+                  className="text-[56px] font-bold font-num tabular-nums leading-none transition-colors"
+                  style={{ color: scoreColor(overall) }}
+                >
                   {overall ?? "—"}
                 </span>
                 <span className="text-[14px] text-ink-4 font-num">/100</span>
