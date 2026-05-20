@@ -11,7 +11,6 @@ import {
   getLatestBodyFatPct,
   getLatestMuscleMass,
   idealWeightRange,
-  healthyWaistRange,
   healthyBodyFatRange,
   healthyMuscleMassRange,
   healthyMuscleMassKgRange,
@@ -90,7 +89,6 @@ export default async function BodyPage({
 
   // Healthy reference ranges for the 3 row bars.
   const weightRange = idealWeightRange(profile?.heightCm ?? null);
-  const waistRange = healthyWaistRange(profile?.gender ?? null);
   const fatRange = healthyBodyFatRange(profile?.gender ?? null);
   const muscleRange = healthyMuscleMassRange(profile?.gender ?? null);
 
@@ -221,19 +219,6 @@ export default async function BodyPage({
               }
             />
             <MetricRow
-              label="รอบเอว"
-              value={latestWaist ? `${latestWaist.value} cm` : "—"}
-              barValue={latestWaist?.value ?? null}
-              low={waistRange.low}
-              high={waistRange.high}
-              hideBar
-              note={
-                latestWaist
-                  ? waistAdvice(latestWaist.value, waistRange)
-                  : "บันทึกรอบเอวที่หน้า log"
-              }
-            />
-            <MetricRow
               label="% ไขมัน"
               value={latestBodyFat ? `${latestBodyFat.value.toFixed(1)}%` : "—"}
               barValue={latestBodyFat?.value ?? null}
@@ -266,7 +251,7 @@ export default async function BodyPage({
           </div>
 
           <p className="mt-3 text-[9.5px] text-ink-4 leading-snug">
-            อ้างอิง: BMI 18.5–22.9 (WHO Asia-Pacific) · รอบเอว IDF Asian · % ไขมัน (Omron HBF) ·
+            อ้างอิง: BMI 18.5–22.9 (WHO Asia-Pacific) · % ไขมัน (Omron HBF) ·
             กล้ามเนื้อ kg ({brandLabel(profile?.scaleBrand ?? null)}) · กล้ามเนื้อ % (InBody adult Asian)
             <Link href="/client/profile" className="text-pillar-sleep font-semibold ml-1">
               เปลี่ยนเครื่อง →
@@ -456,13 +441,6 @@ function weightAdvice(value: number, range: { low: number; high: number }): stri
     return `เกินเกณฑ์ — ควรลดอีก ${(value - range.high).toFixed(1)} kg`;
   }
   return `อยู่ในเกณฑ์ปกติ (${range.low}–${range.high} kg)`;
-}
-
-function waistAdvice(value: number, range: { low: number; high: number }): string {
-  if (value > range.high) {
-    return `เกิน ${(value - range.high).toFixed(1)} cm — เข้าเกณฑ์ metabolic syndrome (IDF Asian)`;
-  }
-  return `อยู่ในเกณฑ์ปกติ (< ${range.high} cm)`;
 }
 
 function fatAdvice(value: number, range: { low: number; high: number }): string {
