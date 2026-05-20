@@ -14,8 +14,10 @@ type Props = {
   display?: string;
   /** Color of the big center number. Defaults to ink. */
   textColor?: string;
-  /** Optional reference tick on the ring at a given 0-100 position. */
-  mark?: { value: number; color?: string; label?: string };
+  /** Optional reference tick on the ring at a given 0-100 position.
+   *  `afterColor` recolors filled segments that fall past the mark — used
+   *  to call out a "target zone" (e.g. BMR → TDEE is the healthy band). */
+  mark?: { value: number; color?: string; label?: string; afterColor?: string };
 };
 
 // Garmin-style segmented arc donut. N rounded segments with a fixed angular
@@ -40,6 +42,8 @@ export function DonutScore({
   const segDeg = (360 - segments * gapDeg) / segments;
   const filled = value == null ? 0 : Math.round((value / 100) * segments);
   const text = display ?? (value == null ? "—" : String(value));
+  const markAngle =
+    mark != null ? (Math.max(0, Math.min(100, mark.value)) / 100) * 360 : null;
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
@@ -47,11 +51,19 @@ export function DonutScore({
         const start = i * (segDeg + gapDeg);
         const end = start + segDeg;
         const isFilled = i < filled;
+        // Past the mark? Compare segment center to mark angle.
+        const past =
+          markAngle != null && mark?.afterColor != null && start + segDeg / 2 >= markAngle;
+        const fillColor = isFilled
+          ? past
+            ? (mark!.afterColor as string)
+            : color
+          : trackColor;
         return (
           <path
             key={i}
             d={describeArc(cx, cy, r, start, end)}
-            stroke={isFilled ? color : trackColor}
+            stroke={fillColor}
             strokeWidth={thickness}
             strokeLinecap="round"
             fill="none"
@@ -82,9 +94,8 @@ export function DonutScore({
           {label}
         </text>
       ) : null}
-      {mark
+      {mark && markAngle != null
         ? (() => {
-            const markAngle = (Math.max(0, Math.min(100, mark.value)) / 100) * 360;
             const tickColor = mark.color ?? "#14142B";
             const tickOuter = polarToCartesian(cx, cy, r + thickness / 2 + 5, markAngle);
             const tickInner = polarToCartesian(cx, cy, r - thickness / 2 - 1, markAngle);
