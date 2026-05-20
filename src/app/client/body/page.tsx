@@ -10,9 +10,13 @@ import {
   getRecentVitals,
   getLatestBodyFatPct,
   getLatestMuscleMass,
+  idealWeightRange,
+  healthyBodyFatRange,
+  healthyMuscleMassRange,
+  rangeFlag,
 } from "@/lib/body";
 import { TrendChart } from "@/components/charts/TrendChart";
-import { MultiDonut } from "@/components/charts/MultiDonut";
+import { RangeBar } from "@/components/charts/RangeBar";
 import { flagTone } from "@/lib/vitals";
 
 type SearchParams = Promise<{ range?: string }>;
@@ -48,6 +52,7 @@ export default async function BodyPage({
       where: { userId: session.user.id },
       select: {
         heightCm: true,
+        gender: true,
         weightCadence: true,
         waistCadence: true,
         bpCadence: true,
@@ -76,17 +81,17 @@ export default async function BodyPage({
     ? (glucose[0].values as { value: number })
     : null;
 
-  // Body comp ring fill values (0-100 for the donut).
-  // BMI position within 15-35 range (BMI 25 → 50% fill).
-  const bmiRing = bmi != null ? Math.max(0, Math.min(100, ((bmi - 15) / 20) * 100)) : null;
-  const fatRing = latestBodyFat ? latestBodyFat.value : null;
-  // Muscle: if % use directly; if kg convert against weight.
+  // Healthy reference ranges for the 3 row bars.
+  const weightRange = idealWeightRange(profile?.heightCm ?? null);
+  const fatRange = healthyBodyFatRange(profile?.gender ?? null);
+  const muscleRange = healthyMuscleMassRange(profile?.gender ?? null);
+
+  // Muscle mass percentage (if stored as kg, convert against weight).
   const musclePct = (() => {
     if (!latestMuscle || !latestWeight) return null;
     if (latestMuscle.unit === "%") return latestMuscle.value;
     return +((latestMuscle.value / latestWeight.value) * 100).toFixed(1);
   })();
-  const muscleRing = musclePct;
 
   return (
     <main className="min-h-screen bg-canvas pb-6">
@@ -136,67 +141,71 @@ export default async function BodyPage({
           ) : null}
         </section>
 
-        {/* Weight hero — multi-ring body composition + trend */}
+        {/* Hero — 3 range bars: weight · body fat · muscle mass */}
         <section className="mt-4 bg-pillar-sleep-wash rounded-2xl p-5 border border-pillar-sleep/30">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-pillar-sleep font-bold">
-            น้ำหนัก
-          </p>
-          {latestWeight ? (
-            <div className="mt-3 flex items-center gap-4">
-              <MultiDonut
-                rings={[
-                  { key: "muscle", value: muscleRing, color: "#5E8B4D" }, // outer: muscle (green)
-                  { key: "fat",    value: fatRing,    color: "#D38442" }, // mid: fat (orange)
-                  { key: "bmi",    value: bmiRing,    color: "#4A6FA5" }, // inner: BMI (blue)
-                ]}
-                size={140}
-                thickness={8}
-                ringGap={3}
-                segments={18}
-                gapDeg={3}
-                trackColor="#FFFFFFAA"
-                centerValue={String(latestWeight.value)}
-                centerLabel="kg"
-                centerColor="#4A6FA5"
-              />
-              <div className="flex-1 min-w-0">
-                {weightDelta != null && weightDelta !== 0 ? (
-                  <span
-                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-pill inline-block ${
-                      weightDelta < 0
-                        ? "bg-pillar-social-wash text-pillar-social"
-                        : "bg-white/70 text-pillar-stress"
-                    }`}
-                  >
-                    {weightDelta > 0 ? "↑" : "↓"} {Math.abs(weightDelta)} kg
-                  </span>
-                ) : null}
-                <ul className="mt-2 space-y-1.5 text-[11px]">
-                  <RingLegend
-                    swatch="#4A6FA5"
-                    label="BMI"
-                    value={bmi != null ? bmi.toFixed(1) : "—"}
-                  />
-                  <RingLegend
-                    swatch="#D38442"
-                    label="ไขมัน"
-                    value={fatRing != null ? `${fatRing.toFixed(1)}%` : "—"}
-                  />
-                  <RingLegend
-                    swatch="#5E8B4D"
-                    label="กล้ามเนื้อ"
-                    value={musclePct != null ? `${musclePct.toFixed(1)}%` : "—"}
-                  />
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <p className="text-[20px] text-ink-4 mt-2">ยังไม่มีข้อมูล</p>
-          )}
-          <div className="mt-4">
+          <div className="flex items-baseline justify-between">
+            <p className="text-[10px] uppercase tracking-[0.08em] text-pillar-sleep font-bold">
+              องค์ประกอบร่างกาย
+            </p>
+            {weightDelta != null && weightDelta !== 0 ? (
+              <span
+                className={`text-[11px] font-semibold px-2 py-0.5 rounded-pill ${
+                  weightDelta < 0
+                    ? "bg-pillar-social-wash text-pillar-social"
+                    : "bg-white/70 text-pillar-stress"
+                }`}
+              >
+                {weightDelta > 0 ? "↑" : "↓"} {Math.abs(weightDelta)} kg
+              </span>
+            ) : null}
+          </div>
+
+          <div className="mt-3 space-y-3.5">
+            <MetricRow
+              label="น้ำหนัก"
+              value={latestWeight ? `${latestWeight.value} kg` : "—"}
+              barValue={latestWeight?.value ?? null}
+              low={weightRange?.low ?? null}
+              high={weightRange?.high ?? null}
+              note={
+                latestWeight && weightRange
+                  ? weightAdvice(latestWeight.value, weightRange)
+                  : null
+              }
+            />
+            <MetricRow
+              label="% ไขมัน"
+              value={latestBodyFat ? `${latestBodyFat.value.toFixed(1)}%` : "—"}
+              barValue={latestBodyFat?.value ?? null}
+              low={fatRange.low}
+              high={fatRange.high}
+              note={
+                latestBodyFat
+                  ? fatAdvice(latestBodyFat.value, fatRange)
+                  : "บันทึก % ไขมันจากเครื่องชั่งสมาร์ท"
+              }
+            />
+            <MetricRow
+              label="กล้ามเนื้อ %"
+              value={musclePct != null ? `${musclePct.toFixed(1)}%` : "—"}
+              barValue={musclePct}
+              low={muscleRange.low}
+              high={muscleRange.high}
+              note={
+                musclePct != null
+                  ? muscleAdvice(musclePct, muscleRange)
+                  : "บันทึกมวลกล้ามจากเครื่องชั่ง"
+              }
+            />
+          </div>
+
+          <div className="mt-5 pt-4 border-t border-pillar-sleep/20">
+            <p className="text-[10px] uppercase tracking-wider text-pillar-sleep font-bold mb-2">
+              แนวโน้มน้ำหนัก
+            </p>
             <TrendChart
               data={weightHistory.map((m) => ({ x: m.measuredAt, y: m.value }))}
-              height={100}
+              height={90}
               color="#4A6FA5"
             />
           </div>
@@ -318,25 +327,73 @@ export default async function BodyPage({
   );
 }
 
-function RingLegend({
-  swatch,
+function MetricRow({
   label,
   value,
+  barValue,
+  low,
+  high,
+  note,
 }: {
-  swatch: string;
   label: string;
   value: string;
+  barValue: number | null;
+  low: number | null;
+  high: number | null;
+  note: string | null;
 }) {
+  const flag =
+    barValue == null || low == null || high == null
+      ? "normal"
+      : rangeFlag(barValue, low, high);
   return (
-    <li className="flex items-baseline gap-2">
-      <span
-        className="size-2 rounded-full flex-shrink-0"
-        style={{ backgroundColor: swatch }}
-      />
-      <span className="text-ink-3 flex-1">{label}</span>
-      <span className="font-num font-semibold text-ink-2 tabular-nums">{value}</span>
-    </li>
+    <div>
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-[12px] font-semibold text-ink-2">{label}</p>
+        <p className="text-[16px] font-num font-bold tabular-nums text-ink">{value}</p>
+      </div>
+      {barValue != null && low != null && high != null ? (
+        <div className="mt-1.5">
+          <RangeBar value={barValue} low={low} high={high} flag={flag} width={320} height={20} />
+          <div className="flex items-baseline justify-between mt-0.5 text-[10px] font-num text-ink-4">
+            <span>{low}</span>
+            <span>{high}</span>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-1.5 h-5 rounded-pill bg-white/60" />
+      )}
+      {note ? (
+        <p className="mt-0.5 text-[10.5px] text-ink-3 leading-snug">{note}</p>
+      ) : null}
+    </div>
   );
+}
+
+function weightAdvice(value: number, range: { low: number; high: number }): string {
+  if (value < range.low) {
+    return `ต่ำกว่าเกณฑ์ — ควรเพิ่มอีก ${(range.low - value).toFixed(1)} kg`;
+  }
+  if (value > range.high) {
+    return `เกินเกณฑ์ — ควรลดอีก ${(value - range.high).toFixed(1)} kg`;
+  }
+  return `อยู่ในเกณฑ์ปกติ (${range.low}–${range.high} kg)`;
+}
+
+function fatAdvice(value: number, range: { low: number; high: number }): string {
+  if (value < range.low) return `ไขมันต่ำกว่าเกณฑ์ (ต่ำกว่า ${range.low}%)`;
+  if (value > range.high) {
+    return `เกินเกณฑ์ — ควรลดอีก ${(value - range.high).toFixed(1)}%`;
+  }
+  return `อยู่ในเกณฑ์ปกติ (${range.low}–${range.high}%)`;
+}
+
+function muscleAdvice(value: number, range: { low: number; high: number }): string {
+  if (value < range.low) {
+    return `ควรเพิ่มอีก ${(range.low - value).toFixed(1)}% — เพิ่มโปรตีน + เวท`;
+  }
+  if (value > range.high) return `กล้ามดีมาก (สูงกว่าเกณฑ์ปกติ)`;
+  return `อยู่ในเกณฑ์ปกติ (${range.low}–${range.high}%)`;
 }
 
 type VitalTone = "activity" | "nutrition" | "stress" | "sleep" | "social" | "substances";
