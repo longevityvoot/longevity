@@ -13,6 +13,7 @@ import {
   idealWeightRange,
   healthyBodyFatRange,
   healthyMuscleMassRange,
+  healthyMuscleMassKgRange,
   rangeFlag,
 } from "@/lib/body";
 import { TrendChart } from "@/components/charts/TrendChart";
@@ -106,9 +107,14 @@ export default async function BodyPage({
         pctEquivalent: value,
       };
     }
-    // unit = kg: convert range % → kg via current weight (if known).
-    const rangeLowKg = weight != null ? +((muscleRange.low / 100) * weight).toFixed(1) : null;
-    const rangeHighKg = weight != null ? +((muscleRange.high / 100) * weight).toFixed(1) : null;
+    // unit = kg: prefer SMMI-based range (uses height², the clinical standard)
+    // so we match InBody's "predicted-for-frame" classification rather than
+    // a flat %-of-weight band. Falls back to %-derived kg range if no height.
+    const kgRange = healthyMuscleMassKgRange(profile?.heightCm ?? null, profile?.gender ?? null);
+    const rangeLowKg =
+      kgRange?.low ?? (weight != null ? +((muscleRange.low / 100) * weight).toFixed(1) : null);
+    const rangeHighKg =
+      kgRange?.high ?? (weight != null ? +((muscleRange.high / 100) * weight).toFixed(1) : null);
     const pctEquivalent = weight != null ? +((value / weight) * 100).toFixed(1) : null;
     return {
       unit: "kg" as const,
@@ -233,7 +239,7 @@ export default async function BodyPage({
           </div>
 
           <p className="mt-3 text-[9.5px] text-ink-4 leading-snug">
-            อ้างอิง: BMI 18.5–22.9 (WHO Asia-Pacific) · % ไขมัน (Omron HBF) · กล้ามเนื้อ (InBody adult Asian)
+            อ้างอิง: BMI 18.5–22.9 (WHO Asia-Pacific) · % ไขมัน (Omron HBF) · กล้ามเนื้อ kg (SMMI/AWGS 2019) · กล้ามเนื้อ % (InBody adult Asian)
           </p>
 
           <div className="mt-5 pt-4 border-t border-pillar-sleep/20">
