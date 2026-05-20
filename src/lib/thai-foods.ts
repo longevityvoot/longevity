@@ -234,8 +234,6 @@ export const THAI_FOODS: FoodItem[] = [
   // numbers below are mid-range averages across common Thai-market SKUs.
   // Mix with water (no extra kcal). Adding skim milk adds ~80 kcal/cup.
   { key: "bodykey-shake",        name: "BodyKey Meal Shake (Amway)",     kcal: 215, unit: "1 ซอง (~50g)",  category: "supplement", keywords: ["bodykey", "body key", "บอดี้คีย์", "บอดี้คีย", "บอดี้ คีย์", "amway", "แอมเวย์", "meal replacement", "นูทริไลท์", "shake", "เชค"] },
-  { key: "bodykey-meal-bar",     name: "BodyKey Meal Bar (Amway)",        kcal: 220, unit: "1 แท่ง (60g)", category: "supplement", keywords: ["bodykey bar", "บอดี้คีย์ บาร์", "amway bar", "แอมเวย์ บาร์", "meal bar"] },
-  { key: "bodykey-snack-bar",    name: "BodyKey Snack Bar (Amway)",       kcal: 150, unit: "1 แท่ง (35g)", category: "supplement", keywords: ["bodykey snack", "บอดี้คีย์ สแน็ค", "amway snack"] },
   { key: "nutrilite-plant-pro",  name: "Nutrilite All Plant Protein",     kcal: 40,  unit: "1 scoop (10g)", category: "supplement", keywords: ["nutrilite", "นูทริไลท์", "amway protein", "แอมเวย์", "plant protein", "soy"] },
   { key: "whey-concentrate",     name: "Whey Protein Concentrate",        kcal: 120, unit: "1 scoop (30g)", category: "supplement", keywords: ["whey", "เวย์", "concentrate", "wpc"] },
   { key: "whey-isolate",         name: "Whey Protein Isolate",            kcal: 110, unit: "1 scoop (30g)", category: "supplement", keywords: ["whey isolate", "เวย์ไอโซเลต", "wpi"] },
