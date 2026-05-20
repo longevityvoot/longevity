@@ -104,8 +104,22 @@ export function bmrMethod(lbmKg: number | null | undefined): "katch-mcardle" | "
 }
 
 // Sedentary multiplier: BMR * 1.4 — light activity. Coach can tune later.
+// This is TDEE (maintenance) — the upper bound; eating above this means
+// weight gain.
 export function estimateDailyTarget(bmr: number, activityFactor = 1.4): number {
   return Math.round(bmr * activityFactor);
+}
+
+// Default daily Goal = TDEE − 240 kcal/day.
+// 240 kcal × 30 days = 7,200 kcal/month ≈ ~1 kg of body fat loss per month
+// at a conservative pace. Will become user-tunable (lose / maintain / gain)
+// once the goal preference lands in ClientProfile.
+export const DEFAULT_DEFICIT_KCAL = 240;
+export function estimateDailyGoal(
+  tdee: number,
+  deficitKcal = DEFAULT_DEFICIT_KCAL,
+): number {
+  return Math.max(0, Math.round(tdee - deficitKcal));
 }
 
 export function totalKcal(meals: Array<{ kcal: number | null }>): number {

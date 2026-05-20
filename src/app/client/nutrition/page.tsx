@@ -7,6 +7,8 @@ import {
   totalKcal,
   estimateBMR,
   estimateDailyTarget,
+  estimateDailyGoal,
+  DEFAULT_DEFICIT_KCAL,
   bmrMethod,
   dailyQualityByAxis,
   MEAL_TYPES,
@@ -43,6 +45,7 @@ export default async function NutritionPage() {
 
   let dailyTarget: number | null = null;
   let bmr: number | null = null;
+  let tdee: number | null = null;
   let method: "katch-mcardle" | "mifflin-st-jeor" = "mifflin-st-jeor";
   if (profile) {
     const weight = latestWeight?.value ?? profile.weightKg;
@@ -54,7 +57,8 @@ export default async function NutritionPage() {
       lbmKg: latestLbm,
     });
     method = bmrMethod(latestLbm);
-    dailyTarget = estimateDailyTarget(bmr);
+    tdee = estimateDailyTarget(bmr);
+    dailyTarget = estimateDailyGoal(tdee);
   }
 
   const pct =
@@ -159,29 +163,39 @@ export default async function NutritionPage() {
               </span>
             </p>
 
-            {bmr != null ? (
+            {bmr != null && tdee != null ? (
               <p className="text-[11px] text-ink-4 mt-1">
-                BMR <span className="font-num font-semibold text-ink-3">{bmr.toLocaleString()}</span>
-                {" × "}activity 1.4
-                <span>
-                  {" · "}
-                  {method === "katch-mcardle" ? "Katch-McArdle" : "Mifflin-St Jeor"}
-                </span>
+                เป้า = TDEE − <span className="font-num font-semibold text-ink-3">{DEFAULT_DEFICIT_KCAL}</span>
+                {" · ลด ~1 kg/เดือน"}
               </p>
             ) : null}
 
             <div className="mt-5 pt-4 border-t border-pillar-nutrition/20 text-left">
               <p className="text-[11px] uppercase tracking-wider text-pillar-nutrition font-bold">
-                ช่วงที่ปลอดภัย
+                ตัวเลขสำคัญ
               </p>
-              <p className="mt-1 text-[12.5px] text-ink-2 font-num">
-                <span className="font-semibold">{bmr?.toLocaleString()}</span>
-                <span className="text-ink-4"> (BMR) </span>
-                <span className="text-ink-4">≤ กิน ≤</span>
-                <span className="font-semibold"> {dailyTarget.toLocaleString()}</span>
-                <span className="text-ink-4"> (TDEE)</span>
+              <ul className="mt-2 space-y-1 text-[12px] font-num">
+                <li className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-ink-4" />
+                  <span className="text-ink-3 flex-1">BMR (ขั้นต่ำ)</span>
+                  <span className="font-semibold text-ink-2">{bmr?.toLocaleString()}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-pillar-nutrition" />
+                  <span className="text-ink-3 flex-1">Goal (เป้า)</span>
+                  <span className="font-semibold text-pillar-nutrition">{dailyTarget.toLocaleString()}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-pillar-activity/60" />
+                  <span className="text-ink-3 flex-1">TDEE (คงที่)</span>
+                  <span className="font-semibold text-ink-2">{tdee?.toLocaleString()}</span>
+                </li>
+              </ul>
+              <p className="text-[10px] text-ink-4 mt-2">
+                BMR × activity 1.4 ·{" "}
+                {method === "katch-mcardle" ? "Katch-McArdle" : "Mifflin-St Jeor"}
               </p>
-              <ul className="mt-2 space-y-1 text-[11px] text-ink-3 leading-snug">
+              <ul className="mt-3 space-y-1 text-[11px] text-ink-3 leading-snug border-t border-pillar-nutrition/20 pt-2.5">
                 <li className="flex items-start gap-1.5">
                   <span className="text-pillar-stress mt-0.5 font-bold">↓</span>
                   <span><span className="font-semibold text-ink-2">ต่ำกว่า BMR</span> = ระบบเผาผลาญช้าลง · สูญเสียกล้ามเนื้อ</span>
