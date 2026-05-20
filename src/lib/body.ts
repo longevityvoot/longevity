@@ -71,6 +71,19 @@ export function idealWeightRange(heightCm: number | null): { low: number; high: 
   };
 }
 
+// Healthy waist circumference (cm) per IDF Asian criteria — the cutoff
+// used by Thai MOPH and the Asia-Pacific working group for diagnosing
+// abdominal obesity / metabolic syndrome:
+//   Male:   < 90 cm normal, ≥ 90 cm risk
+//   Female: < 80 cm normal, ≥ 80 cm risk
+// (Stricter than the WHO global cutoff of 102/88 because Asian
+// populations show visceral-fat-driven CVD/T2DM risk at lower waist.)
+export function healthyWaistRange(gender: string | null): { low: number; high: number } {
+  if (gender === "male") return { low: 60, high: 90 };
+  if (gender === "female") return { low: 55, high: 80 };
+  return { low: 60, high: 85 };
+}
+
 // Healthy body-fat % band. Tuned to the Omron HBF series reference
 // adopted by most Thai-market smart scales:
 //   Male:   10–19.9% normal (≥20 slightly high, ≥25 high)
