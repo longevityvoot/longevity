@@ -9,6 +9,7 @@ import {
   substancesCtxFromWeekly,
   socialCtxFromWeekly,
   scoreColor,
+  scoreBandClasses,
 } from "@/lib/scoring";
 import { todayLocalDate, mondayOf } from "@/lib/dates";
 import { MultiDonut } from "@/components/charts/MultiDonut";
@@ -157,11 +158,15 @@ export default async function ClientHome() {
           </button>
         </header>
 
-        {/* Hero score */}
-        <section className="mt-6 bg-surface rounded-xl p-5 border border-border">
+        {/* Hero score — card surface tints with the score band */}
+        <section
+          className={`mt-6 rounded-2xl p-5 border ${scoreBandClasses(overall).bg} ${scoreBandClasses(overall).border}`}
+        >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-bold">
+              <p
+                className={`text-[10px] uppercase tracking-[0.08em] font-bold ${scoreBandClasses(overall).overline}`}
+              >
                 Longevity score
               </p>
               <div className="mt-1 flex items-baseline gap-1">
@@ -177,17 +182,15 @@ export default async function ClientHome() {
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {overallDelta != null && overallDelta !== 0 ? (
                     <span
-                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-pill ${
-                        overallDelta > 0
-                          ? "bg-pillar-social-wash text-pillar-social"
-                          : "bg-pillar-stress-wash text-pillar-stress"
+                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-pill bg-white/70 ${
+                        overallDelta > 0 ? "text-pillar-social" : "text-pillar-stress"
                       }`}
                     >
                       {overallDelta > 0 ? "↑" : "↓"} {Math.abs(overallDelta)} จากเมื่อวาน
                     </span>
                   ) : null}
                   {flaggedCount > 0 ? (
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-pill bg-pillar-stress-wash text-pillar-stress">
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-pill bg-white/70 text-pillar-activity">
                       {flaggedCount} ค่าผิดปกติ
                     </span>
                   ) : null}
