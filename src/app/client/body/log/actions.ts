@@ -43,15 +43,20 @@ export async function logBodyMeasurement(type: "weight" | "waist", form: FormDat
       });
     }
 
-    const muscleRaw = form.get("muscleMassKg");
+    // Muscle mass: user picks unit (kg or %); store as-entered.
+    const muscleRaw = form.get("muscleMassValue");
+    const muscleUnitRaw = form.get("muscleMassUnit");
     const muscleMass = muscleRaw && muscleRaw !== "" ? Number(muscleRaw) : null;
-    if (muscleMass != null && Number.isFinite(muscleMass) && muscleMass > 0 && muscleMass < value) {
+    const muscleUnit = muscleUnitRaw === "%" ? "%" : "kg";
+    const validKg = muscleUnit === "kg" && muscleMass != null && muscleMass > 0 && muscleMass < value;
+    const validPct = muscleUnit === "%" && muscleMass != null && muscleMass > 0 && muscleMass < 100;
+    if (muscleMass != null && Number.isFinite(muscleMass) && (validKg || validPct)) {
       await prisma.bodyMeasurement.create({
         data: {
           userId: session.user.id,
           type: "muscleMass",
           value: muscleMass,
-          unit: "kg",
+          unit: muscleUnit,
           measuredAt,
           context,
         },
