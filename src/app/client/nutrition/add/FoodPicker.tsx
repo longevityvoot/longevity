@@ -79,7 +79,7 @@ export function FoodPicker() {
     ? Number(customKcal) || 0
     : 0;
   const effectiveDesc = picked
-    ? `${picked.name}${extra ? " (พิเศษ)" : ""} · ${picton(portion)} ${picked.unit}`
+    ? `${picked.name}${extra ? " (พิเศษ)" : ""} · ${composePortion(picked.unit, portion)}`
     : customName;
 
   return (
@@ -302,14 +302,32 @@ export function FoodPicker() {
   );
 }
 
+// Compose "{count} {unit-noun}" from a library entry's `unit` field and
+// the user-chosen portion. Most library entries already store a leading
+// count ("1 ทัพพี", "2 ฟอง"); we multiply that by the portion and render
+// once, so portion=1 of "1 ทัพพี" reads "1 ทัพพี" instead of "1 1 ทัพพี".
+function composePortion(rawUnit: string, portion: number): string {
+  const m = rawUnit.match(/^(\d+(?:\.\d+)?)\s+(.+)$/);
+  if (!m) return `${picton(portion)} ${rawUnit}`;
+  const baseCount = Number(m[1]);
+  const rest = m[2];
+  const effective = +(baseCount * portion).toFixed(2);
+  return `${picton(effective)} ${rest}`;
+}
+
 function picton(p: number): string {
-  if (p === 0.25) return "¼";
-  if (p === 0.5) return "½";
-  if (p === 0.75) return "¾";
-  if (p === 1) return "1";
-  if (p === 1.5) return "1½";
   if (Number.isInteger(p)) return String(p);
-  return String(p);
+  // Mixed numbers: split whole + nice fractional part if it lines up.
+  const whole = Math.floor(p);
+  const frac = +(p - whole).toFixed(2);
+  const fracMap: Record<string, string> = {
+    "0.25": "¼",
+    "0.5":  "½",
+    "0.75": "¾",
+  };
+  const fracStr = fracMap[String(frac)];
+  if (fracStr) return whole === 0 ? fracStr : `${whole}${fracStr}`;
+  return p.toFixed(2).replace(/\.?0+$/, "");
 }
 
 function plateLabel(p: number): string {
