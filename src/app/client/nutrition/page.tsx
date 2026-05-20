@@ -92,54 +92,87 @@ export default async function NutritionPage() {
       </header>
 
       <div className="max-w-[420px] mx-auto px-5 pt-4">
-        {/* Daily total hero */}
-        <section className="bg-surface rounded-xl p-5 border border-border">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-bold">
-            พลังงานวันนี้
-          </p>
-          <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-[48px] font-bold font-num tabular-nums leading-none text-ink">
-              {totalToday}
-            </span>
-            <span className="text-[13px] text-ink-4 font-medium">kcal</span>
-          </div>
-          {dailyTarget != null ? (
-            <>
-              <div className="mt-3 h-2 rounded-pill bg-canvas overflow-hidden">
-                <div
-                  className={`h-full rounded-pill transition-all ${
-                    pct! > 120
-                      ? "bg-pillar-activity"
-                      : pct! < 70
-                      ? "bg-pillar-stress"
-                      : "bg-pillar-nutrition"
-                  }`}
-                  style={{ width: `${Math.min(100, pct ?? 0)}%` }}
-                />
-              </div>
-              <p className="text-[11px] text-ink-3 mt-1.5">
-                เป้าหมาย{" "}
-                <span className="font-num font-semibold text-ink-2">
-                  {dailyTarget}
-                </span>{" "}
-                kcal/วัน
-                {pct != null ? (
-                  <span className="text-ink-4"> · {pct}% ของเป้า</span>
-                ) : null}
+        {/* Goal hero — big number front and center */}
+        {dailyTarget != null ? (
+          <section className="bg-surface rounded-2xl p-6 border border-border text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-pillar-nutrition font-bold">
+              เป้าหมายวันนี้
+            </p>
+            <div className="mt-3 flex items-baseline justify-center gap-2">
+              <span className="text-[72px] font-bold font-num tabular-nums leading-none text-ink">
+                {dailyTarget.toLocaleString()}
+              </span>
+              <span className="text-[16px] text-ink-3 font-medium">kcal</span>
+            </div>
+            {bmr != null ? (
+              <p className="text-[11px] text-ink-4 mt-2">
+                BMR <span className="font-num font-semibold text-ink-3">{bmr.toLocaleString()}</span>
+                {" × "}activity 1.4
+                <span className="text-ink-4">
+                  {" · "}
+                  {method === "katch-mcardle" ? "Katch-McArdle" : "Mifflin-St Jeor"}
+                </span>
               </p>
-              {bmr != null ? (
-                <p className="text-[10px] text-ink-4 mt-0.5">
-                  BMR {bmr} · activity factor 1.4 ·{" "}
-                  {method === "katch-mcardle" ? "Katch-McArdle (LBM)" : "Mifflin-St Jeor"}
-                </p>
-              ) : null}
-            </>
-          ) : (
-            <p className="text-[12px] text-ink-3 mt-2">
+            ) : null}
+
+            <div className="mt-6 h-3 rounded-pill bg-canvas overflow-hidden">
+              <div
+                className={`h-full rounded-pill transition-all ${
+                  pct! > 120
+                    ? "bg-pillar-activity"
+                    : pct! < 70
+                    ? "bg-pillar-stress"
+                    : "bg-pillar-nutrition"
+                }`}
+                style={{ width: `${Math.min(100, pct ?? 0)}%` }}
+              />
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+              <Stat label="กินแล้ว" value={totalToday.toLocaleString()} unit="kcal" />
+              <Stat
+                label={totalToday > dailyTarget ? "เกินเป้า" : "เหลือ"}
+                value={Math.abs(dailyTarget - totalToday).toLocaleString()}
+                unit="kcal"
+                tone={totalToday > dailyTarget ? "warn" : "ok"}
+              />
+              <Stat label="ความคืบหน้า" value={`${pct ?? 0}`} unit="%" />
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-border text-left">
+              <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
+                ช่วงที่ปลอดภัย
+              </p>
+              <p className="mt-1 text-[12.5px] text-ink-2 font-num">
+                <span className="font-semibold">{bmr?.toLocaleString()}</span>
+                <span className="text-ink-4"> (BMR) </span>
+                <span className="text-ink-4">≤ กิน ≤</span>
+                <span className="font-semibold"> {dailyTarget.toLocaleString()}</span>
+                <span className="text-ink-4"> (TDEE)</span>
+              </p>
+              <ul className="mt-2 space-y-1 text-[11px] text-ink-3 leading-snug">
+                <li className="flex items-start gap-1.5">
+                  <span className="text-pillar-stress mt-0.5">↓</span>
+                  <span><span className="font-semibold text-ink-2">ต่ำกว่า BMR</span> = ระบบเผาผลาญช้าลง (starvation mode) · สูญเสียกล้ามเนื้อ</span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="text-pillar-activity mt-0.5">↑</span>
+                  <span><span className="font-semibold text-ink-2">เกิน TDEE</span> = พลังงานเหลือ → น้ำหนักขึ้น (เว้นแต่ตั้งใจสร้างกล้าม)</span>
+                </li>
+              </ul>
+            </div>
+          </section>
+        ) : (
+          <section className="bg-surface rounded-2xl p-6 border border-border text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-ink-4 font-bold">
+              เป้าหมายวันนี้
+            </p>
+            <p className="mt-3 text-[24px] font-semibold text-ink">—</p>
+            <p className="text-[12px] text-ink-3 mt-3">
               กรอก profile (ส่วนสูง · น้ำหนัก · วันเกิด) เพื่อให้คำนวณเป้าหมายได้
             </p>
-          )}
-        </section>
+          </section>
+        )}
 
         {hasAnyQuality ? (
           <section className="mt-3 bg-surface rounded-xl p-4 border border-border">
@@ -232,6 +265,32 @@ function QualityRow({ label, score }: { label: string; score: number | null }) {
     <div className="flex items-center justify-between gap-3 text-[12.5px]">
       <dt className="text-ink-2">{label}</dt>
       <dd className={`font-semibold ${tone}`}>{status}</dd>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  unit,
+  tone,
+}: {
+  label: string;
+  value: string;
+  unit: string;
+  tone?: "ok" | "warn";
+}) {
+  const valCls =
+    tone === "warn" ? "text-pillar-activity" : "text-ink";
+  return (
+    <div>
+      <p className="text-[9px] uppercase tracking-wider text-ink-4 font-semibold">
+        {label}
+      </p>
+      <p className={`text-[18px] font-num font-bold tabular-nums mt-0.5 leading-tight ${valCls}`}>
+        {value}
+      </p>
+      <p className="text-[9px] text-ink-4 leading-none">{unit}</p>
     </div>
   );
 }
