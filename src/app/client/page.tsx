@@ -3,8 +3,13 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PILLARS } from "@/lib/pillars";
-import { scoreFromCheckIn, overallScore, weeklySocialPeak } from "@/lib/scoring";
-import { todayLocalDate } from "@/lib/dates";
+import {
+  scoreFromCheckIn,
+  overallScore,
+  substancesCtxFromWeekly,
+  socialCtxFromWeekly,
+} from "@/lib/scoring";
+import { todayLocalDate, mondayOf } from "@/lib/dates";
 import { MultiDonut } from "@/components/charts/MultiDonut";
 import { DonutScore } from "@/components/charts/DonutScore";
 import { getUpcomingSessionForClient } from "@/lib/sessions";
@@ -27,6 +32,9 @@ export default async function ClientHome() {
   const today = todayLocalDate();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
+  const thisWeekStart = mondayOf(today);
+  const lastWeekStart = new Date(thisWeekStart);
+  lastWeekStart.setUTCDate(lastWeekStart.getUTCDate() - 7);
 
   const [
     todayCheckIn,
@@ -38,6 +46,8 @@ export default async function ClientHome() {
     yesterdayMeals,
     profile,
     latestLbm,
+    thisWeekly,
+    lastWeekly,
   ] = await Promise.all([
     prisma.dailyCheckIn.findUnique({
       where: { userId_date: { userId: session.user.id, date: today } },
@@ -49,7 +59,7 @@ export default async function ClientHome() {
       where: { userId: session.user.id },
       orderBy: { date: "desc" },
       take: 14,
-      select: { date: true, socialKind: true, socialActivities: true },
+      select: { date: true },
     }),
     getUpcomingSessionForClient(session.user.id),
     listMessages(threadIdForClient(session.user.id), 3),
@@ -60,6 +70,12 @@ export default async function ClientHome() {
       select: { heightCm: true, gender: true, dateOfBirth: true, weightKg: true },
     }),
     getLatestLBM(session.user.id),
+    prisma.weeklyReflection.findUnique({
+      where: { userId_weekStart: { userId: session.user.id, weekStart: thisWeekStart } },
+    }),
+    prisma.weeklyReflection.findUnique({
+      where: { userId_weekStart: { userId: session.user.id, weekStart: lastWeekStart } },
+    }),
   ]);
 
   let dailyTarget: number | null = null;
@@ -84,15 +100,20 @@ export default async function ClientHome() {
     dailyTarget,
     qualityScore: dailyMealQuality(yesterdayMeals),
   };
-  const socialToday = { weeklyPeakRating: weeklySocialPeak(recent14, today) };
-  const socialYesterday = { weeklyPeakRating: weeklySocialPeak(recent14, yesterday) };
   const scores = scoreFromCheckIn(todayCheckIn, {
     nutrition: nutritionToday,
-    social: socialToday,
+    social: socialCtxFromWeekly(thisWeekly),
+    substances: substancesCtxFromWeekly(thisWeekly),
   });
+  // Yesterday's "previous" comparison uses last week's reflection if today
+  // crosses a Monday boundary, otherwise still this week's. Simpler:
+  // always use this-week's data for yesterday too — weekly fields don't
+  // jitter day-by-day anyway.
+  const prevWeekly = today.getTime() === thisWeekStart.getTime() ? lastWeekly : thisWeekly;
   const prevScores = scoreFromCheckIn(yesterdayCheckIn, {
     nutrition: nutritionYesterday,
-    social: socialYesterday,
+    social: socialCtxFromWeekly(prevWeekly),
+    substances: substancesCtxFromWeekly(prevWeekly),
   });
   const overall = overallScore(scores);
   const prevOverall = overallScore(prevScores);
@@ -204,10 +225,10 @@ export default async function ClientHome() {
           </Link>
         ) : null}
 
-        {/* Primary CTA */}
+        {/* Primary CTAs — daily + weekly */}
         <Link
           href="/client/checkin"
-          className={`mt-3 w-full h-13 h-12 rounded-md inline-flex items-center justify-between px-5 ${
+          className={`mt-3 w-full h-12 rounded-md inline-flex items-center justify-between px-5 ${
             todayCheckIn == null
               ? "bg-pillar-activity text-white"
               : "bg-surface border border-border-strong text-ink-2"
@@ -222,6 +243,20 @@ export default async function ClientHome() {
             {todayCheckIn == null ? "ประเมินวันนี้" : "แก้ประเมินวันนี้"}
           </span>
           <span className="text-[18px]">→</span>
+        </Link>
+
+        <Link
+          href="/client/weekly"
+          className={`mt-2 w-full h-11 rounded-md inline-flex items-center justify-between px-5 border ${
+            thisWeekly == null
+              ? "bg-pillar-social-wash border-pillar-social/40 text-pillar-social"
+              : "bg-surface border-border-strong text-ink-3"
+          }`}
+        >
+          <span className="text-[13px] font-semibold">
+            {thisWeekly == null ? "สรุปสัปดาห์นี้ — รอบันทึก" : "แก้สรุปสัปดาห์นี้"}
+          </span>
+          <span className="text-[16px]">→</span>
         </Link>
 
         {/* 6 pillar tiles */}

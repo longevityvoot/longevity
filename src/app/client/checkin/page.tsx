@@ -21,21 +21,13 @@ export default async function CheckInPage() {
     month: "short",
   });
 
-  // Count filled vs total — gives the "X/7" header progress feel
-  const totalFields = 7;
+  // Count filled vs total — gives the "X/5" header progress feel
+  const totalFields = 5;
   let filled = 0;
   if (existing?.energyLevel != null) filled++;
   if (existing?.moodLevel != null) filled++;
   if (existing?.sleepQuality != null) filled++;
   if (existing?.stressLevel != null) filled++;
-  if (existing?.socialKind || existing?.socialActivities) filled++;
-  if (
-    (existing?.alcoholUnits ?? 0) > 0 ||
-    (existing?.caffeineCount ?? 0) > 0 ||
-    (existing?.sugaryDrinkCount ?? 0) > 0 ||
-    existing?.smokedToday
-  )
-    filled++;
   if (existing?.notes) filled++;
 
   return (
@@ -104,38 +96,18 @@ export default async function CheckInPage() {
           highLabel="เครียดมาก"
         />
 
-        <Section title="สังคม" question="วันนี้ปฏิสัมพันธ์กับคนแบบไหน?">
-          <SocialKindPicker defaultValue={existing?.socialKind ?? null} />
-          <textarea
-            name="socialActivities"
-            defaultValue={existing?.socialActivities ?? ""}
-            rows={2}
-            placeholder="รายละเอียดเพิ่ม (optional) — เช่น ดินเนอร์กับครอบครัว"
-            className="mt-3 w-full rounded-md border border-border-strong px-3 py-2 text-[13px] resize-none focus:outline-none focus:border-ink"
-          />
-        </Section>
-
-        <Section title="สารต่างๆ" question="แอลกอฮอล์ · เครื่องดื่มน้ำตาลสูง · บุหรี่">
-          <div className="grid grid-cols-3 gap-3">
-            <NumField name="alcoholUnits" label="drinks" defaultValue={existing?.alcoholUnits ?? 0} step="0.5" min="0" max="20" />
-            <NumField name="sugaryDrinkCount" label="น้ำตาลสูง" defaultValue={existing?.sugaryDrinkCount ?? 0} step="1" min="0" max="20" />
-            <NumField name="caffeineCount" label="กาแฟดำ" defaultValue={existing?.caffeineCount ?? 0} step="1" min="0" max="20" />
-          </div>
-          <p className="mt-2 text-[10.5px] text-ink-4 leading-snug">
-            <span className="font-semibold text-ink-3">น้ำตาลสูง</span> = น้ำอัดลม · น้ำหวาน · น้ำผลไม้ · ชานมไข่มุก · กาแฟใส่น้ำตาล/นม
-            <br />
-            <span className="font-semibold text-ink-3">กาแฟดำ</span> ไม่ใส่น้ำตาล/นม — ไม่ลดคะแนน (info-only)
+        <section className="bg-pillar-social-wash border border-pillar-social/30 rounded-lg p-3.5">
+          <p className="text-[11px] uppercase tracking-wider text-pillar-social font-bold">
+            พฤติกรรมสะสม
           </p>
-          <label className="mt-3 flex items-center gap-2.5 cursor-pointer">
-            <input
-              name="smokedToday"
-              type="checkbox"
-              defaultChecked={existing?.smokedToday ?? false}
-              className="size-5 accent-ink"
-            />
-            <span className="text-[14px] text-ink-2">วันนี้สูบบุหรี่ / พ่นไอ / เคี้ยวยาเส้น</span>
-          </label>
-        </Section>
+          <p className="text-[12.5px] text-ink-2 mt-1 leading-snug">
+            แอลกอฮอล์ · เครื่องดื่มน้ำตาลสูง · บุหรี่ · สังคม — บันทึกในหน้า{" "}
+            <Link href="/client/weekly" className="font-semibold text-pillar-social underline">
+              สรุปสัปดาห์
+            </Link>{" "}
+            ทุกอาทิตย์ (อาทิตย์ละครั้ง)
+          </p>
+        </section>
 
         <TextSection
           name="notes"
@@ -243,38 +215,6 @@ function Section({
   );
 }
 
-function NumField({
-  name,
-  label,
-  defaultValue,
-  step,
-  min,
-  max,
-}: {
-  name: string;
-  label: string;
-  defaultValue: number;
-  step: string;
-  min: string;
-  max: string;
-}) {
-  return (
-    <label className="block">
-      <span className="text-[11px] text-ink-3 font-semibold">{label}</span>
-      <input
-        name={name}
-        type="number"
-        inputMode="decimal"
-        step={step}
-        min={min}
-        max={max}
-        defaultValue={defaultValue}
-        className="mt-1 w-full h-11 rounded-md border border-border-strong px-3 text-[16px] font-num text-center focus:outline-none focus:border-ink"
-      />
-    </label>
-  );
-}
-
 function CheckIcon() {
   return (
     <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -283,35 +223,3 @@ function CheckIcon() {
   );
 }
 
-// Single-choice social engagement picker — ordered low to high mortality
-// benefit per Holt-Lunstad 2010 + Harvard 75-year study.
-function SocialKindPicker({ defaultValue }: { defaultValue: string | null }) {
-  const options: Array<{ v: string; label: string; hint: string }> = [
-    { v: "none",      label: "ไม่มี",        hint: "ไม่ได้คุยกับใคร" },
-    { v: "text",      label: "ข้อความ",      hint: "chat / social media" },
-    { v: "call",      label: "โทร/วิดีโอ",   hint: "ได้ยินเสียง" },
-    { v: "in-person", label: "พบตัว",        hint: "1-2 คน" },
-    { v: "group",     label: "กิจกรรมกลุ่ม", hint: "ครอบครัว / community" },
-  ];
-  return (
-    <div className="grid grid-cols-5 gap-1.5">
-      {options.map((o) => (
-        <label
-          key={o.v}
-          className="cursor-pointer rounded-md border border-border bg-canvas px-1.5 py-2 text-center has-[:checked]:bg-ink has-[:checked]:text-white has-[:checked]:border-ink"
-          title={o.hint}
-        >
-          <input
-            type="radio"
-            name="socialKind"
-            value={o.v}
-            defaultChecked={defaultValue === o.v}
-            className="sr-only"
-          />
-          <span className="block text-[11px] font-semibold leading-tight">{o.label}</span>
-          <span className="block text-[9px] opacity-70 mt-0.5 leading-tight">{o.hint}</span>
-        </label>
-      ))}
-    </div>
-  );
-}

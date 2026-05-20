@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { scoreFromCheckIn, overallScore, weeklySocialPeak, type PillarScores } from "@/lib/scoring";
-import { todayLocalDate } from "@/lib/dates";
+import {
+  scoreFromCheckIn,
+  overallScore,
+  substancesCtxFromWeekly,
+  socialCtxFromWeekly,
+  type PillarScores,
+} from "@/lib/scoring";
+import { todayLocalDate, mondayOf, dateKey } from "@/lib/dates";
 import {
   estimateBMR,
   estimateDailyTarget,
@@ -31,6 +37,7 @@ export type ClientRowDTO = {
 // in the designer console list.
 export async function listClients(): Promise<ClientRowDTO[]> {
   const today = todayLocalDate();
+  const thisWeekStart = mondayOf(today);
   const clients = await prisma.user.findMany({
     where: { clientProfile: { isNot: null } },
     select: {
@@ -41,13 +48,21 @@ export async function listClients(): Promise<ClientRowDTO[]> {
         orderBy: { date: "desc" },
         take: 1,
       },
+      weeklyReflections: {
+        where: { weekStart: thisWeekStart },
+        take: 1,
+      },
     },
     orderBy: { name: "asc" },
   });
 
   return clients.map((c) => {
     const latest = c.dailyCheckIns[0] ?? null;
-    const scores = scoreFromCheckIn(latest);
+    const weekly = c.weeklyReflections[0] ?? null;
+    const scores = scoreFromCheckIn(latest, {
+      social: socialCtxFromWeekly(weekly),
+      substances: substancesCtxFromWeekly(weekly),
+    });
     const overall = overallScore(scores);
     const hasToday =
       !!latest && latest.date.getTime() === today.getTime();
@@ -107,10 +122,16 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
   });
   if (!user || !user.clientProfile) return null;
 
-  const [todayMeals, nutritionHistory, latestLbm] = await Promise.all([
+  const earliest = user.dailyCheckIns[user.dailyCheckIns.length - 1]?.date ?? today;
+  const earliestWeek = mondayOf(earliest);
+  const [todayMeals, nutritionHistory, latestLbm, weeklies] = await Promise.all([
     getMealsForDay(id, today),
     getDailyNutritionHistory(id, 14),
     getLatestLBM(id),
+    prisma.weeklyReflection.findMany({
+      where: { userId: id, weekStart: { gte: earliestWeek } },
+      orderBy: { weekStart: "desc" },
+    }),
   ]);
   const bmr = estimateBMR({
     gender: user.clientProfile.gender,
@@ -120,16 +141,20 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
     lbmKg: latestLbm,
   });
   const dailyTarget = estimateDailyTarget(bmr);
+  const weeklyByKey = new Map(weeklies.map((w) => [dateKey(w.weekStart), w]));
+  const weeklyFor = (d: Date) => weeklyByKey.get(dateKey(mondayOf(d))) ?? null;
 
   const recentCheckIns = user.dailyCheckIns.map((ci) => {
-    const day = nutritionHistory.get(ci.date.toISOString().slice(0, 10));
+    const day = nutritionHistory.get(dateKey(ci.date));
+    const w = weeklyFor(ci.date);
     const scores = scoreFromCheckIn(ci, {
       nutrition: {
         kcalToday: day?.kcal ?? 0,
         dailyTarget,
         qualityScore: day?.qualityScore ?? null,
       },
-      social: { weeklyPeakRating: weeklySocialPeak(user.dailyCheckIns, ci.date) },
+      social: socialCtxFromWeekly(w),
+      substances: substancesCtxFromWeekly(w),
     });
     return {
       date: ci.date,
@@ -142,13 +167,15 @@ export async function getClientDetail(id: string): Promise<ClientDetailDTO | nul
   const todayCI = user.dailyCheckIns.find(
     (ci) => ci.date.getTime() === today.getTime(),
   ) ?? null;
+  const todayWeekly = weeklyFor(today);
   const todayScores = scoreFromCheckIn(todayCI, {
     nutrition: {
       kcalToday: totalKcal(todayMeals),
       dailyTarget,
       qualityScore: dailyMealQuality(todayMeals),
     },
-    social: { weeklyPeakRating: weeklySocialPeak(user.dailyCheckIns, today) },
+    social: socialCtxFromWeekly(todayWeekly),
+    substances: substancesCtxFromWeekly(todayWeekly),
   });
 
   return {
