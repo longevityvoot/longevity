@@ -96,6 +96,10 @@ model ClientProfile {
   longevityGoal         String?
   interestTags          String[] @default([])
   wearableType          String?
+  // Body-composition scale brand. Used to pick the right reference band
+  // for SMM kg/% — Omron, InBody, Tanita, and Xiaomi each report and
+  // classify muscle mass slightly differently.
+  scaleBrand            String?  // "omron" | "inbody" | "tanita" | "xiaomi"
   googleHealthConnected Boolean  @default(false)
   googleHealthTokens    Json?
 
