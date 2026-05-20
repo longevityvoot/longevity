@@ -15,6 +15,15 @@ import { getLatestWeight, getLatestLBM } from "@/lib/body";
 import { ageFromDOB } from "@/lib/clients";
 import { deleteMeal } from "./actions";
 
+// Soft warm-toned accents for meal-type sections, looping the day:
+// morning gold → midday red-orange → evening blue-violet → snack green.
+const MEAL_TYPE_TONE: Record<string, string> = {
+  breakfast: "#D38442", // orange
+  lunch:     "#C45151", // red
+  dinner:    "#4A6FA5", // blue
+  snack:     "#5E8B4D", // green
+};
+
 export default async function NutritionPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
@@ -94,19 +103,19 @@ export default async function NutritionPage() {
       <div className="max-w-[420px] mx-auto px-5 pt-4">
         {/* Goal hero — big number front and center */}
         {dailyTarget != null ? (
-          <section className="bg-surface rounded-2xl p-6 border border-border text-center">
+          <section className="bg-pillar-nutrition-wash rounded-2xl p-6 border border-pillar-nutrition/30 text-center">
             <p className="text-[10px] uppercase tracking-[0.12em] text-pillar-nutrition font-bold">
               เป้าหมายวันนี้
             </p>
             <div className="mt-3 flex items-baseline justify-center gap-2">
-              <span className="text-[72px] font-bold font-num tabular-nums leading-none text-ink">
+              <span className="text-[72px] font-bold font-num tabular-nums leading-none text-pillar-nutrition">
                 {dailyTarget.toLocaleString()}
               </span>
-              <span className="text-[16px] text-ink-3 font-medium">kcal</span>
+              <span className="text-[16px] text-pillar-nutrition/70 font-medium">kcal</span>
             </div>
             {bmr != null ? (
-              <p className="text-[11px] text-ink-4 mt-2">
-                BMR <span className="font-num font-semibold text-ink-3">{bmr.toLocaleString()}</span>
+              <p className="text-[11px] text-ink-3 mt-2">
+                BMR <span className="font-num font-semibold text-ink-2">{bmr.toLocaleString()}</span>
                 {" × "}activity 1.4
                 <span className="text-ink-4">
                   {" · "}
@@ -115,7 +124,7 @@ export default async function NutritionPage() {
               </p>
             ) : null}
 
-            <div className="mt-6 h-3 rounded-pill bg-canvas overflow-hidden">
+            <div className="mt-6 h-3 rounded-pill bg-white/60 overflow-hidden">
               <div
                 className={`h-full rounded-pill transition-all ${
                   pct! > 120
@@ -139,8 +148,8 @@ export default async function NutritionPage() {
               <Stat label="ความคืบหน้า" value={`${pct ?? 0}`} unit="%" />
             </div>
 
-            <div className="mt-5 pt-4 border-t border-border text-left">
-              <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
+            <div className="mt-5 pt-4 border-t border-pillar-nutrition/20 text-left">
+              <p className="text-[11px] uppercase tracking-wider text-pillar-nutrition font-bold">
                 ช่วงที่ปลอดภัย
               </p>
               <p className="mt-1 text-[12.5px] text-ink-2 font-num">
@@ -152,19 +161,19 @@ export default async function NutritionPage() {
               </p>
               <ul className="mt-2 space-y-1 text-[11px] text-ink-3 leading-snug">
                 <li className="flex items-start gap-1.5">
-                  <span className="text-pillar-stress mt-0.5">↓</span>
-                  <span><span className="font-semibold text-ink-2">ต่ำกว่า BMR</span> = ระบบเผาผลาญช้าลง (starvation mode) · สูญเสียกล้ามเนื้อ</span>
+                  <span className="text-pillar-stress mt-0.5 font-bold">↓</span>
+                  <span><span className="font-semibold text-ink-2">ต่ำกว่า BMR</span> = ระบบเผาผลาญช้าลง · สูญเสียกล้ามเนื้อ</span>
                 </li>
                 <li className="flex items-start gap-1.5">
-                  <span className="text-pillar-activity mt-0.5">↑</span>
-                  <span><span className="font-semibold text-ink-2">เกิน TDEE</span> = พลังงานเหลือ → น้ำหนักขึ้น (เว้นแต่ตั้งใจสร้างกล้าม)</span>
+                  <span className="text-pillar-activity mt-0.5 font-bold">↑</span>
+                  <span><span className="font-semibold text-ink-2">เกิน TDEE</span> = พลังงานเหลือ → น้ำหนักขึ้น</span>
                 </li>
               </ul>
             </div>
           </section>
         ) : (
-          <section className="bg-surface rounded-2xl p-6 border border-border text-center">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-ink-4 font-bold">
+          <section className="bg-pillar-nutrition-wash rounded-2xl p-6 border border-pillar-nutrition/30 text-center">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-pillar-nutrition font-bold">
               เป้าหมายวันนี้
             </p>
             <p className="mt-3 text-[24px] font-semibold text-ink">—</p>
@@ -176,7 +185,7 @@ export default async function NutritionPage() {
 
         {hasAnyQuality ? (
           <section className="mt-3 bg-surface rounded-xl p-4 border border-border">
-            <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-bold">
+            <p className="text-[10px] uppercase tracking-[0.08em] text-pillar-social font-bold">
               คุณภาพอาหารวันนี้
             </p>
             <dl className="mt-2 space-y-1.5">
@@ -191,7 +200,8 @@ export default async function NutritionPage() {
         {/* Add CTA */}
         <Link
           href="/client/nutrition/add"
-          className="mt-3 w-full h-12 rounded-md bg-ink text-white font-semibold text-[15px] inline-flex items-center justify-center gap-2"
+          className="mt-3 w-full h-12 rounded-md bg-pillar-nutrition text-white font-semibold text-[15px] inline-flex items-center justify-center gap-2"
+          style={{ boxShadow: "0 4px 12px rgba(201, 168, 72, 0.30)" }}
         >
           + เพิ่มมื้ออาหาร
         </Link>
@@ -206,14 +216,25 @@ export default async function NutritionPage() {
             const items = byType[t.key] ?? [];
             if (items.length === 0) return null;
             const sub = totalKcal(items);
+            const tone = MEAL_TYPE_TONE[t.key];
             return (
               <section
                 key={t.key}
                 className="mt-4 bg-surface border border-border rounded-lg p-4"
               >
                 <div className="flex items-baseline justify-between">
-                  <h2 className="text-[13px] font-semibold text-ink">{t.label}</h2>
-                  <span className="text-[11px] text-ink-4 font-num">
+                  <h2 className="text-[13px] font-semibold text-ink flex items-center gap-2">
+                    <span
+                      className="inline-block size-2 rounded-full"
+                      style={{ backgroundColor: tone }}
+                      aria-hidden="true"
+                    />
+                    {t.label}
+                  </h2>
+                  <span
+                    className="text-[11px] font-num font-semibold"
+                    style={{ color: tone }}
+                  >
                     {sub} kcal
                   </span>
                 </div>
