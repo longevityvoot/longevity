@@ -12,8 +12,9 @@ const CATEGORIES: Array<{ key: FoodCategory | "all"; label: string }> = [
   { key: "meat",    label: CATEGORY_LABEL.meat },
   { key: "fruit",   label: CATEGORY_LABEL.fruit },
   { key: "drink",   label: CATEGORY_LABEL.drink },
-  { key: "snack",   label: CATEGORY_LABEL.snack },
-  { key: "dessert", label: CATEGORY_LABEL.dessert },
+  { key: "snack",      label: CATEGORY_LABEL.snack },
+  { key: "dessert",    label: CATEGORY_LABEL.dessert },
+  { key: "supplement", label: CATEGORY_LABEL.supplement },
 ];
 
 type Rating = -2 | -1 | 0 | 1 | 2 | null;
