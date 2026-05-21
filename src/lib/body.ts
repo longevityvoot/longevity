@@ -159,17 +159,18 @@ export function predictedSMM(
 
 // Brand-aware muscle mass (kg) band centered on predicted SMM. Different
 // consumer BIA scales widen the band differently — InBody/Tanita run
-// tighter, Xiaomi/Omron looser. Predicted SMM gets a small upward bias
-// for InBody/Tanita because their published "Normal" mid-point sits
-// slightly above Lee's anthropometric prediction.
+// tighter, Xiaomi/Omron looser. Predicted SMM gets an upward bias for
+// InBody/Tanita because their proprietary predicted-for-frame algorithm
+// tends to land higher than Lee 2000's anthropometric prediction
+// (empirical: 178cm 70kg male age 40 InBody-predicted ≈ Lee × 1.15).
 export function muscleKgRangeForBrand(
   brand: string | null,
   predicted: number | null,
 ): { low: number; high: number } | null {
   if (predicted == null) return null;
   const bias: Record<string, number> = {
-    inbody: 1.08,
-    tanita: 1.06,
+    inbody: 1.15,
+    tanita: 1.12,
     omron:  1.0,
     xiaomi: 1.0,
   };
