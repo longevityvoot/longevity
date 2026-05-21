@@ -347,7 +347,7 @@ export default async function ClientHome() {
           </h2>
           <div className="grid grid-cols-2 gap-2.5">
             <ShortcutTile href="/client/labs" label="ผลแล็บ" hint="เลือด" icon={<FlaskIcon />} tone="substances" />
-            <ShortcutTile href="/client/meds" label="ยา" hint="วันนี้" icon={<PillIcon />} tone="stress" />
+            <ShortcutTile href="/client/meds" label="อาหารเสริม" hint="วันนี้" icon={<PillIcon />} tone="stress" />
           </div>
         </section>
 

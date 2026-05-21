@@ -43,7 +43,7 @@ export default async function CoachMedsPage({
         <header className="mt-3 flex items-baseline justify-between gap-3">
           <div>
             <h1 className="text-[22px] font-semibold tracking-tight text-ink">
-              Meds — {client.name}
+              Supplements — {client.name}
             </h1>
             <p className="text-[12px] text-ink-3 mt-1">
               {active.length} active · {discontinued.length} หยุดแล้ว
@@ -53,12 +53,12 @@ export default async function CoachMedsPage({
             href={`/coach/clients/${id}/meds/new`}
             className="h-10 px-4 inline-flex items-center rounded-md bg-ink text-white text-[13px] font-semibold"
           >
-            + ยาใหม่
+            + อาหารเสริมใหม่
           </Link>
         </header>
 
         {active.length === 0 ? (
-          <p className="mt-6 text-[14px] text-ink-3">ยังไม่มียา active</p>
+          <p className="mt-6 text-[14px] text-ink-3">ยังไม่มีอาหารเสริม active</p>
         ) : (
           <ul className="mt-5 space-y-3">
             {active.map((m) => (

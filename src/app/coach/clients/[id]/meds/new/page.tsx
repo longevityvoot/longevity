@@ -30,7 +30,7 @@ export default async function NewMedicationPage({
           ← กลับ
         </Link>
         <h1 className="mt-3 text-[22px] font-semibold tracking-tight text-ink">
-          เพิ่มยา / อาหารเสริม — {client.name}
+          เพิ่มอาหารเสริม — {client.name}
         </h1>
 
         <form
