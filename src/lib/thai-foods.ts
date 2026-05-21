@@ -202,6 +202,13 @@ export const THAI_FOODS: FoodItem[] = [
 
   // Snacks
   { key: "bread-toast",   name: "ขนมปังปิ้งเนยน้ำตาล", kcal: 180, unit: "2 แผ่น",  category: "snack",  keywords: ["toast"] },
+  { key: "bread-white",        name: "ขนมปังขาว",                 kcal: 80,  unit: "1 แผ่น",  category: "snack", keywords: ["bread", "white bread", "ขนมปังแผ่น", "แป้ง", "carb"] },
+  { key: "bread-wholewheat",   name: "ขนมปังโฮลวีต",               kcal: 75,  unit: "1 แผ่น",  category: "snack", keywords: ["whole wheat bread", "wholewheat", "ขนมปังแผ่น", "แป้ง", "carb"] },
+  { key: "bread-multigrain",   name: "ขนมปังหลายเมล็ดธัญพืช",       kcal: 90,  unit: "1 แผ่น",  category: "snack", keywords: ["multigrain", "ขนมปังแผ่น", "แป้ง", "carb"] },
+  { key: "bread-rye",          name: "ขนมปังไรย์",                  kcal: 85,  unit: "1 แผ่น",  category: "snack", keywords: ["rye bread", "ขนมปังแผ่น", "แป้ง"] },
+  { key: "bread-baguette",     name: "บาเก็ต",                      kcal: 140, unit: "1 แผ่นบาง", category: "snack", keywords: ["baguette", "french bread", "แป้ง"] },
+  { key: "bread-bun",          name: "ขนมปังก้อน (เบอร์เกอร์)",      kcal: 150, unit: "1 ก้อน",  category: "snack", keywords: ["burger bun", "ขนมปังก้อน", "แป้ง"] },
+  { key: "croissant",          name: "ครัวซอง",                     kcal: 230, unit: "1 ชิ้น",  category: "snack", keywords: ["croissant", "บัตเตอร์", "แป้ง"] },
   { key: "sandwich-ham",  name: "แซนด์วิชแฮม",      kcal: 320, unit: "1 ชิ้น",  category: "snack",  keywords: ["sandwich"] },
   { key: "chips",         name: "มันฝรั่งทอด",       kcal: 250, unit: "1 ห่อ",   category: "snack",  keywords: ["chips"] },
   { key: "popcorn",       name: "ป๊อปคอร์น",         kcal: 200, unit: "1 ถ้วย",  category: "snack",  keywords: ["popcorn"] },
