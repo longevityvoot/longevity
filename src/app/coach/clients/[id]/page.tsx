@@ -301,7 +301,7 @@ export default async function ClientDetailPage({
                   href={`/coach/clients/${id}/meds`}
                   className="w-full h-10 inline-flex items-center justify-center rounded-md border border-border-strong text-[13px] font-semibold text-ink-2"
                 >
-                  Meds →
+                  Supplements →
                 </Link>
               </div>
               {lastMessage ? (

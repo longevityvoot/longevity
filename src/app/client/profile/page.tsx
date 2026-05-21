@@ -130,7 +130,7 @@ export default async function ClientProfilePage() {
             href="/client/meds"
             className="flex items-center justify-between text-[14px] text-ink-2"
           >
-            <span>ยา · อาหารเสริม</span>
+            <span>อาหารเสริม</span>
             <span className="text-ink-4">→</span>
           </Link>
           <Link

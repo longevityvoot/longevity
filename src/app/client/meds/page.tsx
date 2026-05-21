@@ -40,7 +40,7 @@ export default async function MedsPage() {
 
         <header className="mt-3">
           <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-            ยา · อาหารเสริม
+            อาหารเสริม
           </p>
           <h1 className="text-[22px] font-semibold tracking-tight text-ink mt-0.5">
             รายการที่กิน
@@ -93,7 +93,7 @@ export default async function MedsPage() {
               );
             })}
             {Object.values(todaySlots).every((arr) => arr.length === 0) ? (
-              <p className="text-[13px] text-ink-3">ไม่มียาตามตารางวันนี้</p>
+              <p className="text-[13px] text-ink-3">ไม่มีอาหารเสริมตามตารางวันนี้</p>
             ) : null}
           </div>
         </section>
