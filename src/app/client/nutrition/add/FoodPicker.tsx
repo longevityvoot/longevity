@@ -181,7 +181,7 @@ export function FoodPicker() {
               ขนาดที่กิน
             </p>
             <div className="mt-2 grid grid-cols-4 gap-2">
-              {[0.25, 0.5, 0.75, 1].map((p) => (
+              {[0.5, 0.75, 1, 2].map((p) => (
                 <button
                   key={p}
                   type="button"
@@ -198,7 +198,7 @@ export function FoodPicker() {
               ))}
             </div>
             <p className="mt-2 text-[10px] text-ink-4">
-              กิน 2 จาน? บันทึก 2 ครั้ง
+              กิน &gt; 2 จาน? บันทึกแยกครั้งเพิ่ม
             </p>
             <button
               type="button"
@@ -331,21 +331,32 @@ function picton(p: number): string {
 }
 
 function plateLabel(p: number): string {
-  if (p === 0.25) return "¼ จาน";
   if (p === 0.5) return "½ จาน";
   if (p === 0.75) return "¾ จาน";
   if (p === 1) return "เต็มจาน";
+  if (p === 2) return "2 จาน";
   return `${p} จาน`;
 }
 
 // SVG plate filled clockwise per fraction. Active state inverts colors so
 // the selected option reads against the ink background.
 function PlateIcon({ fill, active }: { fill: number; active: boolean }) {
+  // For p > 1, show two stacked plates (offset slightly) to convey
+  // "multiple plates". Single plate uses the same arc math as before.
+  const ring = active ? "#FFFFFF" : "#C9A848";
+  const accent = active ? "#FFFFFF" : "#C9A848";
+  if (fill > 1) {
+    // 2-plate stack: a smaller back plate offset up-left + a full front plate.
+    return (
+      <svg width={26} height={22} viewBox="0 0 28 24" aria-hidden="true">
+        <circle cx={10} cy={9}  r={7} fill={accent} fillOpacity={0.4} stroke={ring} strokeWidth={1.5} />
+        <circle cx={16} cy={13} r={7} fill={accent} stroke={ring} strokeWidth={1.5} />
+      </svg>
+    );
+  }
   const cx = 12;
   const cy = 12;
   const r = 8;
-  const ring = active ? "#FFFFFF" : "#C9A848";
-  const accent = active ? "#FFFFFF" : "#C9A848";
   // Path arc from 12 o'clock clockwise by `fill * 360`.
   const angle = fill * 360 - 0.0001; // avoid full-circle == zero arc
   const large = angle > 180 ? 1 : 0;
