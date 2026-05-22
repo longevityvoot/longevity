@@ -61,10 +61,11 @@ export default async function NewSessionPage({
             <input
               name="scheduledAt"
               type="datetime-local"
-              className="mt-1 w-full h-11 rounded-md border border-border-strong px-3 text-[14px]"
+              defaultValue={defaultScheduledAt()}
+              className="mt-1 w-full h-11 rounded-md border border-border-strong px-3 text-[14px] font-num"
             />
             <span className="text-[11px] text-ink-4 mt-1 block">
-              เว้นว่างได้ถ้าเป็น async
+              กดที่ช่องเพื่อเลือก · เว้นว่างได้ถ้าเป็น async
             </span>
           </label>
 
@@ -144,4 +145,13 @@ export default async function NewSessionPage({
       </div>
     </main>
   );
+}
+
+// Default to tomorrow 10:00 local, formatted for <input type="datetime-local">.
+function defaultScheduledAt(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(10, 0, 0, 0);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
