@@ -39,7 +39,7 @@ export default async function ClientDetailPage({
     <main className="min-h-screen bg-canvas">
       <div className="max-w-[1280px] mx-auto px-6 py-6">
         <Link href="/coach" className="text-[13px] text-ink-3 inline-flex items-center gap-1">
-          ← กลับ designer console
+          ← กลับ Longeneer console
         </Link>
 
         <header className="mt-3 flex items-start justify-between">
@@ -128,7 +128,7 @@ export default async function ClientDetailPage({
                   <span className="font-num font-semibold text-ink-3">
                     {client.profile.activityFactor ?? 1.4}
                   </span>
-                  {client.profile.activityFactor == null ? " (default)" : " (ตั้งโดย designer)"}
+                  {client.profile.activityFactor == null ? " (default)" : " (ตั้งโดย Longeneer)"}
                 </p>
               </section>
             ) : null}

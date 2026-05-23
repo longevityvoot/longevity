@@ -2,11 +2,11 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Longevity Designer",
-  description: "ดูแลสุขภาพระยะยาวกับ designer ส่วนตัว",
+  title: "Longeneer",
+  description: "longevity engineer · ระบบติดตาม 6 ด้านสุขภาพระยะยาว",
   appleWebApp: {
     capable: true,
-    title: "Longevity",
+    title: "Longeneer",
     statusBarStyle: "default",
   },
 };

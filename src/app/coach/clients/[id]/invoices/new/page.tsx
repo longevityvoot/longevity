@@ -45,7 +45,7 @@ export default async function NewInvoicePage({
             <input
               name="description"
               required
-              defaultValue="ค่าบริการ designer รอบประจำเดือน"
+              defaultValue="ค่าบริการ Longeneer รอบประจำเดือน"
               className="mt-1 w-full h-11 rounded-md border border-border-strong px-3 text-[14px]"
             />
           </label>

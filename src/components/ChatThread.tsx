@@ -20,7 +20,7 @@ export function ChatThread({
         </div>
         <p className="mt-3 text-[14px] font-semibold text-ink-2">ยังไม่มีบันทึก</p>
         <p className="mt-1 text-[12px] text-ink-3 max-w-[260px]">
-          เขียนถาม designer ไว้ — เป็น thread บันทึกย้อนหลังได้ ไม่ต้องรอ realtime
+          เขียนถาม Longeneer ไว้ — เป็น thread บันทึกย้อนหลังได้ ไม่ต้องรอ realtime
         </p>
       </div>
     );
@@ -64,7 +64,7 @@ export function ChatThread({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[12px] font-semibold text-ink leading-tight truncate">
-                        {mine ? "คุณ" : designer ? "Longevity Designer" : m.user.name}
+                        {mine ? "คุณ" : designer ? "Longeneer" : m.user.name}
                       </p>
                       <p className="text-[10px] text-ink-4 leading-tight">
                         {formatTime(m.createdAt)}

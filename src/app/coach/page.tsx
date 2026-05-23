@@ -21,7 +21,7 @@ export default async function CoachDashboard() {
         <header className="flex items-start justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-wider text-ink-4 font-semibold">
-              Designer console
+              Longeneer console
             </p>
             <h1 className="text-[24px] font-semibold tracking-tight text-ink mt-0.5">
               {session.user.name}

@@ -31,7 +31,7 @@ export default async function NewLabPage({
           เพิ่มผลตรวจ
         </h1>
         <p className="text-[12px] text-ink-3 mt-1">
-          กรอกค่าจากใบผลตรวจ — designer จะ review ก่อน publish
+          กรอกค่าจากใบผลตรวจ — Longeneer จะ review ก่อน publish
         </p>
 
         <nav className="mt-4 flex flex-wrap gap-2">
@@ -130,10 +130,10 @@ export default async function NewLabPage({
             className="w-full h-12 rounded-md bg-pillar-substances text-white font-semibold text-[15px]"
             style={{ boxShadow: "0 4px 12px rgba(125, 92, 149, 0.30)" }}
           >
-            ส่งให้ designer review
+            ส่งให้ Longeneer review
           </button>
           <p className="text-[11px] text-ink-4 text-center">
-            ค่าที่กรอกจะถูกส่งเป็น draft — designer จะ verify + publish ให้
+            ค่าที่กรอกจะถูกส่งเป็น draft — Longeneer จะ verify + publish ให้
           </p>
         </form>
       </div>

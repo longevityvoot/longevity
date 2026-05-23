@@ -17,7 +17,7 @@ export default async function ClientChatPage() {
       select: { assignedCoach: { select: { name: true } } },
     }),
   ]);
-  const designerName = profile?.assignedCoach?.name ?? "Longevity Designer";
+  const designerName = profile?.assignedCoach?.name ?? "Longeneer";
 
   return (
     <main className="min-h-screen bg-canvas pb-6">
@@ -35,7 +35,7 @@ export default async function ClientChatPage() {
               บันทึกการคุย
             </p>
             <p className="text-[11px] text-ink-3 leading-tight truncate">
-              กับ Longevity Designer · ไม่ realtime — ทาง designer จะตอบเมื่อสะดวก
+              กับ Longeneer · ไม่ realtime — ทาง Longeneer จะตอบเมื่อสะดวก
             </p>
           </div>
         </div>

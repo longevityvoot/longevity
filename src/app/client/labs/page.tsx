@@ -65,10 +65,10 @@ export default async function LabsPage() {
             </span>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-semibold text-ink">
-                ส่ง draft รอ designer review
+                ส่ง draft รอ Longeneer review
               </p>
               <p className="text-[11px] text-ink-3 mt-0.5">
-                จะเห็นค่าหลัง designer publish
+                จะเห็นค่าหลัง Longeneer publish
               </p>
             </div>
           </section>
@@ -83,7 +83,7 @@ export default async function LabsPage() {
               ยังไม่มีผลตรวจ
             </p>
             <p className="mt-1 text-[12px] text-ink-3">
-              เริ่มจากผลตรวจล่าสุดของคุณ designer จะช่วยอ่าน
+              เริ่มจากผลตรวจล่าสุดของคุณ Longeneer จะช่วยอ่าน
             </p>
             <Link
               href="/client/labs/new"

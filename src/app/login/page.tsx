@@ -37,10 +37,10 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
         <div className="flex flex-col items-center text-center">
           <FlowerHero size={240} />
           <h1 className="mt-3 text-[26px] font-bold tracking-tight text-ink leading-tight">
-            Longevity Designer
+            Longeneer
           </h1>
           <p className="mt-2 text-[13px] text-ink-3 max-w-[300px]">
-            ดูแลสุขภาพระยะยาว · ระบบติดตาม 6 ด้านโดย designer ส่วนตัวของคุณ
+            longevity engineer · ระบบติดตาม 6 ด้านสุขภาพระยะยาว
           </p>
         </div>
 

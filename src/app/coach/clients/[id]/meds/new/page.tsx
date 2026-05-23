@@ -96,7 +96,7 @@ export default async function NewMedicationPage({
             <div className="mt-2 flex gap-3 flex-wrap">
               <Radio name="source" value="doctor" label="แพทย์" defaultChecked />
               <Radio name="source" value="pharmacist" label="ร้านยา" />
-              <Radio name="source" value="coach" label="Longevity Designer" />
+              <Radio name="source" value="coach" label="Longeneer" />
               <Radio name="source" value="self" label="ตัวเอง" />
             </div>
           </fieldset>

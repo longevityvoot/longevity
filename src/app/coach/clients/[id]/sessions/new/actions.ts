@@ -55,7 +55,7 @@ export async function createSession(clientId: string, form: FormData) {
       data: {
         threadId: threadIdForClient(clientId),
         userId: session.user.id,
-        content: `📅 Designer นัด session ใหม่: ${when}${durationRaw ? ` (~${durationRaw} นาที)` : ""}`,
+        content: `📅 Longeneer นัด session ใหม่: ${when}${durationRaw ? ` (~${durationRaw} นาที)` : ""}`,
       },
     });
   }
