@@ -7,7 +7,7 @@ export type MedSlot = (typeof MED_SLOTS)[number];
 export const SOURCE_LABEL: Record<string, string> = {
   doctor: "แพทย์",
   pharmacist: "ร้านยา",
-  coach: "Longevity Designer",
+  coach: "Longeneer",
   self: "ตัวเอง",
 };
 

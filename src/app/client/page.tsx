@@ -358,13 +358,13 @@ export default async function ClientHome() {
         >
           <div className="flex items-center justify-between">
             <p className="text-[11px] uppercase tracking-wider text-ink-4 font-bold">
-              คุยกับ Longevity Designer
+              คุยกับ Longeneer
             </p>
             <span className="text-[12px] text-ink-3">→</span>
           </div>
           <p className="text-[14px] text-ink-2 mt-1.5 line-clamp-2">
             {lastMessage
-              ? `${lastMessage.user.role === "CLIENT" ? "คุณ" : "Longevity Designer"}: ${lastMessage.content}`
+              ? `${lastMessage.user.role === "CLIENT" ? "คุณ" : "Longeneer"}: ${lastMessage.content}`
               : "ยังไม่มีข้อความ — เริ่มถามได้เลย"}
           </p>
         </Link>

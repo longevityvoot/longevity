@@ -14,7 +14,7 @@ export default async function NewClientPage() {
     <main className="min-h-screen bg-canvas">
       <div className="max-w-[560px] mx-auto px-6 py-6">
         <Link href="/coach" className="text-[13px] text-ink-3 inline-flex items-center gap-1">
-          ← กลับ designer console
+          ← กลับ Longeneer console
         </Link>
         <h1 className="mt-3 text-[22px] font-semibold tracking-tight text-ink">
           เพิ่มลูกค้าใหม่

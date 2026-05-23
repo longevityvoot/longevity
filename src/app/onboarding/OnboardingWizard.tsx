@@ -287,7 +287,7 @@ function Step2({
         ประวัติสุขภาพ
       </h1>
       <p className="text-[13px] text-ink-3 mt-2">
-        designer ใช้ดูภาพรวมก่อน session แรก — เว้นว่างได้ถ้ายังไม่อยากกรอก
+        Longeneer ใช้ดูภาพรวมก่อน session แรก — เว้นว่างได้ถ้ายังไม่อยากกรอก
       </p>
 
       <section className="mt-6 bg-surface rounded-xl p-5 border border-border space-y-4">
@@ -343,7 +343,7 @@ function Step3({
           value={state.longevityGoal ?? ""}
           onChange={(e) => patch({ longevityGoal: e.target.value })}
           rows={4}
-          placeholder="เล่าให้ designer ฟัง — ทำไมอยากดูแลตัวเอง ตอนนี้ติดอะไร อยากให้ผลลัพธ์เป็นแบบไหน"
+          placeholder="เล่าให้ Longeneer ฟัง — ทำไมอยากดูแลตัวเอง ตอนนี้ติดอะไร อยากให้ผลลัพธ์เป็นแบบไหน"
           className="w-full rounded-md border border-border-strong px-3 py-2 text-[14px] resize-none focus:outline-none focus:border-ink"
         />
       </section>

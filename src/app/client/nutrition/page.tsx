@@ -197,7 +197,7 @@ export default async function NutritionPage() {
                   <p className="text-[10px] text-ink-4 mt-2">
                     BMR × activity {af.toFixed(af % 1 !== 0 ? 3 : 1)} ·{" "}
                     {method === "katch-mcardle" ? "Katch-McArdle" : "Mifflin-St Jeor"}
-                    {profile?.activityFactor != null ? " · designer tuned" : ""}
+                    {profile?.activityFactor != null ? " · Longeneer tuned" : ""}
                   </p>
                 );
               })()}

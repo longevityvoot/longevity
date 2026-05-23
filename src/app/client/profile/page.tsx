@@ -44,7 +44,7 @@ export default async function ClientProfilePage() {
               <Row k="น้ำหนักเริ่มต้น" v={`${profile.weightKg} kg`} />
               <Row k="wearable" v={profile.wearableType ?? "ไม่มี"} />
               {profile.assignedCoach ? (
-                <Row k="Longevity Designer" v={profile.assignedCoach.name} />
+                <Row k="Longeneer" v={profile.assignedCoach.name} />
               ) : null}
             </dl>
           ) : (
@@ -86,7 +86,7 @@ export default async function ClientProfilePage() {
             </dl>
           ) : null}
           <p className="text-[11px] text-ink-4 mt-3">
-            แก้ cadence ได้ผ่าน designer ในเฟส 1 — Settings page มาเฟสถัดไป
+            แก้ cadence ได้ผ่าน Longeneer ในเฟส 1 — Settings page มาเฟสถัดไป
           </p>
         </section>
 
@@ -147,7 +147,7 @@ export default async function ClientProfilePage() {
             href="/coach"
             className="mt-6 w-full h-11 inline-flex items-center justify-center rounded-md bg-ink text-white text-[14px] font-semibold"
           >
-            ← มุม designer
+            ← มุม Longeneer
           </Link>
         ) : null}
 

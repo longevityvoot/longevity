@@ -113,7 +113,7 @@ export default async function WeeklyReflectionPage() {
 
         <Section
           title="บันทึก / เป้าหมายสัปดาห์หน้า"
-          question="optional · designer อ่าน"
+          question="optional · Longeneer อ่าน"
         >
           <textarea
             name="notes"

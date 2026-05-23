@@ -35,7 +35,7 @@ export type ClientRowDTO = {
 //
 // Filter by ClientProfile presence rather than role so a COACH/ADMIN who
 // dogfoods through the client side (own LINE account onboards) also shows up
-// in the designer console list.
+// in the Longeneer console list.
 export async function listClients(): Promise<ClientRowDTO[]> {
   const today = todayLocalDate();
   const thisWeekStart = mondayOf(today);

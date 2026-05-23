@@ -116,9 +116,9 @@ export default async function CheckInPage() {
         <TextSection
           name="notes"
           title="บันทึกอื่นๆ"
-          question="ไม่บังคับ · designer จะอ่าน"
+          question="ไม่บังคับ · Longeneer จะอ่าน"
           defaultValue={existing?.notes ?? ""}
-          placeholder="อยากเล่าให้ designer ฟัง..."
+          placeholder="อยากเล่าให้ Longeneer ฟัง..."
           rows={3}
         />
 
@@ -133,7 +133,7 @@ export default async function CheckInPage() {
               <span>บันทึกประเมิน</span>
             </button>
             <p className="mt-1.5 text-[10px] text-ink-4 text-center">
-              แก้ไขทีหลังได้ · designer เห็นข้อมูลของคุณ
+              แก้ไขทีหลังได้ · Longeneer เห็นข้อมูลของคุณ
             </p>
           </div>
         </div>

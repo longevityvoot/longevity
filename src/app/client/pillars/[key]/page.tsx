@@ -269,7 +269,7 @@ export default async function PillarDetailPage({
         {/* Designer note placeholder */}
         <section className="mt-3 bg-surface rounded-lg p-5 border border-border">
           <h2 className="text-[10px] uppercase tracking-wider text-ink-4 font-bold">
-            หมายเหตุจาก designer
+            หมายเหตุจาก Longeneer
           </h2>
           <p className="text-[13px] text-ink-3 mt-2">
             ยังไม่มี note สำหรับ pillar นี้
