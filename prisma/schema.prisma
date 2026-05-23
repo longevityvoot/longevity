@@ -139,8 +139,13 @@ model DailyCheckIn {
 
   energyLevel  Int?
   moodLevel    Int?
-  sleepQuality Int?
+  sleepQuality Int?   // legacy 1-10 subjective (kept for old data)
   stressLevel  Int?
+
+  // Granular sleep tracking — replaces sleepQuality slider.
+  sleepHours     Float?   // e.g. 6.5
+  sleepWakeups   Int?     // 0 | 1 | 2 | 3 (3 = 3+)
+  sleepFeeling   String?  // "fresh" | "neutral" | "tired"
 
   nutritionNotes   String?
   supplementsTaken Json?

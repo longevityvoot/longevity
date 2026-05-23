@@ -33,7 +33,7 @@ export function scoreFromCheckIn(
 ): PillarScores | null {
   if (!c) return null;
 
-  const sleep = clamp((c.sleepQuality ?? 5) * 10);
+  const sleep = scoreSleep(c);
   // Stress pillar = mental wellbeing — average inverted-stress with mood.
   const moodScore = (c.moodLevel ?? 5) * 10;
   const stressScore = (11 - (c.stressLevel ?? 5)) * 10;
@@ -180,6 +180,41 @@ export function overallScore(scores: PillarScores | null): number | null {
   }
   if (den === 0) return null;
   return Math.round(num / den);
+}
+
+// Sleep pillar score from granular inputs (hours + wakeups + feeling).
+// Falls back to old subjective 1-10 slider for legacy check-ins.
+//
+//   Base from hours:
+//     <5   → 25   5-6 → 45   6-7 → 60   7-8 → 80   8-9 → 85   >9 → 75
+//   Wakeups modifier:  0 → +10,  1-2 → 0,  3+ → -10
+//   Feeling modifier:  fresh → +5,  neutral → 0,  tired → -5
+function scoreSleep(c: DailyCheckIn): number {
+  // New granular path
+  if (c.sleepHours != null) {
+    const h = c.sleepHours;
+    let base: number;
+    if (h < 5) base = 25;
+    else if (h < 6) base = 45;
+    else if (h < 7) base = 60;
+    else if (h < 8) base = 80;
+    else if (h < 9) base = 85;
+    else base = 75;
+
+    const wakeupMod =
+      c.sleepWakeups == null ? 0 :
+      c.sleepWakeups === 0 ? 10 :
+      c.sleepWakeups <= 2 ? 0 : -10;
+
+    const feelMod =
+      c.sleepFeeling === "fresh" ? 5 :
+      c.sleepFeeling === "tired" ? -5 : 0;
+
+    return clamp(base + wakeupMod + feelMod);
+  }
+
+  // Legacy fallback: subjective 1-10 slider
+  return clamp((c.sleepQuality ?? 5) * 10);
 }
 
 function clamp(v: number) {
