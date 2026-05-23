@@ -118,6 +118,37 @@ export default async function ClientProfilePage() {
           </form>
         </section>
 
+        <section className="mt-3 bg-surface border border-border rounded-lg p-4">
+          <h2 className="text-[12px] uppercase tracking-wider text-ink-4 font-semibold">
+            Google Health
+          </h2>
+          {profile?.googleHealthConnected ? (
+            <div className="mt-2">
+              <p className="text-[13px] text-pillar-social font-semibold">เชื่อมต่อแล้ว ✓</p>
+              <form action="/api/google-health/disconnect" method="POST" className="mt-2">
+                <button
+                  type="submit"
+                  className="text-[12px] text-pillar-activity underline"
+                >
+                  ยกเลิกการเชื่อมต่อ
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="mt-2">
+              <p className="text-[11px] text-ink-3 leading-snug">
+                เชื่อมต่อเพื่อ sync น้ำหนัก, body comp, sleep, HR, ความดัน, น้ำตาล อัตโนมัติ
+              </p>
+              <Link
+                href="/api/google-health/connect"
+                className="mt-3 w-full h-10 rounded-md bg-pillar-social text-white font-semibold text-[13px] inline-flex items-center justify-center gap-2"
+              >
+                🔗 เชื่อมต่อ Google Health
+              </Link>
+            </div>
+          )}
+        </section>
+
         <section className="mt-3 bg-surface border border-border rounded-lg p-4 space-y-3">
           <Link
             href="/client/labs"
