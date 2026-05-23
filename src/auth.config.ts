@@ -27,7 +27,10 @@ declare module "next-auth/jwt" {
 // Edge-safe config — no Prisma, no bcrypt. Used by middleware.
 export const authConfig = {
   pages: { signIn: "/login" },
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days — keeps session alive across LINE browser reopens
+  },
   providers: [],
   callbacks: {
     jwt({ token, user }) {

@@ -1,5 +1,7 @@
+import { headers } from "next/headers";
 import { signIn } from "@/auth";
 import { FlowerHero } from "@/components/FlowerHero";
+import { AutoLineSignIn } from "./AutoLineSignIn";
 
 type SearchParams = Promise<{ from?: string; error?: string }>;
 
@@ -7,6 +9,27 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
   const { from = "/", error } = await searchParams;
   const googleConfigured = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
   const lineConfigured = !!(process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRET);
+
+  // Detect LINE in-app browser — auto-start LINE OAuth without showing
+  // the login page so users inside LINE don't have to tap a button to
+  // sign into an app they launched from LINE.
+  const ua = (await headers()).get("user-agent") ?? "";
+  const isLineBrowser = /Line\//i.test(ua) && lineConfigured && !error;
+
+  // When inside LINE's browser, auto-submit the LINE sign-in form so
+  // the user doesn't see a login page at all — just a brief spinner
+  // then straight into the app.
+  if (isLineBrowser) {
+    return (
+      <main className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="text-center">
+          <FlowerHero size={120} />
+          <p className="mt-4 text-[13px] text-ink-3">กำลังเข้าสู่ระบบผ่าน LINE...</p>
+          <AutoLineSignIn from={from} />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-canvas flex items-center justify-center px-5 py-10">
