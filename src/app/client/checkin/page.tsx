@@ -81,15 +81,78 @@ export default async function CheckInPage() {
           highLabel="ดีมาก"
           tone="stress"
         />
-        <ScaleSection
-          name="sleepQuality"
-          title="การนอน"
-          question="คุณภาพการนอนเมื่อคืน?"
-          defaultValue={existing?.sleepQuality ?? null}
-          lowLabel="แย่"
-          highLabel="หลับสนิทดี"
-          tone="sleep"
-        />
+        <Section title="การนอน" question="เมื่อคืนนอนเป็นยังไง?" tone="sleep">
+          <div className="space-y-3">
+            <label className="block">
+              <span className="text-[11px] text-ink-3 font-semibold">ชั่วโมงที่นอน</span>
+              <div className="relative mt-1">
+                <input
+                  name="sleepHours"
+                  type="number"
+                  inputMode="decimal"
+                  step={0.5}
+                  min={0}
+                  max={16}
+                  defaultValue={existing?.sleepHours ?? ""}
+                  placeholder="เช่น 6.5"
+                  className="w-full h-11 rounded-md border border-border-strong pl-3 pr-14 text-[16px] font-num focus:outline-none focus:border-ink bg-white/70"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink-4">ชม.</span>
+              </div>
+            </label>
+
+            <fieldset>
+              <legend className="text-[11px] text-ink-3 font-semibold">ตื่นกลางคืนกี่ครั้ง</legend>
+              <div className="mt-1.5 grid grid-cols-4 gap-2">
+                {[
+                  { v: "0", label: "ไม่ตื่น" },
+                  { v: "1", label: "1 ครั้ง" },
+                  { v: "2", label: "2 ครั้ง" },
+                  { v: "3", label: "3+" },
+                ].map((o) => (
+                  <label
+                    key={o.v}
+                    className="h-9 rounded-md border border-border-strong text-[12px] font-semibold inline-flex items-center justify-center cursor-pointer has-[:checked]:bg-pillar-sleep has-[:checked]:text-white has-[:checked]:border-pillar-sleep"
+                  >
+                    <input
+                      type="radio"
+                      name="sleepWakeups"
+                      value={o.v}
+                      defaultChecked={String(existing?.sleepWakeups ?? "") === o.v}
+                      className="sr-only"
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className="text-[11px] text-ink-3 font-semibold">ตื่นมารู้สึกยังไง</legend>
+              <div className="mt-1.5 grid grid-cols-3 gap-2">
+                {[
+                  { v: "fresh", label: "สดชื่น" },
+                  { v: "neutral", label: "เฉยๆ" },
+                  { v: "tired", label: "เหนื่อย" },
+                ].map((o) => (
+                  <label
+                    key={o.v}
+                    className="h-9 rounded-md border border-border-strong text-[12px] font-semibold inline-flex items-center justify-center cursor-pointer has-[:checked]:bg-pillar-sleep has-[:checked]:text-white has-[:checked]:border-pillar-sleep"
+                  >
+                    <input
+                      type="radio"
+                      name="sleepFeeling"
+                      value={o.v}
+                      defaultChecked={existing?.sleepFeeling === o.v}
+                      className="sr-only"
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        </Section>
         <ScaleSection
           name="stressLevel"
           title="ความเครียด"

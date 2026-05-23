@@ -7,9 +7,16 @@ import { todayLocalDate } from "@/lib/dates";
 
 function intOrNull(form: FormData, key: string): number | null {
   const raw = form.get(key);
-  if (raw == null) return null;
+  if (raw == null || raw === "") return null;
   const n = Number(raw);
   return Number.isFinite(n) ? Math.round(n) : null;
+}
+
+function floatOrNull(form: FormData, key: string): number | null {
+  const raw = form.get(key);
+  if (raw == null || raw === "") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
 }
 
 function trimmedOrNull(form: FormData, key: string): string | null {
@@ -24,11 +31,19 @@ export async function saveCheckIn(form: FormData) {
   if (!session?.user?.id) redirect("/login");
 
   const date = todayLocalDate();
+
+  // Sleep feeling validation
+  const feelRaw = trimmedOrNull(form, "sleepFeeling");
+  const sleepFeeling =
+    feelRaw && ["fresh", "neutral", "tired"].includes(feelRaw) ? feelRaw : null;
+
   const data = {
     energyLevel: intOrNull(form, "energyLevel"),
     moodLevel: intOrNull(form, "moodLevel"),
-    sleepQuality: intOrNull(form, "sleepQuality"),
     stressLevel: intOrNull(form, "stressLevel"),
+    sleepHours: floatOrNull(form, "sleepHours"),
+    sleepWakeups: intOrNull(form, "sleepWakeups"),
+    sleepFeeling,
     notes: trimmedOrNull(form, "notes"),
   };
 
