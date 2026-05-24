@@ -212,7 +212,12 @@ function scoreActivity(c: DailyCheckIn): number {
 //   Wakeups modifier:  0 → +10,  1-2 → 0,  3+ → -10
 //   Feeling modifier:  fresh → +5,  neutral → 0,  tired → -5
 function scoreSleep(c: DailyCheckIn): number {
-  // New granular path
+  // Device score takes priority (Fitbit/Garmin/Samsung 0-100)
+  if (c.sleepScore != null && c.sleepScore >= 0 && c.sleepScore <= 100) {
+    return c.sleepScore;
+  }
+
+  // Computed from hours + wakeups + feeling
   if (c.sleepHours != null) {
     const h = c.sleepHours;
     let base: number;
