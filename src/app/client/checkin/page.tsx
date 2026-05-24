@@ -104,6 +104,32 @@ export default async function CheckInPage() {
         <Section title="การนอน" question="เมื่อคืนนอนเป็นยังไง?" tone="sleep">
           <div className="space-y-3">
             <label className="block">
+              <span className="text-[11px] text-ink-3 font-semibold">Sleep score จากอุปกรณ์ <span className="font-normal italic">(optional — Fitbit/Garmin/Samsung)</span></span>
+              <div className="relative mt-1">
+                <input
+                  name="sleepScore"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={100}
+                  defaultValue={existing?.sleepScore ?? ""}
+                  placeholder="เช่น 82"
+                  className="w-full h-11 rounded-md border border-border-strong pl-3 pr-16 text-[16px] font-num focus:outline-none focus:border-ink bg-white/70"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink-4">/100</span>
+              </div>
+              <span className="text-[10px] text-ink-4 mt-1 block">
+                ถ้าใส่ = ใช้ตรงนี้เลย · ไม่ใส่ = คำนวณจากข้อมูลด้านล่าง
+              </span>
+            </label>
+
+            <div className="border-t border-border-strong/50 pt-3">
+              <p className="text-[10px] uppercase tracking-wider text-ink-4 font-bold mb-2">
+                หรือ กรอกเอง (ไม่มีอุปกรณ์)
+              </p>
+            </div>
+
+            <label className="block">
               <span className="text-[11px] text-ink-3 font-semibold">ชั่วโมงที่นอน</span>
               <div className="relative mt-1">
                 <input

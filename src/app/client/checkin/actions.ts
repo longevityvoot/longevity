@@ -45,6 +45,7 @@ export async function saveCheckIn(form: FormData) {
     sleepHours: floatOrNull(form, "sleepHours"),
     sleepWakeups: intOrNull(form, "sleepWakeups"),
     sleepFeeling,
+    sleepScore: intOrNull(form, "sleepScore"),
     notes: trimmedOrNull(form, "notes"),
   };
 
