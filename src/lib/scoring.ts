@@ -38,7 +38,7 @@ export function scoreFromCheckIn(
   const moodScore = (c.moodLevel ?? 5) * 10;
   const stressScore = (11 - (c.stressLevel ?? 5)) * 10;
   const stress = clamp((stressScore + moodScore) / 2);
-  const activity = clamp((c.energyLevel ?? 5) * 10);
+  const activity = scoreActivity(c);
   const nutrition = scoreNutrition(ctx?.nutrition);
   const social = scoreSocial(ctx?.social);
   const substances = scoreSubstances(ctx?.substances);
@@ -180,6 +180,28 @@ export function overallScore(scores: PillarScores | null): number | null {
   }
   if (den === 0) return null;
   return Math.round(num / den);
+}
+
+// Activity pillar score from step count. Falls back to subjective
+// energy level (1-10) for check-ins without steps.
+//
+//   <3,000     → 20  (very sedentary)
+//   3,000-5,000 → 35
+//   5,000-7,500 → 50
+//   7,500-10,000 → 70
+//   10,000-12,500 → 85
+//   >12,500    → 95
+function scoreActivity(c: DailyCheckIn): number {
+  if (c.stepsCount != null && c.stepsCount > 0) {
+    const s = c.stepsCount;
+    if (s < 3000) return 20;
+    if (s < 5000) return 35;
+    if (s < 7500) return 50;
+    if (s < 10000) return 70;
+    if (s < 12500) return 85;
+    return 95;
+  }
+  return clamp((c.energyLevel ?? 5) * 10);
 }
 
 // Sleep pillar score from granular inputs (hours + wakeups + feeling).

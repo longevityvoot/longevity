@@ -63,15 +63,35 @@ export default async function CheckInPage() {
       </header>
 
       <form action={saveCheckIn} className="max-w-[420px] mx-auto px-5 pt-5 space-y-4">
-        <ScaleSection
-          name="energyLevel"
-          title="พลังงานวันนี้"
-          question="ในระดับ 1-10 รู้สึกเท่าไหร่?"
-          defaultValue={existing?.energyLevel ?? null}
-          lowLabel="หมดแรง"
-          highLabel="สดชื่นมาก"
-          tone="activity"
-        />
+        <Section title="กิจกรรม" question="เคลื่อนไหววันนี้เป็นยังไง?" tone="activity">
+          <div className="space-y-3">
+            <label className="block">
+              <span className="text-[11px] text-ink-3 font-semibold">จำนวนก้าว (ดูจากมือถือ/นาฬิกา)</span>
+              <div className="relative mt-1">
+                <input
+                  name="stepsCount"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={99999}
+                  defaultValue={existing?.stepsCount ?? ""}
+                  placeholder="เช่น 8200"
+                  className="w-full h-11 rounded-md border border-border-strong pl-3 pr-14 text-[16px] font-num focus:outline-none focus:border-ink bg-white/70"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink-4">ก้าว</span>
+              </div>
+              <span className="text-[10px] text-ink-4 mt-1 block">
+                เว้นว่างได้ — ระบบจะใช้ระดับพลังงานแทน
+              </span>
+            </label>
+            <ScaleInput
+              name="energyLevel"
+              defaultValue={existing?.energyLevel ?? null}
+              lowLabel="หมดแรง"
+              highLabel="สดชื่นมาก"
+            />
+          </div>
+        </Section>
         <ScaleSection
           name="moodLevel"
           title="อารมณ์"

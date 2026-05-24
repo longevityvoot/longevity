@@ -39,6 +39,7 @@ export async function saveCheckIn(form: FormData) {
 
   const data = {
     energyLevel: intOrNull(form, "energyLevel"),
+    stepsCount: intOrNull(form, "stepsCount"),
     moodLevel: intOrNull(form, "moodLevel"),
     stressLevel: intOrNull(form, "stressLevel"),
     sleepHours: floatOrNull(form, "sleepHours"),
