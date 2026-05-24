@@ -146,6 +146,7 @@ model DailyCheckIn {
   sleepHours     Float?   // e.g. 6.5
   sleepWakeups   Int?     // 0 | 1 | 2 | 3 (3 = 3+)
   sleepFeeling   String?  // "fresh" | "neutral" | "tired"
+  stepsCount     Int?     // daily step count from phone/watch
 
   nutritionNotes   String?
   supplementsTaken Json?
