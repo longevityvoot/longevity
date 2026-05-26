@@ -79,12 +79,12 @@ export function PoleStrip({ dim, scoreObj }: { dim: string; scoreObj: DimScore }
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
         <div style={{ textAlign: "left" as const }}>
-          <div style={{ fontSize: 13, fontWeight: 500 }}>{def.low}</div>
-          <div style={{ fontSize: 11, color: "var(--ink-faint)" }}>{def.thLow}</div>
+          <div style={{ fontSize: 13, fontWeight: 500 }}>{def.thLow}</div>
+          <div className="mono" style={{ fontSize: 10, color: "var(--ink-faint)" }}>{def.low}</div>
         </div>
         <div style={{ textAlign: "right" as const }}>
-          <div style={{ fontSize: 13, fontWeight: 500 }}>{def.high}</div>
-          <div style={{ fontSize: 11, color: "var(--ink-faint)" }}>{def.thHigh}</div>
+          <div style={{ fontSize: 13, fontWeight: 500 }}>{def.thHigh}</div>
+          <div className="mono" style={{ fontSize: 10, color: "var(--ink-faint)" }}>{def.high}</div>
         </div>
       </div>
       <div style={{ position: "relative", marginTop: 10, height: 8 }}>
