@@ -103,8 +103,7 @@ export function Results({ answers, onRestart }: { answers: Answers; onRestart: (
                     <span style={{ width: 22, height: 22, borderRadius: "50%", background: dimColor, color: "var(--bg)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontFamily: "IBM Plex Mono, monospace", fontSize: 10 }}>{d}</span>
                     <span className="mono" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>{s.name}</span>
                   </div>
-                  <div className="serif" style={{ fontSize: 30, fontStyle: "italic", marginTop: 10, color: dimColor, lineHeight: 1.1 }}>{s.thLabel || s.label}</div>
-                  <div className="mono" style={{ fontSize: 11, color: "var(--ink-faint)", marginTop: 4, letterSpacing: "0.04em" }}>{s.label}</div>
+                  <div className="serif" style={{ fontSize: 30, fontStyle: "italic", marginTop: 10, color: dimColor, lineHeight: 1.1 }}>{s.label}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div className="serif" style={{ fontSize: 38, fontStyle: "italic", color: dimColor, lineHeight: 1 }}>{s.value?.toFixed(1)}</div>
