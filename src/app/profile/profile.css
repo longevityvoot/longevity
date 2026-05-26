@@ -1,0 +1,60 @@
+.profile-root {
+  font-family: 'IBM Plex Sans Thai', system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+  min-height: 100dvh;
+
+  /* Grove palette defaults */
+  --bg: #EFE9DC;
+  --paper: #FAF5E8;
+  --ink: #1B2218;
+  --ink-soft: #4C5A48;
+  --ink-faint: #8B9583;
+  --rule: rgba(27,34,24,0.10);
+  --rule-strong: rgba(27,34,24,0.22);
+  --accent: #3F6E4A;
+  --accent-soft: #C9D8C4;
+  --secondary: #D97534;
+  --secondary-soft: #F5D9C2;
+  --block: #3F6E4A;
+  --block-ink: #FAF5E8;
+  --block2: #E8A86B;
+  --block2-ink: #1B2218;
+  --max: 540px;
+
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.profile-root .serif {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.profile-root .mono {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+.profile-root ::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.profile-root button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.profile-root input,
+.profile-root textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+.profile-root textarea {
+  resize: none;
+}
