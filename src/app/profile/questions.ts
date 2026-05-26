@@ -95,6 +95,7 @@ export type DimensionMeta = {
   mid: string;
   high: string;
   thLow: string;
+  thMid: string;
   thHigh: string;
 };
 
@@ -251,12 +252,12 @@ export const QUESTIONS = {
   } as const,
 
   dimensions: {
-    D1: { name: 'Discipline', low: 'Spontaneous', mid: 'Flexible',   high: 'Disciplined',     thLow: 'ยืดหยุ่น',     thHigh: 'มีวินัย' },
-    D2: { name: 'Social',     low: 'Solo Charger', mid: 'Balanced',   high: 'Social Charger',  thLow: 'ชาร์จคนเดียว', thHigh: 'ชาร์จด้วยคน' },
-    D3: { name: 'Data',       low: 'Intuitive',    mid: 'Mixed',      high: 'Data-driven',     thLow: 'ใช้สัญชาตญาณ', thHigh: 'ใช้ข้อมูล' },
-    D4: { name: 'Variety',    low: 'Routine Lover', mid: 'Balanced',  high: 'Variety Seeker',  thLow: 'ชอบของเดิม',   thHigh: 'ชอบลองใหม่' },
-    D5: { name: 'Chronotype', low: 'Night Owl',    mid: 'All-day',    high: 'Early Bird',      thLow: 'คนกลางคืน',    thHigh: 'คนเช้า' },
-    D6: { name: 'Horizon',    low: 'Short-term',   mid: 'Mixed',      high: 'Long-term',       thLow: 'ระยะสั้น',     thHigh: 'ระยะยาว' },
+    D1: { name: 'วินัย',       low: 'Spontaneous',   mid: 'Flexible',  high: 'Disciplined',    thLow: 'ยืดหยุ่น',     thMid: 'สมดุล',      thHigh: 'มีวินัย' },
+    D2: { name: 'พลังงานสังคม', low: 'Solo Charger',  mid: 'Balanced',  high: 'Social Charger', thLow: 'ชาร์จคนเดียว', thMid: 'สมดุล',      thHigh: 'ชาร์จด้วยคน' },
+    D3: { name: 'การใช้ข้อมูล', low: 'Intuitive',     mid: 'Mixed',     high: 'Data-driven',    thLow: 'ใช้สัญชาตญาณ', thMid: 'ผสมผสาน',    thHigh: 'ใช้ข้อมูล' },
+    D4: { name: 'ความหลากหลาย', low: 'Routine Lover', mid: 'Balanced',  high: 'Variety Seeker', thLow: 'ชอบของเดิม',   thMid: 'สมดุล',      thHigh: 'ชอบลองใหม่' },
+    D5: { name: 'จังหวะชีวิต',  low: 'Night Owl',     mid: 'All-day',   high: 'Early Bird',     thLow: 'คนกลางคืน',    thMid: 'ทั้งวัน',    thHigh: 'คนเช้า' },
+    D6: { name: 'มุมมองเวลา',  low: 'Short-term',    mid: 'Mixed',     high: 'Long-term',      thLow: 'ระยะสั้น',     thMid: 'ผสมผสาน',    thHigh: 'ระยะยาว' },
   } as const satisfies Record<string, DimensionMeta>,
 
   snippets: {
@@ -317,10 +318,10 @@ export function computeScores(answers: Answers): Record<string, DimensionScore> 
     let pole: Pole;
     let label: string;
     let thLabel: string;
-    if (v == null)     { pole = 'mid';  label = dim.mid;  thLabel = ''; }
+    if (v == null)     { pole = 'mid';  label = dim.mid;  thLabel = dim.thMid; }
     else if (v <= 2.5) { pole = 'low';  label = dim.low;  thLabel = dim.thLow; }
     else if (v >= 3.5) { pole = 'high'; label = dim.high; thLabel = dim.thHigh; }
-    else               { pole = 'mid';  label = dim.mid;  thLabel = ''; }
+    else               { pole = 'mid';  label = dim.mid;  thLabel = dim.thMid; }
     result[d] = { value: v, pole, label, thLabel, name: dim.name };
   }
   return result;

@@ -6,8 +6,8 @@ const DIMS = ["D1", "D2", "D3", "D4", "D5", "D6"] as const;
 
 export function Radar({ scores, size = 320 }: { scores: Record<string, DimScore>; size?: number }) {
   const cx = size / 2, cy = size / 2;
-  const rMax = size * 0.34;
-  const labelR = size * 0.46;
+  const rMax = size * 0.30;
+  const labelR = size * 0.48;
 
   const angleAt = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / DIMS.length;
   const pt = (i: number, val: number): [number, number] => {
@@ -51,14 +51,14 @@ export function Radar({ scores, size = 320 }: { scores: Record<string, DimScore>
         const y = cy + Math.sin(a) * labelR;
         const sc = scores[d];
         const anchor = Math.cos(a) > 0.3 ? "start" : Math.cos(a) < -0.3 ? "end" : "middle";
-        const dy = Math.sin(a) > 0.3 ? "0.9em" : Math.sin(a) < -0.3 ? "0" : "0.35em";
+        const dy = Math.sin(a) > 0.3 ? "1.2em" : Math.sin(a) < -0.3 ? "-0.4em" : "0.35em";
         return (
           <g key={`label-${d}`}>
-            <text x={x} y={y} textAnchor={anchor} dy={dy} fill="var(--ink)" style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-              {sc?.label ?? "—"}
+            <text x={x} y={y} textAnchor={anchor} dy={dy} fill="var(--ink)" style={{ fontSize: 12, fontWeight: 600 }}>
+              {sc?.thLabel ?? sc?.label ?? "—"}
             </text>
-            <text x={x} y={y} textAnchor={anchor} dy={`calc(${dy} + 1.15em)`} fill="var(--ink-faint)" style={{ fontSize: 10, fontFamily: "IBM Plex Mono, monospace" }}>
-              D{i + 1} · {sc?.value?.toFixed(1) ?? "—"}
+            <text x={x} y={y} textAnchor={anchor} dy={`calc(${dy} + 1.3em)`} fill="var(--ink-faint)" style={{ fontSize: 9, fontFamily: "IBM Plex Mono, monospace" }}>
+              {sc?.value?.toFixed(1) ?? "—"} / 5.0
             </text>
           </g>
         );
