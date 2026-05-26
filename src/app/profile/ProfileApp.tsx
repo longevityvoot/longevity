@@ -111,7 +111,7 @@ export function ProfileApp() {
   } else if (q.kind === "longtext") {
     screen = <LongTextScreen q={q} value={ans as string | undefined} onChange={(v) => setAns(q.id, v)} onContinue={() => isAnswered(q) && advance()} />;
   } else if (q.kind === "single-select") {
-    screen = <SingleSelectScreen q={q} value={ans as string | undefined} onChange={(v) => setAns(q.id, v)} onContinue={() => isAnswered(q) && advance()} />;
+    screen = <SingleSelectScreen q={q} value={ans as string | undefined} onChange={(v) => setAns(q.id, v)} onContinue={advance} />;
   } else if (q.kind === "multi-select") {
     screen = <MultiSelectScreen q={q} value={ans as { values: string[]; other: string } | undefined} onChange={(v) => setAns(q.id, v)} />;
   } else if (q.kind === "likert") {
