@@ -10,6 +10,7 @@ const DIMS = ["D1", "D2", "D3", "D4", "D5", "D6"] as const;
 export function Results({ answers, onRestart }: { answers: Answers; onRestart: () => void }) {
   const scores = useMemo(() => computeScores(answers), [answers]);
   const name = (answers.A1 as string) || "คุณ";
+  const rankedDims = useMemo(() => [...DIMS].sort((a, b) => (scores[b]?.value ?? 0) - (scores[a]?.value ?? 0)), [scores]);
 
   const snippet = (d: string) => {
     const s = scores[d];
@@ -57,7 +58,7 @@ export function Results({ answers, onRestart }: { answers: Answers; onRestart: (
         <div className="mono" style={{ fontSize: 11, letterSpacing: "0.14em", color: "var(--ink-faint)", textTransform: "uppercase", marginBottom: 4 }}>
           ตำแหน่งระหว่างขั้ว
         </div>
-        {DIMS.map((d) => <PoleStrip key={d} dim={d} scoreObj={scores[d]} />)}
+        {rankedDims.map((d) => <PoleStrip key={d} dim={d} scoreObj={scores[d]} />)}
       </div>
 
       {/* TDEE */}
@@ -88,7 +89,7 @@ export function Results({ answers, onRestart }: { answers: Answers; onRestart: (
         <h2 className="serif" style={{ margin: "10px 0 22px", fontSize: 32, lineHeight: 1.1, fontStyle: "italic", fontWeight: 400 }}>
           อ่านผลลัพธ์<br />ก่อนเริ่ม.
         </h2>
-        {DIMS.map((d, idx) => {
+        {rankedDims.map((d, idx) => {
           const s = scores[d];
           const sn = snippet(d);
           if (!s) return null;
