@@ -86,7 +86,7 @@ export function Results({ answers, onRestart }: { answers: Answers; onRestart: (
       <div style={{ marginTop: 44 }}>
         <div className="mono" style={{ fontSize: 11, letterSpacing: "0.18em", color: "var(--ink-faint)" }}>LAYER 02 · INSIGHTS</div>
         <h2 className="serif" style={{ margin: "10px 0 22px", fontSize: 32, lineHeight: 1.1, fontStyle: "italic", fontWeight: 400 }}>
-          อ่านตัวเอง <br />ก่อนเราเริ่ม.
+          อ่านผลลัพธ์<br />ก่อนเริ่ม.
         </h2>
         {DIMS.map((d, idx) => {
           const s = scores[d];
