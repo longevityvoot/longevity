@@ -14,7 +14,7 @@ const allQuestions = buildAllQuestions();
 
 const sectionInfo: Record<string, { letter: string; title: string; desc: string; count: number }> = {
   A: { letter: "A", title: "Context.", desc: "เริ่มจากข้อมูลพื้นฐาน — ใครคุณคืออะไร อยากให้ระบบนี้ทำงานเพื่ออะไร และตอนนี้กำลังกังวลอะไรอยู่", count: 6 },
-  B: { letter: "B", title: "Profile.", desc: "ส่วนนี้คือใจกลางของ Longeneer Profile — 18 ข้อสำหรับวัด 6 มิติของนิสัย: วินัย, social, การใช้ข้อมูล, การลองใหม่, จังหวะเวลา, และมุมมองระยะยาว ตอบตามที่เป็นจริง ไม่มีคำตอบถูกผิด", count: 18 },
+  B: { letter: "B", title: "Profile.", desc: "ใจกลางของ Longeneer Profile — 24 ข้อวัด 6 มิติของนิสัย ตอบตามที่เป็นจริง ไม่มีคำตอบถูกผิด", count: 24 },
   C: { letter: "C", title: "Reflection.", desc: "สามข้อสุดท้าย — เปิดเล่าให้ผมฟัง อะไรที่ตัวเลขเก็บไม่ได้ ขอให้ใช้คำของคุณเอง", count: 3 },
 };
 

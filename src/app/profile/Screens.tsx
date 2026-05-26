@@ -273,7 +273,7 @@ export function Welcome({ onStart, onSkipDemo }: { onStart: () => void; onSkipDe
           Longeneer<br /><span style={{ color: "var(--block2)" }}>Profile.</span>
         </h1>
         <div className="mono" style={{ marginTop: 28, fontSize: 11, opacity: 0.78, letterSpacing: "0.1em", position: "relative", zIndex: 1, display: "flex", gap: 14, flexWrap: "wrap" }}>
-          <span>24 ข้อ</span><span style={{ opacity: 0.5 }}>·</span>
+          <span>33 ข้อ</span><span style={{ opacity: 0.5 }}>·</span>
           <span>~10 นาที</span><span style={{ opacity: 0.5 }}>·</span>
           <span>ไม่ต้องล็อกอิน</span>
         </div>
@@ -291,7 +291,7 @@ export function Welcome({ onStart, onSkipDemo }: { onStart: () => void; onSkipDe
           <div style={{ display: "flex", flexDirection: "column" }}>
             {([
               ["A", "Context", "6 ข้อ", "อายุ, เป้าหมาย, สุขภาพปัจจุบัน", "var(--accent)"],
-              ["B", "Profile", "18 ข้อ", "วินัย · social · ข้อมูล · จังหวะชีวิต", "var(--secondary)"],
+              ["B", "Profile", "24 ข้อ", "วินัย · social · ข้อมูล · จังหวะชีวิต", "var(--secondary)"],
               ["C", "Reflection", "3 ข้อ", "เล่าเพิ่ม ก่อนเราคุยกัน", "var(--accent)"],
             ] as const).map(([k, t, c, d, clr]) => (
               <div key={k} style={{ display: "flex", gap: 16, alignItems: "flex-start", padding: "16px 0", borderTop: "1px solid var(--rule)" }}>
