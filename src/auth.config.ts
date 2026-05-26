@@ -36,13 +36,13 @@ export const authConfig = {
     jwt({ token, user }) {
       if (user) {
         token.uid = user.id;
-        if (user.role) token.role = user.role;
+        token.role = user.role ?? "CLIENT";
       }
       return token;
     },
     session({ session, token }) {
       if (token.uid) session.user.id = token.uid;
-      if (token.role) session.user.role = token.role;
+      session.user.role = (token.role as Role) ?? "CLIENT";
       return session;
     },
   },
