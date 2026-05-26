@@ -11,18 +11,6 @@ const useLine = !!(process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRE
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
-  // SameSite=None so OAuth state/PKCE cookies survive cross-site
-  // redirects in LINE's iOS WKWebView (which drops Lax cookies).
-  cookies: {
-    state: {
-      name: "authjs.state",
-      options: { httpOnly: true, sameSite: "none" as const, path: "/", secure: true },
-    },
-    pkceCodeVerifier: {
-      name: "authjs.pkce",
-      options: { httpOnly: true, sameSite: "none" as const, path: "/", secure: true },
-    },
-  },
   callbacks: {
     ...authConfig.callbacks,
     async jwt({ token, user }) {
