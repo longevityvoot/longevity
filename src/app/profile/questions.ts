@@ -253,7 +253,7 @@ export const QUESTIONS = {
 
   dimensions: {
     D1: { name: 'วินัย',       low: 'Spontaneous',   mid: 'Flexible',  high: 'Disciplined',    thLow: 'ยืดหยุ่น',     thMid: 'สมดุล',      thHigh: 'มีวินัย' },
-    D2: { name: 'พลังงานสังคม', low: 'Solo Charger',  mid: 'Balanced',  high: 'Social Charger', thLow: 'ชาร์จคนเดียว', thMid: 'สมดุล',      thHigh: 'ชาร์จด้วยคน' },
+    D2: { name: 'พลังงานสังคม', low: 'Solo Charger',  mid: 'Balanced',  high: 'Social Charger', thLow: 'ชอบอยู่คนเดียว', thMid: 'สมดุล',      thHigh: 'ชอบอยู่กับคน' },
     D3: { name: 'การใช้ข้อมูล', low: 'Intuitive',     mid: 'Mixed',     high: 'Data-driven',    thLow: 'ใช้สัญชาตญาณ', thMid: 'ผสมผสาน',    thHigh: 'ใช้ข้อมูล' },
     D4: { name: 'ความหลากหลาย', low: 'Routine Lover', mid: 'Balanced',  high: 'Variety Seeker', thLow: 'ชอบของเดิม',   thMid: 'สมดุล',      thHigh: 'ชอบลองใหม่' },
     D5: { name: 'จังหวะชีวิต',  low: 'Night Owl',     mid: 'All-day',   high: 'Early Bird',     thLow: 'คนกลางคืน',    thMid: 'ทั้งวัน',    thHigh: 'คนเช้า' },
