@@ -11,6 +11,18 @@ const useLine = !!(process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRE
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
+  // SameSite=None so OAuth state/PKCE cookies survive cross-site
+  // redirects in LINE's iOS WKWebView (which drops Lax cookies).
+  cookies: {
+    state: {
+      name: "authjs.state",
+      options: { httpOnly: true, sameSite: "none" as const, path: "/", secure: true },
+    },
+    pkceCodeVerifier: {
+      name: "authjs.pkce",
+      options: { httpOnly: true, sameSite: "none" as const, path: "/", secure: true },
+    },
+  },
   callbacks: {
     ...authConfig.callbacks,
     async jwt({ token, user }) {
@@ -32,15 +44,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientId: process.env.LINE_CHANNEL_ID,
             clientSecret: process.env.LINE_CHANNEL_SECRET,
             authorization: {
-              params: {
-                scope: "openid profile",
-                state: "longeneer",
-              },
+              params: { scope: "openid profile" },
             },
-            // iOS LINE WKWebView drops cookies across OAuth redirects,
-            // breaking PKCE + state verification. We send a static state
-            // (LINE rejects requests without one) but skip verification.
-            checks: [],
+            checks: ["state"],
             profile(profile) {
               return {
                 id: profile.sub,
