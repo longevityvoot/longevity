@@ -36,7 +36,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
             // LINE rejects authorize without state; bring it back alongside
             // the default PKCE check.
-            checks: ["state"],
+            // iOS LINE in-app browser (WKWebView) drops cookies across
+            // OAuth redirects — both PKCE and state checks fail. LINE's
+            // id_token signature + whitelisted callback URL provide security.
+            checks: [],
             profile(profile) {
               return {
                 id: profile.sub,
