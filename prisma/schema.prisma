@@ -29,14 +29,14 @@ model User {
   createdAt     DateTime  @default(now())
 
   accounts     Account[]
-  authSessions AuthSession[]
+  sessions     Session[]
 
   clientProfile   ClientProfile?
   coachProfile    CoachProfile?
   assignedClients ClientProfile[] @relation("AssignedCoach")
 
-  sessionsAsClient Session[] @relation("ClientSessions")
-  sessionsAsCoach  Session[] @relation("CoachSessions")
+  sessionsAsClient CoachingSession[] @relation("ClientSessions")
+  sessionsAsCoach  CoachingSession[] @relation("CoachSessions")
 
   dailyCheckIns    DailyCheckIn[]
   weeklyReflections WeeklyReflection[]
@@ -68,11 +68,13 @@ model Account {
   @@id([provider, providerAccountId])
 }
 
-model AuthSession {
+model Session {
   sessionToken String   @id
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("AuthSession")
 }
 
 model VerificationToken {
@@ -203,7 +205,7 @@ model HealthMetric {
   @@index([userId, metricType, date])
 }
 
-model Session {
+model CoachingSession {
   id               String    @id @default(cuid())
   clientId         String
   client           User      @relation("ClientSessions", fields: [clientId], references: [id])
@@ -217,6 +219,8 @@ model Session {
   attachedSnapshot Json?
   status           String
   createdAt        DateTime  @default(now())
+
+  @@map("Session")
 }
 
 model Message {

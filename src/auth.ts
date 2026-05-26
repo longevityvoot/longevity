@@ -11,6 +11,20 @@ const useLine = !!(process.env.LINE_CHANNEL_ID && process.env.LINE_CHANNEL_SECRE
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
+  callbacks: {
+    ...authConfig.callbacks,
+    async jwt({ token, user }) {
+      if (user) {
+        token.uid = user.id;
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id! },
+          select: { role: true },
+        });
+        token.role = dbUser?.role ?? "CLIENT";
+      }
+      return token;
+    },
+  },
   providers: [
     ...(useLine
       ? [

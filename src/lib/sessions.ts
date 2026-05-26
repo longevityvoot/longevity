@@ -24,7 +24,7 @@ export function parseActionItems(raw: unknown): ActionItem[] {
 }
 
 export async function listSessionsForClient(clientId: string): Promise<SessionDTO[]> {
-  const rows = await prisma.session.findMany({
+  const rows = await prisma.coachingSession.findMany({
     where: { clientId },
     orderBy: [{ scheduledAt: "desc" }, { createdAt: "desc" }],
     take: 20,
@@ -42,7 +42,7 @@ export async function listSessionsForClient(clientId: string): Promise<SessionDT
 }
 
 export async function getUpcomingSessionForClient(clientId: string) {
-  return prisma.session.findFirst({
+  return prisma.coachingSession.findFirst({
     where: {
       clientId,
       status: "upcoming",

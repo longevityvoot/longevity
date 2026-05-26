@@ -27,7 +27,7 @@ export async function createSession(clientId: string, form: FormData) {
 
   const scheduledAt = scheduledRaw ? new Date(scheduledRaw) : null;
 
-  await prisma.session.create({
+  await prisma.coachingSession.create({
     data: {
       clientId,
       coachId: session.user.id,
