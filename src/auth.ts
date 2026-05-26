@@ -36,7 +36,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
             // LINE rejects authorize without state; bring it back alongside
             // the default PKCE check.
-            checks: ["pkce", "state"],
+            checks: ["state"],
             profile(profile) {
               return {
                 id: profile.sub,
