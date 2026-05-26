@@ -32,13 +32,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientId: process.env.LINE_CHANNEL_ID,
             clientSecret: process.env.LINE_CHANNEL_SECRET,
             authorization: {
-              params: { scope: "openid profile" },
+              params: {
+                scope: "openid profile",
+                state: "longeneer",
+              },
             },
-            // LINE rejects authorize without state; bring it back alongside
-            // the default PKCE check.
-            // iOS LINE in-app browser (WKWebView) drops cookies across
-            // OAuth redirects — both PKCE and state checks fail. LINE's
-            // id_token signature + whitelisted callback URL provide security.
+            // iOS LINE WKWebView drops cookies across OAuth redirects,
+            // breaking PKCE + state verification. We send a static state
+            // (LINE rejects requests without one) but skip verification.
             checks: [],
             profile(profile) {
               return {
